@@ -14,7 +14,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mtaa.techtalk.DataGetter.getCategories
 import com.mtaa.techtalk.DataGetter.getRecentReviews
@@ -82,13 +81,5 @@ fun SplashScreen() {
         )
         Text("Welcome to TechTalk")
         Text("Review App")
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    TechTalkTheme(true) {
-        SplashScreen()
     }
 }
