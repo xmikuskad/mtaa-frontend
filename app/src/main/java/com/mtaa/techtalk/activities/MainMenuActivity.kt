@@ -1,5 +1,7 @@
-package com.mtaa.techtalk
+package com.mtaa.techtalk.activities
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +18,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +28,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.mtaa.techtalk.CategoryInfo
+import com.mtaa.techtalk.DataGetter
+import com.mtaa.techtalk.R
+import com.mtaa.techtalk.ReviewInfoItem
+import com.mtaa.techtalk.ReviewsInfo
 import com.mtaa.techtalk.ui.theme.TechTalkBlue
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.Dispatchers
@@ -37,37 +45,24 @@ const val MAX_CATEGORIES_COUNT = 6
 const val MAX_REVIEW_TEXT = 80
 
 class MainMenuActivity : ComponentActivity() {
-    lateinit var viewModel: MainMenuViewModel
+    private lateinit var viewModel: MainMenuViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.enterTransition = null
+        window.exitTransition = null
 
         viewModel = ViewModelProvider(this).get(MainMenuViewModel::class.java)
 
         setContent {
             TechTalkTheme(true) {
                 Scaffold(
-                    topBar =
-                    {
-                        TopAppBar(
-                            title = {
-                                Image(
-                                    painter = painterResource(R.drawable.logo_transparent_banner_text),
-                                    contentDescription = null
-                                )
-                            },
-                            navigationIcon = {
-                                Image(
-                                    painter = painterResource(R.drawable.ic_baseline_menu_24_white),
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(horizontal = 16.dp).clickable(onClick = { printHello() })
-                                )
-                            },
-                            backgroundColor = TechTalkBlue
-                        )
-                    }
+                    topBar = { TopBar() }
                 ) {
-                    MenuScreen(liveCategories = viewModel.liveCategories,liveRecentReviews = viewModel.liveRecentReviews)
+                    MenuScreen(
+                        liveCategories = viewModel.liveCategories,
+                        liveRecentReviews = viewModel.liveRecentReviews
+                    )
                     initMainMenu()
 
                 }
@@ -80,21 +75,19 @@ class MainMenuActivity : ComponentActivity() {
         viewModel.loadCategoriesMenu() //They are the same, no need to reload
 
         //If we came from splash screen load preloaded data
-        if(intent.getStringExtra("activity").equals("splash")) {
+        if (intent.getStringExtra("activity").equals("splash")) {
             viewModel.loadRecentReviews(SplashActivity.reviews.reviews)
-        }
-        else { //Update data and download again
+        } else { //Update data and download again
             MainScope().launch(Dispatchers.Main) {
                 try {
-                    val recentReviews:ReviewsInfo
+                    val recentReviews: ReviewsInfo
                     withContext(Dispatchers.IO) {
                         // do blocking networking on IO thread
                         recentReviews = DataGetter.getRecentReviews()
                     }
                     //Need to be called here to prevent blocking UI
                     viewModel.loadRecentReviews(recentReviews.reviews)
-                }
-                catch (e:Exception) {
+                } catch (e: Exception) {
                     println(e.stackTraceToString())
                 }
             }
@@ -113,22 +106,48 @@ class MainMenuViewModel: ViewModel() {
         liveCategories.value = SplashActivity.categories.categories
     }
 
-    fun loadRecentReviews(reviews:List<ReviewInfoItem>){
+    fun loadRecentReviews(reviews: List<ReviewInfoItem>) {
         liveRecentReviews.value = reviews
     }
 }
 
+@Composable
+fun TopBar() {
+    TopAppBar(
+        title = {
+            Image(
+                painter = painterResource(R.drawable.logo_transparent_banner_text),
+                contentDescription = null
+            )
+        },
+        navigationIcon = {
+            Image(
+                painter = painterResource(R.drawable.ic_baseline_menu_24_white),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .clickable(onClick = { println("Open menu") })
+            )
+        },
+        backgroundColor = TechTalkBlue
+    )
+}
 
 @Composable
 fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:LiveData<List<ReviewInfoItem>>) {
     val categories by liveCategories.observeAsState(initial = emptyList())
     val reviews by liveRecentReviews.observeAsState(initial = emptyList())
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
             .padding(top = 20.dp)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        //TODO delete later
+        Button(onClick = { openCategories(context) }) {
+            Text("Open category menu")
+        }
         Text(
             "Most popular categories",
             style = TextStyle(fontSize = 25.sp),
@@ -138,13 +157,7 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
             LazyColumn(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.Start) {
                 itemsIndexed(categories) { index, item ->
                     if (index % 2 == 0 && index < MAX_CATEGORIES_COUNT) {
-                        Card(
-                            modifier = Modifier
-                                .padding(top = 10.dp)
-                                .size(150.dp, 30.dp)
-                                .clickable(onClick = { printHello() }),
-                            backgroundColor = Color.DarkGray,
-                        ) { Text(item.name, modifier = Modifier.padding(5.dp), textAlign = TextAlign.Center)  }
+                        CategoryMainMenu(item = item, context = context)
                     }
                 }
 
@@ -153,13 +166,7 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
             LazyColumn(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
                 itemsIndexed(categories) { index, item ->
                     if (index % 2 == 1 && index < MAX_CATEGORIES_COUNT) {
-                        Card(
-                            modifier = Modifier
-                                .padding(top = 10.dp)
-                                .size(150.dp, 30.dp)
-                                .clickable(onClick = { printHello() }),
-                            backgroundColor = Color.DarkGray
-                        ) { Text(item.name, modifier = Modifier.padding(5.dp), textAlign = TextAlign.Center ) }
+                        CategoryMainMenu(item = item, context = context)
                     }
                 }
 
@@ -172,14 +179,31 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
         )
         LazyColumn(modifier = Modifier.padding(top = 15.dp)) {
             items(reviews) { item ->
-                reviewBox(item)
+                ReviewBox(item)
             }
         }
     }
 }
 
 @Composable
-fun reviewBox(reviewInfo: ReviewInfoItem) {
+fun CategoryMainMenu(item:CategoryInfo,context: Context){
+    Card(
+        modifier = Modifier
+            .padding(top = 10.dp)
+            .size(150.dp, 30.dp)
+            .clickable(onClick = { openProductsMenu(item, context) }),
+        backgroundColor = Color.DarkGray,
+    ) {
+        Text(
+            item.name,
+            modifier = Modifier.padding(5.dp),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun ReviewBox(reviewInfo: ReviewInfoItem) {
     //Calculate before showing
     var positives = 0
     var negatives = 0
@@ -194,7 +218,7 @@ fun reviewBox(reviewInfo: ReviewInfoItem) {
         modifier = Modifier
             .padding(20.dp)
             .fillMaxWidth()
-            .clickable(onClick = { printHello() }),
+            .clickable(onClick = { println("Open review") }),
         backgroundColor = Color.DarkGray
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -209,7 +233,7 @@ fun reviewBox(reviewInfo: ReviewInfoItem) {
                 Text(text = "$negatives negatives", modifier = Modifier.padding(5.dp))
             }
             Spacer(Modifier.size(10.dp))
-            Row() {
+            Row {
                 Text(text = "${reviewInfo.likes} likes", modifier = Modifier.padding(5.dp))
                 Spacer(Modifier.size(10.dp))
                 Text(text = "${reviewInfo.dislikes} dislikes", modifier = Modifier.padding(5.dp))
@@ -220,6 +244,9 @@ fun reviewBox(reviewInfo: ReviewInfoItem) {
     }
 }
 
-fun printHello() {
-    println("HELLO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+//TODO remake into navigation drawer
+fun openCategories(context:Context){
+    val intent = Intent(context, CategoriesActivity::class.java)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+    context.startActivity(intent)
 }
