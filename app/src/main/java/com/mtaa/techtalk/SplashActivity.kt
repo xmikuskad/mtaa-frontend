@@ -6,22 +6,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.mtaa.techtalk.DataGetter.getCategories
 import com.mtaa.techtalk.DataGetter.getRecentReviews
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.*
 
-class MainActivity : ComponentActivity() {
+class SplashActivity : ComponentActivity() {
     companion object initialData {
         lateinit var categories :CategoriesInfo
         lateinit var reviews : ReviewsInfo
@@ -54,7 +52,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 //Load new screen
-                val intent = Intent(context, MainMenu::class.java)
+                val intent = Intent(context, MainMenuActivity::class.java)
                 intent.putExtra("activity","splash")
                 intent.flags =
                     Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -72,14 +70,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SplashScreen() {
-    Column(
-        modifier = Modifier.padding(8.dp)
+    Box(
+        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
         Image(
             painter = painterResource(R.drawable.logo_transparent),
             contentDescription = null
         )
-        Text("Welcome to TechTalk")
-        Text("Review App")
     }
 }

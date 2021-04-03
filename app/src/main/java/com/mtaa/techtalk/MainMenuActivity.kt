@@ -3,7 +3,7 @@ package com.mtaa.techtalk
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.mtaa.techtalk.ui.theme.TechTalkBlue
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -34,7 +36,7 @@ import java.lang.Exception
 const val MAX_CATEGORIES_COUNT = 6
 const val MAX_REVIEW_TEXT = 80
 
-class MainMenu : ComponentActivity() {
+class MainMenuActivity : ComponentActivity() {
     lateinit var viewModel: MainMenuViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,9 +46,27 @@ class MainMenu : ComponentActivity() {
 
         setContent {
             TechTalkTheme(true) {
-                Scaffold(topBar = {
-                    TopAppBar(title = { Text("Main menu") })
-                }) {
+                Scaffold(
+                    topBar =
+                    {
+                        TopAppBar(
+                            title = {
+                                Image(
+                                    painter = painterResource(R.drawable.logo_transparent_banner_text),
+                                    contentDescription = null
+                                )
+                            },
+                            navigationIcon = {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_baseline_menu_24_white),
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(horizontal = 16.dp).clickable(onClick = { printHello() })
+                                )
+                            },
+                            backgroundColor = TechTalkBlue
+                        )
+                    }
+                ) {
                     MenuScreen(liveCategories = viewModel.liveCategories,liveRecentReviews = viewModel.liveRecentReviews)
                     initMainMenu()
 
@@ -61,7 +81,7 @@ class MainMenu : ComponentActivity() {
 
         //If we came from splash screen load preloaded data
         if(intent.getStringExtra("activity").equals("splash")) {
-            viewModel.loadRecentReviews(MainActivity.reviews.reviews)
+            viewModel.loadRecentReviews(SplashActivity.reviews.reviews)
         }
         else { //Update data and download again
             MainScope().launch(Dispatchers.Main) {
@@ -90,7 +110,7 @@ class MainMenuViewModel: ViewModel() {
     val liveRecentReviews = MutableLiveData<List<ReviewInfoItem>>()
 
     fun loadCategoriesMenu() {
-        liveCategories.value = MainActivity.categories.categories
+        liveCategories.value = SplashActivity.categories.categories
     }
 
     fun loadRecentReviews(reviews:List<ReviewInfoItem>){
@@ -121,12 +141,10 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
                         Card(
                             modifier = Modifier
                                 .padding(top = 10.dp)
+                                .size(150.dp, 30.dp)
                                 .clickable(onClick = { printHello() }),
-                            border = BorderStroke(
-                                1.dp,
-                                Color.Red
-                            )
-                        ) { Text(item.name, modifier = Modifier.padding(5.dp)) }
+                            backgroundColor = Color.DarkGray,
+                        ) { Text(item.name, modifier = Modifier.padding(5.dp), textAlign = TextAlign.Center)  }
                     }
                 }
 
@@ -138,12 +156,10 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
                         Card(
                             modifier = Modifier
                                 .padding(top = 10.dp)
+                                .size(150.dp, 30.dp)
                                 .clickable(onClick = { printHello() }),
-                            border = BorderStroke(
-                                1.dp,
-                                Color.Red
-                            )
-                        ) { Text(item.name, modifier = Modifier.padding(5.dp)) }
+                            backgroundColor = Color.DarkGray
+                        ) { Text(item.name, modifier = Modifier.padding(5.dp), textAlign = TextAlign.Center ) }
                     }
                 }
 
@@ -179,10 +195,7 @@ fun reviewBox(reviewInfo: ReviewInfoItem) {
             .padding(20.dp)
             .fillMaxWidth()
             .clickable(onClick = { printHello() }),
-        border = BorderStroke(
-            2.dp,
-            Color.Red
-        )
+        backgroundColor = Color.DarkGray
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
