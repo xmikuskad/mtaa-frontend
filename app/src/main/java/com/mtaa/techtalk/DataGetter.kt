@@ -22,4 +22,7 @@ object DataGetter {
     suspend fun getProducts(categoryID:Int, page:Int): ProductsInfo {
         return client.get("$ADDRESS/categories/$categoryID/$page")
     }
+    suspend fun getReviews(productID:Int, page:Int): ReviewsInfo {
+        return client.get("$ADDRESS/products/$productID/$page")
+    }
 }

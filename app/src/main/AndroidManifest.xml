@@ -24,5 +24,6 @@
         <activity android:name=".activities.MainMenuActivity"/>
         <activity android:name=".activities.CategoriesActivity"/>
         <activity android:name=".activities.ProductsActivity"/>
+        <activity android:name=".activities.ReviewsActivity"/>
     </application>
 </manifest>

@@ -1,5 +1,7 @@
 package com.mtaa.techtalk.activities
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +18,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -24,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.mtaa.techtalk.CategoryInfo
 import com.mtaa.techtalk.DataGetter
 import com.mtaa.techtalk.ProductInfo
 import com.mtaa.techtalk.ProductsInfo
@@ -89,10 +93,7 @@ class ProductScreenViewModel: ViewModel() {
 
 @Composable
 fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenViewModel) {
-    //val context = LocalContext.current
     val products by viewModel.liveProducts.observeAsState(initial = emptyList())
-
-    println(products)
     Column(
         modifier = Modifier
             .padding(20.dp)
@@ -119,11 +120,12 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
 
 @Composable
 fun ProductBox(product: ProductInfo) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .padding(20.dp)
             .fillMaxWidth()
-            .clickable(onClick = { println("Open reviews") }),
+            .clickable(onClick = { openReviewsMenu(product,context) }),
         backgroundColor = Color.DarkGray
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -140,4 +142,12 @@ fun ProductBox(product: ProductInfo) {
             }
         }
     }
+}
+
+fun openReviewsMenu(product : ProductInfo, context: Context){
+    val intent = Intent(context, ReviewsActivity::class.java)
+    intent.putExtra("productId",product.product_id)
+    intent.putExtra("productName",product.name)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+    context.startActivity(intent)
 }

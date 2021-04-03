@@ -64,7 +64,6 @@ class MainMenuActivity : ComponentActivity() {
                         liveRecentReviews = viewModel.liveRecentReviews
                     )
                     initMainMenu()
-
                 }
             }
         }
