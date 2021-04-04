@@ -52,7 +52,7 @@ class ReviewsActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = { TopBar(scaffoldState, scope) },
-                    drawerContent = { Text(text = "drawerContent") }
+                    drawerContent = { Drawer() }
                 ) {
                     ReviewsScreen(productId, productName, viewModel)
                     viewModel.loadReviews(productId)

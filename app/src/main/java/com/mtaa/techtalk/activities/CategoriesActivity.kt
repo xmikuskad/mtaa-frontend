@@ -37,7 +37,7 @@ class CategoriesActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = { TopBar(scaffoldState, scope) },
-                    drawerContent = { Text(text = "drawerContent") }
+                    drawerContent = { Drawer() }
                 ) {
                     CategoryScreen()
                 }

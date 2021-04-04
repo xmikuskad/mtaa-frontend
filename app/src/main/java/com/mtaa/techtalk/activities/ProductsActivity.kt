@@ -59,7 +59,7 @@ class ProductsActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = { TopBar(scaffoldState, scope) },
-                            drawerContent = { Text(text = "drawerContent") }
+                    drawerContent = { Drawer() }
                 ) {
                     ProductsScreen(categoryId, categoryName, viewModel)
                     viewModel.loadProducts(categoryId)

@@ -59,7 +59,7 @@ class MainMenuActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = { TopBar(scaffoldState, scope) },
-                    drawerContent = { Text(text = "drawerContent") }
+                    drawerContent = { Drawer() }
                 ) {
                     MenuScreen(
                         liveCategories = viewModel.liveCategories,
@@ -113,6 +113,48 @@ class MainMenuViewModel: ViewModel() {
 }
 
 @Composable
+fun Drawer() {
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier
+        .padding(top = 20.dp)
+        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Main Menu",
+            modifier = Modifier.clickable(
+                onClick = { print("Main Menu") }
+            ),
+            fontSize = 32.sp
+        )
+        Text(
+            text = "Categories",
+            modifier = Modifier.clickable(
+                onClick = {
+                    // TODO Don't open if already on category screen
+                    openCategories(context)
+                }
+            ),
+            fontSize = 32.sp
+        )
+        Text(
+            text = "Settings",
+            modifier = Modifier.clickable(
+                onClick = { print("Settings") }
+            ),
+            fontSize = 32.sp
+        )
+        Text(
+            text = "About App",
+            modifier = Modifier.clickable(
+                onClick = { print("About App") }
+            ),
+            fontSize = 32.sp
+        )
+    }
+}
+
+@Composable
 fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
     TopAppBar(
         title = {
@@ -127,7 +169,7 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
                 contentDescription = null,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .clickable(onClick = { scope.launch {scaffoldState.drawerState.open()} })
+                    .clickable(onClick = { scope.launch { scaffoldState.drawerState.open() } })
             )
         },
         backgroundColor = TechTalkBlue
@@ -145,10 +187,6 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
             .padding(top = 20.dp)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //TODO delete later
-        Button(onClick = { openCategories(context) }) {
-            Text("Open category menu")
-        }
         Text(
             "Most popular categories",
             style = TextStyle(fontSize = 25.sp),
