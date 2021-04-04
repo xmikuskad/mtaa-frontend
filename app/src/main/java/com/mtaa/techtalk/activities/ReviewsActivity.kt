@@ -8,11 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -47,8 +47,12 @@ class ReviewsActivity : ComponentActivity() {
 
         setContent {
             TechTalkTheme(true) {
+                val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+                val scope = rememberCoroutineScope()
                 Scaffold(
-                    topBar = { TopBar() }
+                    scaffoldState = scaffoldState,
+                    topBar = { TopBar(scaffoldState, scope) },
+                    drawerContent = { Text(text = "drawerContent") }
                 ) {
                     ReviewsScreen(productId, productName, viewModel)
                     viewModel.loadReviews(productId)

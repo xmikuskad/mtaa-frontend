@@ -15,6 +15,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,10 +36,7 @@ import com.mtaa.techtalk.ReviewInfoItem
 import com.mtaa.techtalk.ReviewsInfo
 import com.mtaa.techtalk.ui.theme.TechTalkBlue
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.lang.Exception
 
 const val MAX_CATEGORIES_COUNT = 6
@@ -56,8 +54,12 @@ class MainMenuActivity : ComponentActivity() {
 
         setContent {
             TechTalkTheme(true) {
+                val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+                val scope = rememberCoroutineScope()
                 Scaffold(
-                    topBar = { TopBar() }
+                    scaffoldState = scaffoldState,
+                    topBar = { TopBar(scaffoldState, scope) },
+                    drawerContent = { Text(text = "drawerContent") }
                 ) {
                     MenuScreen(
                         liveCategories = viewModel.liveCategories,
@@ -111,7 +113,7 @@ class MainMenuViewModel: ViewModel() {
 }
 
 @Composable
-fun TopBar() {
+fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
     TopAppBar(
         title = {
             Image(
@@ -125,7 +127,7 @@ fun TopBar() {
                 contentDescription = null,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .clickable(onClick = { println("Open menu") })
+                    .clickable(onClick = { scope.launch {scaffoldState.drawerState.open()} })
             )
         },
         backgroundColor = TechTalkBlue
