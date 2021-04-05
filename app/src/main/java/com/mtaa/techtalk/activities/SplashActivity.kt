@@ -25,6 +25,10 @@ import io.ktor.network.sockets.*
 import kotlinx.coroutines.*
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkBlue
+import android.content.SharedPreferences
+
+
+
 
 
 class SplashActivity : ComponentActivity() {
@@ -38,6 +42,13 @@ class SplashActivity : ComponentActivity() {
         window.enterTransition = null
         window.exitTransition = null
 
+        val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+        var isFirstRun = false
+        if (prefs.getBoolean("firstrun", true)) {
+            isFirstRun = true
+            prefs.edit().putBoolean("firstrun", false).apply()
+        }
+
         setContent {
             TechTalkTheme(true) {
                 // A surface container using the 'background' color from the theme
@@ -45,13 +56,13 @@ class SplashActivity : ComponentActivity() {
                     SplashScreen()
 
                     //Download main menu data and load next activity
-                    initApplication(this)
+                    initApplication(this, isFirstRun)
                 }
             }
         }
     }
 
-    private fun initApplication(context:Context) {
+    private fun initApplication(context:Context, isFirstRun: Boolean) {
         val scope = MainScope()
         scope.launch(Dispatchers.Main) {
             try {
@@ -63,7 +74,11 @@ class SplashActivity : ComponentActivity() {
                 }
 
                 //Load new screen
-                val intent = Intent(context, FirstLaunchActivity::class.java)
+                val intent = if (isFirstRun) {
+                    Intent(context, FirstLaunchActivity::class.java)
+                } else {
+                    Intent(context, MainMenuActivity::class.java)
+                }
                 intent.putExtra("activity","splash")
                 intent.flags =
                     Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
