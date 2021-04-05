@@ -63,7 +63,7 @@ class SplashActivity : ComponentActivity() {
                 }
 
                 //Load new screen
-                val intent = Intent(context, MainMenuActivity::class.java)
+                val intent = Intent(context, FirstLaunchActivity::class.java)
                 intent.putExtra("activity","splash")
                 intent.flags =
                     Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
@@ -83,12 +83,11 @@ class SplashActivity : ComponentActivity() {
 fun SplashScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
         Box(
-            // TODO Workaround this padding maybe
-            modifier = Modifier.padding(top = 150.dp),
             contentAlignment = Alignment.Center
         ) {
             Image(

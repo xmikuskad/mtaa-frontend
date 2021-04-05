@@ -25,5 +25,6 @@
         <activity android:name=".activities.CategoriesActivity"/>
         <activity android:name=".activities.ProductsActivity"/>
         <activity android:name=".activities.ReviewsActivity"/>
+        <activity android:name=".activities.FirstLaunchActivity"/>
     </application>
 </manifest>
