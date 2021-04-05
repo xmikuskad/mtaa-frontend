@@ -7,12 +7,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.mtaa.techtalk.CategoriesInfo
 import com.mtaa.techtalk.DataGetter.getCategories
 import com.mtaa.techtalk.DataGetter.getRecentReviews
@@ -21,6 +24,7 @@ import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.*
 import com.mtaa.techtalk.R
+import com.mtaa.techtalk.ui.theme.TechTalkBlue
 
 
 class SplashActivity : ComponentActivity() {
@@ -77,12 +81,21 @@ class SplashActivity : ComponentActivity() {
 
 @Composable
 fun SplashScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(R.drawable.logo_transparent),
-            contentDescription = null
-        )
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    )
+    {
+        Box(
+            // TODO Workaround this padding maybe
+            modifier = Modifier.padding(top = 150.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(R.drawable.logo_transparent),
+                contentDescription = null
+            )
+        }
+        CircularProgressIndicator(color = TechTalkBlue)
     }
 }

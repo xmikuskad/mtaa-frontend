@@ -114,6 +114,7 @@ class MainMenuViewModel: ViewModel() {
 
 @Composable
 fun Drawer() {
+    // TODO Smaller Width
     val context = LocalContext.current
     Column(
         modifier = Modifier
