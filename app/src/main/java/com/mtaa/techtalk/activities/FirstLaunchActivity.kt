@@ -48,7 +48,13 @@ fun FirstLaunchScreen() {
         )
         Button(
             modifier = Modifier.padding(10.dp).size(250.dp, 50.dp),
-            onClick = { println("Log-In Screen") },
+            onClick = {
+                val intent = Intent(context, LoginActivity::class.java)
+                intent.putExtra("activity", "first-launch")
+                intent.flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                context.startActivity(intent)
+            },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Gray
             )

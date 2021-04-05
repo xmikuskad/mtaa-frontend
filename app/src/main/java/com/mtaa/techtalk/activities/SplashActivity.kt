@@ -49,6 +49,9 @@ class SplashActivity : ComponentActivity() {
             prefs.edit().putBoolean("firstrun", false).apply()
         }
 
+        // TODO Delete after testing
+        isFirstRun = true
+
         setContent {
             TechTalkTheme(true) {
                 // A surface container using the 'background' color from the theme
