@@ -24,7 +24,9 @@ class FirstLaunchActivity : ComponentActivity() {
 
         setContent {
             TechTalkTheme(true) {
-                FirstLaunchScreen()
+                Surface(color = MaterialTheme.colors.background) {
+                    FirstLaunchScreen()
+                }
             }
         }
     }
@@ -47,7 +49,7 @@ fun FirstLaunchScreen() {
         )
         {
             Icon(
-                painter = painterResource(R.drawable.ic_baseline_login_36),
+                painter = painterResource(R.drawable.ic_baseline_login_28),
                 contentDescription = null
             )
             Text(
