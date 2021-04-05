@@ -117,8 +117,34 @@ fun Drawer() {
     val context = LocalContext.current
     Column(
         modifier = Modifier
-        .padding(top = 20.dp)
-        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+            .padding(top = 30.dp)
+            .fillMaxWidth()
+            .padding(start = 30.dp)
+    ) {
+        Row(
+            modifier = Modifier
+            .clickable(
+                onClick = {
+                    println("Open user info")
+                }
+            )
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_baseline_account_circle_48),
+                contentDescription = null
+            )
+            Spacer(Modifier.size(10.dp))
+            Text(
+                text = "Guest",
+                fontSize = 28.sp
+            )
+        }
+    }
+    Column(
+        modifier = Modifier
+            .padding(top = 30.dp)
+            .fillMaxWidth()
+            .padding(start = 30.dp)
     ) {
         Text(
             text = "Main Menu",
