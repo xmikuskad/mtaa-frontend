@@ -153,6 +153,7 @@ fun Drawer() {
             ),
             fontSize = 32.sp
         )
+        Spacer(Modifier.size(20.dp))
         Text(
             text = "Categories",
             modifier = Modifier.clickable(
@@ -163,6 +164,7 @@ fun Drawer() {
             ),
             fontSize = 32.sp
         )
+        Spacer(Modifier.size(20.dp))
         Text(
             text = "Settings",
             modifier = Modifier.clickable(
@@ -170,6 +172,7 @@ fun Drawer() {
             ),
             fontSize = 32.sp
         )
+        Spacer(Modifier.size(20.dp))
         Text(
             text = "About App",
             modifier = Modifier.clickable(
