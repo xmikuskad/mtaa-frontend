@@ -4,8 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -14,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 
@@ -40,11 +41,16 @@ fun FirstLaunchScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Image(
+            modifier = Modifier.padding(top = 10.dp, bottom = 165.dp),
+            painter = painterResource(R.drawable.logo_transparent_banner_text),
+            contentDescription = null
+        )
         Button(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(10.dp).size(250.dp, 50.dp),
             onClick = { println("Log-In Screen") },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.LightGray
+                backgroundColor = Color.Gray
             )
         )
         {
@@ -54,24 +60,26 @@ fun FirstLaunchScreen() {
             )
             Text(
                 text = "Log-In",
-                color = Color.Black
+                color = Color.Black,
+                fontSize = 16.sp
             )
         }
         Button(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(10.dp).size(250.dp, 50.dp),
             onClick = { println("Create Account Screen") },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.LightGray
+                backgroundColor = Color.Gray
             )
         )
         {
             Text(
                 text = "Create Account",
-                color = Color.Black
+                color = Color.Black,
+                fontSize = 16.sp
             )
         }
         Button(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(10.dp).size(250.dp, 50.dp),
             onClick = {
                 val intent = Intent(context, MainMenuActivity::class.java)
                 intent.putExtra("activity", "first-launch")
@@ -80,12 +88,13 @@ fun FirstLaunchScreen() {
                 context.startActivity(intent)
             },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.LightGray
+                backgroundColor = Color.Gray
             )
         ) {
             Text(
                 text = "Continue without Account",
-                color = Color.Black
+                color = Color.Black,
+                fontSize = 16.sp
             )
         }
     }
