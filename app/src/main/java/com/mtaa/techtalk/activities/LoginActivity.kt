@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.Patterns.EMAIL_ADDRESS
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -63,7 +64,7 @@ fun LoginScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val emailState = remember { mutableStateOf(TextFieldValue()) }
-        val isValidEmail = emailState.value.text.count() > 5 && '@' in emailState.value.text
+        val isValidEmail = EMAIL_ADDRESS.matcher(emailState.value.text).matches()
         TextField(
             label = {
                 val label = if (isValidEmail) {
