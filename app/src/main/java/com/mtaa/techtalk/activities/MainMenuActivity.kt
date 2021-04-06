@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,11 +23,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -43,7 +40,7 @@ import com.mtaa.techtalk.DataGetter
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ReviewInfoItem
 import com.mtaa.techtalk.ReviewsInfo
-import com.mtaa.techtalk.ui.theme.TechTalkBlue
+import com.mtaa.techtalk.ui.theme.TechTalkGray
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.*
 import java.lang.Exception
@@ -280,7 +277,7 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
                     .clickable(onClick = { scope.launch { scaffoldState.drawerState.open() } })
             )
         },
-        backgroundColor = TechTalkBlue
+        backgroundColor = TechTalkGray
     )
 }
 

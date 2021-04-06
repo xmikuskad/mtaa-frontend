@@ -13,9 +13,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.mtaa.techtalk.CategoriesInfo
 import com.mtaa.techtalk.DataGetter.getCategories
 import com.mtaa.techtalk.DataGetter.getRecentReviews
@@ -24,11 +22,7 @@ import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.*
 import com.mtaa.techtalk.R
-import com.mtaa.techtalk.ui.theme.TechTalkBlue
-import android.content.SharedPreferences
-
-
-
+import com.mtaa.techtalk.ui.theme.TechTalkGray
 
 
 class SplashActivity : ComponentActivity() {
@@ -109,10 +103,10 @@ fun SplashScreen() {
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(R.drawable.logo_transparent),
+                painter = painterResource(R.drawable.logo_transparent_banner),
                 contentDescription = null
             )
         }
-        CircularProgressIndicator(color = TechTalkBlue)
+        CircularProgressIndicator(color = TechTalkGray)
     }
 }
