@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.mtaa.techtalk.CategoryInfo
 import com.mtaa.techtalk.DataGetter
 import com.mtaa.techtalk.ProductInfo
 import com.mtaa.techtalk.ProductsInfo

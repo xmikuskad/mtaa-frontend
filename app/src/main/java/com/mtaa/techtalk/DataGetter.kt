@@ -1,11 +1,8 @@
 package com.mtaa.techtalk
 
 import io.ktor.client.*
-import io.ktor.client.features.*
 import io.ktor.client.features.json.*
-import io.ktor.client.features.observer.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 
 const val ADDRESS = "http://10.0.2.2:8080"

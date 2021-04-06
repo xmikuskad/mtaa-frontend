@@ -23,7 +23,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mtaa.techtalk.AuthInfo
 import com.mtaa.techtalk.DataGetter
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.client.features.*
