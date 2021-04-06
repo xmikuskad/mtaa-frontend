@@ -2,6 +2,7 @@ package com.mtaa.techtalk.activities
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -23,6 +24,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
@@ -58,6 +60,7 @@ class MainMenuActivity : ComponentActivity() {
         window.exitTransition = null
 
         viewModel = ViewModelProvider(this).get(MainMenuViewModel::class.java)
+        val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
         setContent {
             TechTalkTheme(true) {
@@ -66,7 +69,7 @@ class MainMenuActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = { TopBar(scaffoldState, scope) },
-                    drawerContent = { Drawer() }
+                    drawerContent = { Drawer(prefs) }
                 ) {
                     MenuScreen(
                         liveCategories = viewModel.liveCategories,
@@ -121,14 +124,17 @@ class MainMenuViewModel: ViewModel() {
 }
 
 @Composable
-fun Drawer() {
+fun Drawer(prefs: SharedPreferences) {
     // TODO Smaller Width
     val context = LocalContext.current
+
+    val authToken = prefs.getString("token", "")
+    val name = prefs.getString("username", "")
+
     Column(
         modifier = Modifier
-            .padding(top = 30.dp)
+            .padding(top = 30.dp, start = 30.dp, bottom = 30.dp)
             .fillMaxWidth()
-            .padding(start = 30.dp)
     ) {
         Row(
             modifier = Modifier
@@ -136,7 +142,8 @@ fun Drawer() {
                 onClick = {
                     println("Open user info")
                 }
-            )
+            ),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 modifier = Modifier.size(48.dp, 48.dp),
@@ -145,24 +152,33 @@ fun Drawer() {
                 tint = Color.White
             )
             Spacer(Modifier.size(10.dp))
-            Text(
-                text = "Guest",
-                fontSize = 28.sp
-            )
+            if (name != "") {
+                name
+            } else {
+                "Guest"
+            }?.let {
+                Text(
+                    text = it,
+                    fontSize = 22.sp
+                )
+            }
         }
     }
+    Divider(
+        color = Color.Black,
+        thickness = 1.dp
+    )
     Column(
         modifier = Modifier
-            .padding(top = 30.dp)
+            .padding(top = 30.dp, start = 30.dp, bottom = 30.dp)
             .fillMaxWidth()
-            .padding(start = 30.dp)
     ) {
         Text(
             text = "Main Menu",
             modifier = Modifier.clickable(
                 onClick = { print("Main Menu") }
             ),
-            fontSize = 32.sp
+            fontSize = 28.sp
         )
         Spacer(Modifier.size(20.dp))
         Text(
@@ -173,7 +189,7 @@ fun Drawer() {
                     openCategories(context)
                 }
             ),
-            fontSize = 32.sp
+            fontSize = 28.sp
         )
         Spacer(Modifier.size(20.dp))
         Text(
@@ -181,7 +197,7 @@ fun Drawer() {
             modifier = Modifier.clickable(
                 onClick = { print("Settings") }
             ),
-            fontSize = 32.sp
+            fontSize = 28.sp
         )
         Spacer(Modifier.size(20.dp))
         Text(
@@ -189,8 +205,58 @@ fun Drawer() {
             modifier = Modifier.clickable(
                 onClick = { print("About App") }
             ),
-            fontSize = 32.sp
+            fontSize = 28.sp
         )
+    }
+    Divider(
+        color = Color.Black,
+        thickness = 1.dp
+    )
+    Column(
+        modifier = Modifier
+            .padding(top = 30.dp, start = 30.dp, bottom = 30.dp)
+            .fillMaxWidth()
+    ) {
+        if (name != "" && authToken != "") {
+            Text(
+                text = "Edit Account",
+                modifier = Modifier.clickable(
+                    onClick = { print("Edit Account") }
+                ),
+                fontSize = 28.sp
+            )
+            Spacer(Modifier.size(20.dp))
+            Text(
+                text = "Log-Out",
+                modifier = Modifier.clickable(
+                    onClick = {
+                        prefs.edit().remove("token").apply()
+                        prefs.edit().remove("username").apply()
+
+                        val intent = Intent(context, FirstLaunchActivity::class.java)
+                        intent.putExtra("activity", "menu-log-out")
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                        context.startActivity(intent)
+                    }
+                ),
+                fontSize = 28.sp
+            )
+        } else if (name == "" && authToken == "") {
+            Text(
+                text = "Log-In",
+                modifier = Modifier.clickable(
+                    onClick = {
+                        val intent = Intent(context, LoginActivity::class.java)
+                        intent.putExtra("activity", "first-launch")
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                        context.startActivity(intent)
+                    }
+                ),
+                fontSize = 28.sp
+            )
+        }
     }
 }
 

@@ -29,6 +29,7 @@ class CategoriesActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         window.enterTransition = null
         window.exitTransition = null
+        val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
         setContent {
             TechTalkTheme(true) {
@@ -37,7 +38,7 @@ class CategoriesActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = { TopBar(scaffoldState, scope) },
-                    drawerContent = { Drawer() }
+                    drawerContent = { Drawer(prefs) }
                 ) {
                     CategoryScreen()
                 }

@@ -51,6 +51,7 @@ class ProductsActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(ProductScreenViewModel::class.java)
         categoryId = intent.getIntExtra("categoryId", 0)
         categoryName = intent.getStringExtra("categoryName") ?: "Unknown name"
+        val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
         setContent {
             TechTalkTheme(true) {
@@ -59,7 +60,7 @@ class ProductsActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = { TopBar(scaffoldState, scope) },
-                    drawerContent = { Drawer() }
+                    drawerContent = { Drawer(prefs) }
                 ) {
                     ProductsScreen(categoryId, categoryName, viewModel)
                     viewModel.loadProducts(categoryId)

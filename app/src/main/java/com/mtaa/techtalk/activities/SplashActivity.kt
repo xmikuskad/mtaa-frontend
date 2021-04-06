@@ -50,7 +50,7 @@ class SplashActivity : ComponentActivity() {
         }
 
         // TODO Delete after testing
-        isFirstRun = true
+        //isFirstRun = true
 
         setContent {
             TechTalkTheme(true) {

@@ -54,6 +54,7 @@ class ReviewsActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(ReviewScreenViewModel::class.java)
         productId = intent.getIntExtra("productId", 0)
         productName = intent.getStringExtra("productName") ?: "Unknown name"
+        val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
         setContent {
             TechTalkTheme(true) {
@@ -62,7 +63,7 @@ class ReviewsActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = { TopBar(scaffoldState, scope) },
-                    drawerContent = { Drawer() },
+                    drawerContent = { Drawer(prefs) },
                     floatingActionButton = {
                         // TODO Change button color
                         FloatingActionButton(
