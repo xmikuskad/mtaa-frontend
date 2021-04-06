@@ -3,6 +3,7 @@ package com.mtaa.techtalk.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -12,6 +13,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -19,7 +24,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -130,9 +137,11 @@ fun Drawer() {
                 }
             )
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_baseline_account_circle_48),
-                contentDescription = null
+            Icon(
+                modifier = Modifier.size(48.dp, 48.dp),
+                painter = rememberVectorPainter(image = Icons.Filled.AccountCircle),
+                contentDescription = null,
+                tint = Color.White
             )
             Spacer(Modifier.size(10.dp))
             Text(
@@ -194,11 +203,13 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
             )
         },
         navigationIcon = {
-            Image(
-                painter = painterResource(R.drawable.ic_baseline_menu_24_white),
+            Icon(
+                painter = rememberVectorPainter(Icons.Filled.Menu),
                 contentDescription = null,
+                tint = Color.White,
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .size(24.dp, 24.dp)
+                    .offset(16.dp)
                     .clickable(onClick = { scope.launch { scaffoldState.drawerState.open() } })
             )
         },
@@ -318,4 +329,8 @@ fun openCategories(context:Context){
     val intent = Intent(context, CategoriesActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     context.startActivity(intent)
+}
+
+fun showMessage(context: Context, message:String, length: Int){
+    Toast.makeText(context, message, length).show()
 }

@@ -7,10 +7,13 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Login
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +50,9 @@ fun FirstLaunchScreen() {
             contentDescription = null
         )
         Button(
-            modifier = Modifier.padding(10.dp).size(250.dp, 50.dp),
+            modifier = Modifier
+                .padding(10.dp)
+                .size(250.dp, 50.dp),
             onClick = {
                 val intent = Intent(context, LoginActivity::class.java)
                 intent.putExtra("activity", "first-launch")
@@ -61,8 +66,10 @@ fun FirstLaunchScreen() {
         )
         {
             Icon(
-                painter = painterResource(R.drawable.ic_baseline_login_28),
-                contentDescription = null
+                modifier = Modifier.size(28.dp, 28.dp),
+                painter = rememberVectorPainter(image = Icons.Filled.Login),
+                contentDescription = null,
+                tint = Color.Black
             )
             Text(
                 text = "Log-In",
@@ -71,8 +78,16 @@ fun FirstLaunchScreen() {
             )
         }
         Button(
-            modifier = Modifier.padding(10.dp).size(250.dp, 50.dp),
-            onClick = { println("Create Account Screen") },
+            modifier = Modifier
+                .padding(10.dp)
+                .size(250.dp, 50.dp),
+            onClick = {
+                val intent = Intent(context, CreateAccountActivity::class.java)
+                intent.putExtra("activity", "first-launch")
+                intent.flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                context.startActivity(intent)
+            },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Gray
             )
@@ -85,7 +100,9 @@ fun FirstLaunchScreen() {
             )
         }
         Button(
-            modifier = Modifier.padding(10.dp).size(250.dp, 50.dp),
+            modifier = Modifier
+                .padding(10.dp)
+                .size(250.dp, 50.dp),
             onClick = {
                 val intent = Intent(context, MainMenuActivity::class.java)
                 intent.putExtra("activity", "first-launch")

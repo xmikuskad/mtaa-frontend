@@ -62,7 +62,6 @@ fun LoginScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Enter your e-mail:")
         val emailState = remember { mutableStateOf(TextFieldValue()) }
         val isValidEmail = emailState.value.text.count() > 5 && '@' in emailState.value.text
         TextField(
@@ -86,9 +85,9 @@ fun LoginScreen() {
                 )
             }
         )
-        Text("Enter your password:")
-        val passwordState = remember { mutableStateOf(TextFieldValue()) }
 
+        Spacer(modifier = Modifier.size(10.dp))
+        val passwordState = remember { mutableStateOf(TextFieldValue()) }
         val isValidPassword = passwordState.value.text != ""
         TextField(
             label = {
@@ -118,13 +117,13 @@ fun LoginScreen() {
                 .size(250.dp, 50.dp),
             onClick = {
                 if (!isValidEmail && !isValidPassword) {
-                    showMessage(context, "Invalid e-mail or password!")
+                    showMessage(context, "Invalid e-mail or password!", Toast.LENGTH_SHORT)
                 }
                 else if (!isValidEmail) {
-                    showMessage(context, "Invalid e-mail!")
+                    showMessage(context, "Invalid e-mail!", Toast.LENGTH_SHORT)
                 }
                 else if (!isValidPassword) {
-                    showMessage(context, "Invalid password!")
+                    showMessage(context, "Invalid password!", Toast.LENGTH_SHORT)
                 }
                 else {
                     MainScope().launch(Dispatchers.Main) {
@@ -148,7 +147,7 @@ fun LoginScreen() {
                                 //User or server is offline TODO handle - show warning
                                 is ConnectTimeoutException -> println("server or user offline")
                                 // TODO
-                                is ClientRequestException -> showMessage(context, "This account does not exist!")
+                                is ClientRequestException -> showMessage(context, "This account does not exist!", Toast.LENGTH_SHORT)
                             }
                         }
                     }
@@ -165,8 +164,4 @@ fun LoginScreen() {
             )
         }
     }
-}
-
-fun showMessage(context: Context, message:String){
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
