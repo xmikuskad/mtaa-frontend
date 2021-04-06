@@ -137,7 +137,7 @@ fun LoginScreen(prefs: SharedPreferences) {
                             val intent = Intent(context, MainMenuActivity::class.java)
                             intent.putExtra("activity", "log-in")
                             intent.flags =
-                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             context.startActivity(intent)
 
                         } catch (e: Exception) {

@@ -55,7 +55,7 @@ fun RegisterSuccessScreen() {
                 val intent = Intent(context, MainMenuActivity::class.java)
                 intent.putExtra("activity", "create-account")
                 intent.flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 context.startActivity(intent)
             },
             colors = ButtonDefaults.buttonColors(
@@ -76,7 +76,7 @@ fun RegisterSuccessScreen() {
                 val intent = Intent(context, LoginActivity::class.java)
                 intent.putExtra("activity", "first-launch")
                 intent.flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                    Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
             },
             colors = ButtonDefaults.buttonColors(

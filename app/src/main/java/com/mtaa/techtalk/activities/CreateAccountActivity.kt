@@ -226,7 +226,7 @@ fun CreateAccountScreen() {
                             val intent = Intent(context, RegisterSuccessActivity::class.java)
                             intent.putExtra("activity", "create-account")
                             intent.flags =
-                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             context.startActivity(intent)
 
                         } catch (e: Exception) {

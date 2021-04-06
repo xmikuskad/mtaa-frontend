@@ -192,7 +192,11 @@ fun Drawer(prefs: SharedPreferences) {
         Text(
             text = "Settings",
             modifier = Modifier.clickable(
-                onClick = { print("Settings") }
+                onClick = {
+                    val intent = Intent(context, SettingsActivity::class.java)
+                    intent.putExtra("activity", "drawer")
+                    context.startActivity(intent)
+                }
             ),
             fontSize = 28.sp
         )
@@ -233,7 +237,7 @@ fun Drawer(prefs: SharedPreferences) {
                         val intent = Intent(context, FirstLaunchActivity::class.java)
                         intent.putExtra("activity", "menu-log-out")
                         intent.flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         context.startActivity(intent)
                     }
                 ),
@@ -247,7 +251,7 @@ fun Drawer(prefs: SharedPreferences) {
                         val intent = Intent(context, LoginActivity::class.java)
                         intent.putExtra("activity", "first-launch")
                         intent.flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                            Intent.FLAG_ACTIVITY_NEW_TASK
                         context.startActivity(intent)
                     }
                 ),
