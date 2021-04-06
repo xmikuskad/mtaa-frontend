@@ -35,4 +35,10 @@ object DataGetter {
             body = LoginInfo(password, email)
         }
     }
+    suspend fun createAccount(name: String, email: String, password: String): HttpStatusCode {
+        return client.post("$ADDRESS/users") {
+            contentType(ContentType.Application.Json)
+            body = RegisterInfo(name, password, email)
+        }
+    }
 }

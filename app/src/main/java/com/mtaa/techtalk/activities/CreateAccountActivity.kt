@@ -1,5 +1,6 @@
 package com.mtaa.techtalk.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns.EMAIL_ADDRESS
 import android.widget.Toast
@@ -22,7 +23,17 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mtaa.techtalk.AuthInfo
+import com.mtaa.techtalk.DataGetter
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
+import io.ktor.client.features.*
+import io.ktor.http.*
+import io.ktor.network.sockets.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.lang.Exception
 import java.util.regex.Pattern
 
 class CreateAccountActivity : ComponentActivity() {
@@ -179,7 +190,61 @@ fun CreateAccountScreen() {
         Button(
             modifier = Modifier.padding(30.dp).size(250.dp, 50.dp),
             onClick = {
-                println("create acc")
+                if (!isValidName || !isValidEmail || !isValidPassword || !isValidSecondPassword) {
+                    var message = "Invalid:"
+                    var num = 1
+                    if (!isValidName) {
+                        message += "\n $num. Name"
+                        num++
+                    }
+                    if (!isValidEmail) {
+                        message += "\n $num. E-mail"
+                        num++
+                    }
+                    if (!isValidPassword) {
+                        message += "\n $num. Password"
+                        num++
+                    }
+                    if (!isValidSecondPassword) {
+                        message += "\n $num. Confirmation Password"
+                    }
+                    showMessage(context, message, Toast.LENGTH_SHORT)
+                } else {
+                    MainScope().launch(Dispatchers.Main) {
+                        try {
+                            val createAccountResponse: HttpStatusCode
+                            withContext(Dispatchers.IO) {
+                                // do blocking networking on IO thread
+                                createAccountResponse = DataGetter.createAccount(
+                                    nameState.value.text,
+                                    emailState.value.text,
+                                    passwordState.value.text
+                                )
+                            }
+                            //Need to be called here to prevent blocking UI
+
+                            val intent = Intent(context, RegisterSuccessActivity::class.java)
+                            intent.putExtra("activity", "create-account")
+                            intent.flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            context.startActivity(intent)
+
+                        } catch (e: Exception) {
+                            println(e.stackTraceToString())
+                            when (e) {
+                                //User or server is offline TODO handle - show warning
+                                is ConnectTimeoutException -> println("server or user offline")
+                                // TODO
+                                is ClientRequestException ->
+                                    showMessage(
+                                        context,
+                                        "There already is an account with this e-mail!",
+                                        Toast.LENGTH_SHORT
+                                    )
+                            }
+                        }
+                    }
+                }
             },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Gray

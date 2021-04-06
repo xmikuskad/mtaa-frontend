@@ -28,5 +28,6 @@
         <activity android:name=".activities.FirstLaunchActivity"/>
         <activity android:name=".activities.LoginActivity"/>
         <activity android:name=".activities.CreateAccountActivity"/>
+        <activity android:name=".activities.RegisterSuccessActivity"/>
     </application>
 </manifest>
