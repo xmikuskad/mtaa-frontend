@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -119,7 +120,7 @@ fun CreateAccountScreen() {
             },
             value = passwordState.value,
             onValueChange = { passwordState.value = it },
-            //visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
             modifier = Modifier.size(250.dp, 55.dp),
             isError = !isValidPassword,
@@ -163,7 +164,7 @@ fun CreateAccountScreen() {
             },
             value = secondPasswordState.value,
             onValueChange = { secondPasswordState.value = it },
-            //visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
             modifier = Modifier.size(250.dp, 55.dp),
             isError = !isValidSecondPassword,

@@ -82,8 +82,9 @@ class MainMenuActivity : ComponentActivity() {
     private fun initMainMenu() {
         viewModel.loadCategoriesMenu() //They are the same, no need to reload
 
+        val prevScreen = intent.getStringExtra("activity")
         //If we came from splash screen load preloaded data
-        if (intent.getStringExtra("activity").equals("splash")) {
+        if (prevScreen.equals("splash") || prevScreen.equals("first-launch")) {
             viewModel.loadRecentReviews(SplashActivity.reviews.reviews)
         } else { //Update data and download again
             MainScope().launch(Dispatchers.Main) {
