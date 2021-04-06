@@ -3,7 +3,7 @@ package com.mtaa.techtalk
 data class RegisterInfo(val name: String, val password: String, val email: String)
 data class LoginInfo(val password: String, val email: String)
 data class UserInfo(val name: String, val trust_score: Int, val reviews: MutableList<ReviewInfoItem>)
-data class AuthInfo(val key: String)
+data class AuthInfo(val name: String, val key: String)
 data class NameInfo(val name: String)
 
 /**

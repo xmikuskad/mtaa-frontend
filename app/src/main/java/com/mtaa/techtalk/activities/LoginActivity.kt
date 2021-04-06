@@ -1,8 +1,7 @@
 package com.mtaa.techtalk.activities
 
-import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Patterns.EMAIL_ADDRESS
 import android.widget.Toast
@@ -25,30 +24,26 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mtaa.techtalk.DataGetter
+import com.mtaa.techtalk.AuthInfo
 import com.mtaa.techtalk.DataGetter.login
-import com.mtaa.techtalk.ReviewsInfo
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.client.features.*
-import io.ktor.client.request.*
-import io.ktor.http.*
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
-import java.util.regex.Pattern
-import kotlin.text.Regex.Companion.fromLiteral
 
 class LoginActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
         setContent {
             TechTalkTheme(true) {
                 Surface(color = MaterialTheme.colors.background) {
-                    LoginScreen()
+                    LoginScreen(prefs)
                 }
             }
         }
@@ -56,7 +51,7 @@ class LoginActivity: ComponentActivity() {
 }
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(prefs: SharedPreferences) {
     val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -129,12 +124,15 @@ fun LoginScreen() {
                 else {
                     MainScope().launch(Dispatchers.Main) {
                         try {
-                            val loginResponse: HttpResponseData
+                            val loginResponse: AuthInfo
                             withContext(Dispatchers.IO) {
                                 // do blocking networking on IO thread
                                 loginResponse = login(emailState.value.text, passwordState.value.text)
                             }
                             //Need to be called here to prevent blocking UI
+
+                            prefs.edit().putString("token", loginResponse.key).apply()
+                            prefs.edit().putString("username", loginResponse.name).apply()
 
                             val intent = Intent(context, MainMenuActivity::class.java)
                             intent.putExtra("activity", "log-in")
