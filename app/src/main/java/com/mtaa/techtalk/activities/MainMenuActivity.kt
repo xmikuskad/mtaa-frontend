@@ -53,8 +53,6 @@ class MainMenuActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.enterTransition = null
-        window.exitTransition = null
 
         viewModel = ViewModelProvider(this).get(MainMenuViewModel::class.java)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
@@ -411,21 +409,18 @@ fun ReviewBox(reviewInfo: ReviewInfoItem) {
 //TODO remake into navigation drawer
 fun openCategories(context:Context){
     val intent = Intent(context, CategoriesActivity::class.java)
-    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     context.startActivity(intent)
 }
 
 fun openReviewInfo(context: Context,reviewID: Int) {
     val intent = Intent(context, ReviewInfoActivity::class.java)
     intent.putExtra("reviewID",reviewID)
-    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     context.startActivity(intent)
 }
 
 //General openScreen function TODO refactor to use this!
 fun openScreen(context: Context, activityClass:ComponentActivity){
     val intent = Intent(context, activityClass::class.java)
-    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     context.startActivity(intent)
 }
 
