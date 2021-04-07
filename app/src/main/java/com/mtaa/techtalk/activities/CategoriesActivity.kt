@@ -27,8 +27,6 @@ class CategoriesActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.enterTransition = null
-        window.exitTransition = null
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
         setContent {
@@ -89,8 +87,7 @@ fun CategoryScreen() {
 
 fun openProductsMenu(category : CategoryInfo, context: Context){
     val intent = Intent(context, ProductsActivity::class.java)
-    intent.putExtra("categoryId",category.category_id)
-    intent.putExtra("categoryName",category.name)
-    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+    intent.putExtra("categoryId", category.category_id)
+    intent.putExtra("categoryName", category.name)
     context.startActivity(intent)
 }

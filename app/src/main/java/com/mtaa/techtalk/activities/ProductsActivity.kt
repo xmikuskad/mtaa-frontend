@@ -44,8 +44,6 @@ class ProductsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.enterTransition = null
-        window.exitTransition = null
 
         viewModel = ViewModelProvider(this).get(ProductScreenViewModel::class.java)
         categoryId = intent.getIntExtra("categoryId", 0)
@@ -151,6 +149,5 @@ fun openReviewsMenu(product : ProductInfo, context: Context){
     val intent = Intent(context, ReviewsActivity::class.java)
     intent.putExtra("productId",product.product_id)
     intent.putExtra("productName",product.name)
-    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     context.startActivity(intent)
 }
