@@ -1,5 +1,9 @@
 package com.mtaa.techtalk
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
+
 data class RegisterInfo(val name: String, val password: String, val email: String)
 data class LoginInfo(val password: String, val email: String)
 data class UserInfo(val name: String, val trust_score: Int, val reviews: MutableList<ReviewInfoItem>)
@@ -34,14 +38,17 @@ data class ReviewInfo(val text: String, val attributes: MutableList<ReviewAttrib
                       val product_id: Int, val score: Int, val user_id: Int,
                       val created_at: String)
 //When returning array of reviews
+@Parcelize
 data class ReviewInfoItem(val text: String, val attributes: MutableList<ReviewAttributeInfo>,
                           val images: MutableList<ImageInfo>, val likes:Int, val dislikes:Int,
                           val product_id: Int, val score: Int, val user_id: Int,
-                          val review_id: Int, val created_at: String)
-data class ReviewsInfo(val reviews: MutableList<ReviewInfoItem>)
+                          val review_id: Int, val created_at: String) :Parcelable
 
-data class ReviewAttributeInfo(val text: String, val is_positive: Boolean)
-data class ImageInfo(val image_id: Int)
+data class ReviewsInfo(val reviews: MutableList<ReviewInfoItem>)
+@Parcelize
+data class ReviewAttributeInfo(val text: String, val is_positive: Boolean):Parcelable
+@Parcelize
+data class ImageInfo(val image_id: Int):Parcelable
 
 /**
  * Reviews POST

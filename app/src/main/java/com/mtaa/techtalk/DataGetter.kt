@@ -38,4 +38,6 @@ object DataGetter {
             body = RegisterInfo(name, password, email)
         }
     }
+
+    //"$ADDRESS//reviews/29/photo/29"
 }

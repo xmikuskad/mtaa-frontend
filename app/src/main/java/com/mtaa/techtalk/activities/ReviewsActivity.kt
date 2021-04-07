@@ -28,6 +28,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.mtaa.techtalk.*
+import com.mtaa.techtalk.ui.theme.TechTalkGray
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -60,18 +61,18 @@ class ReviewsActivity : ComponentActivity() {
                     topBar = { TopBar(scaffoldState, scope) },
                     drawerContent = { Drawer(prefs) },
                     floatingActionButton = {
-                        // TODO Change button color
-                        FloatingActionButton(
-                            onClick = { println("Add review") }
-                        )
-                        {
-                            Icon(
+                        ExtendedFloatingActionButton(
+                            onClick = { println("Add review") },
+                            text = {Text(text="Add review")},
+                            icon = {
+                                Icon(
                                 modifier = Modifier.size(40.dp, 40.dp),
                                 painter = rememberVectorPainter(Icons.Filled.Add),
                                 tint = Color.White,
                                 contentDescription = null
-                            )
-                        }
+                            )},
+                            backgroundColor = TechTalkGray
+                        )
                     }
                 ) {
                     ReviewsScreen(productId, productName, viewModel)

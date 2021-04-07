@@ -173,7 +173,7 @@ fun Drawer(prefs: SharedPreferences) {
         Text(
             text = "Main Menu",
             modifier = Modifier.clickable(
-                onClick = { print("Main Menu") }
+                onClick = { openScreen(context,MainMenuActivity()) }
             ),
             fontSize = 28.sp
         )
@@ -249,6 +249,20 @@ fun Drawer(prefs: SharedPreferences) {
                 modifier = Modifier.clickable(
                     onClick = {
                         val intent = Intent(context, LoginActivity::class.java)
+                        intent.putExtra("activity", "first-launch")
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK
+                        context.startActivity(intent)
+                    }
+                ),
+                fontSize = 28.sp
+            )
+            Spacer(Modifier.size(20.dp))
+            Text(
+                text = "Create account",
+                modifier = Modifier.clickable(
+                    onClick = {
+                        val intent = Intent(context, CreateAccountActivity::class.java)
                         intent.putExtra("activity", "first-launch")
                         intent.flags =
                             Intent.FLAG_ACTIVITY_NEW_TASK
@@ -352,6 +366,8 @@ fun CategoryMainMenu(item:CategoryInfo,context: Context){
 
 @Composable
 fun ReviewBox(reviewInfo: ReviewInfoItem) {
+    val context = LocalContext.current
+
     //Calculate before showing
     var positives = 0
     var negatives = 0
@@ -366,7 +382,7 @@ fun ReviewBox(reviewInfo: ReviewInfoItem) {
         modifier = Modifier
             .padding(20.dp)
             .fillMaxWidth()
-            .clickable(onClick = { println("Open review") }),
+            .clickable(onClick = { openReviewInfo(context,reviewInfo) }),
         backgroundColor = Color.DarkGray
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -395,6 +411,20 @@ fun ReviewBox(reviewInfo: ReviewInfoItem) {
 //TODO remake into navigation drawer
 fun openCategories(context:Context){
     val intent = Intent(context, CategoriesActivity::class.java)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+    context.startActivity(intent)
+}
+
+fun openReviewInfo(context: Context,reviewInfo: ReviewInfoItem) {
+    val intent = Intent(context, ReviewInfoActivity::class.java)
+    intent.putExtra("review",reviewInfo)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+    context.startActivity(intent)
+}
+
+//General openScreen function TODO refactor to use this!
+fun openScreen(context: Context, activityClass:ComponentActivity){
+    val intent = Intent(context, activityClass::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     context.startActivity(intent)
 }

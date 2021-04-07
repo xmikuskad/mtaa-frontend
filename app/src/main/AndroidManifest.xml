@@ -9,6 +9,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.TechTalk">
         <activity
             android:name=".activities.SplashActivity"
@@ -30,5 +31,6 @@
         <activity android:name=".activities.CreateAccountActivity"/>
         <activity android:name=".activities.RegisterSuccessActivity"/>
         <activity android:name=".activities.SettingsActivity"/>
+        <activity android:name=".activities.ReviewInfoActivity"/>
     </application>
 </manifest>
