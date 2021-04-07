@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
@@ -124,19 +123,22 @@ fun ReviewDetails(review: ReviewInfoItem, scrollState:ScrollState, id:Int){
     Spacer(Modifier.size(20.dp))
 
     //Photos loading
-    Row(
-        modifier = Modifier
-            .height(300.dp)
-            .horizontalScroll(enabled = true, state = scrollState)
-    ) {
-        for(item in review.images) {
-            GlideImage(
-                data = "$ADDRESS/reviews/" + id + "/photo/" + item.image_id,
-                contentDescription = "My content description", fadeIn = true
-            )
-            Spacer(modifier = Modifier.width(20.dp))
+    if(review.images.size > 0) {
+        Row(
+            modifier = Modifier
+                .height(300.dp)
+                .horizontalScroll(enabled = true, state = scrollState)
+        ) {
+            for(item in review.images) {
+                GlideImage(
+                    data = "$ADDRESS/reviews/" + id + "/photo/" + item.image_id,
+                    contentDescription = "My content description", fadeIn = true
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+            }
         }
     }
+
 
     //Positive attributes
     Spacer(Modifier.size(20.dp))
