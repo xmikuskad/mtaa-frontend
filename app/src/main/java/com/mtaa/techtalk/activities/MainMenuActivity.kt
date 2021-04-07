@@ -382,7 +382,7 @@ fun ReviewBox(reviewInfo: ReviewInfoItem) {
         modifier = Modifier
             .padding(20.dp)
             .fillMaxWidth()
-            .clickable(onClick = { openReviewInfo(context,reviewInfo) }),
+            .clickable(onClick = { openReviewInfo(context,reviewInfo.review_id) }),
         backgroundColor = Color.DarkGray
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -415,9 +415,9 @@ fun openCategories(context:Context){
     context.startActivity(intent)
 }
 
-fun openReviewInfo(context: Context,reviewInfo: ReviewInfoItem) {
+fun openReviewInfo(context: Context,reviewID: Int) {
     val intent = Intent(context, ReviewInfoActivity::class.java)
-    intent.putExtra("review",reviewInfo)
+    intent.putExtra("reviewID",reviewID)
     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     context.startActivity(intent)
 }

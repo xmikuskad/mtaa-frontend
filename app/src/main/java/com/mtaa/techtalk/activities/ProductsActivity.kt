@@ -103,7 +103,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            categoryName,
+            "Category $categoryName",
             style = TextStyle(fontSize = 25.sp),
             textAlign = TextAlign.Center
         )

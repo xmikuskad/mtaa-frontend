@@ -110,7 +110,6 @@ class ReviewScreenViewModel: ViewModel() {
 
 @Composable
 fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewModel) {
-    //val context = LocalContext.current
     val reviews by viewModel.liveReviews.observeAsState(initial = emptyList())
 
     Column(
@@ -119,7 +118,7 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            productName,
+            "Reviews of $productName",
             style = TextStyle(fontSize = 25.sp),
             textAlign = TextAlign.Center
         )

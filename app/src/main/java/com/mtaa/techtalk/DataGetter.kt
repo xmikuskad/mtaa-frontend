@@ -38,6 +38,8 @@ object DataGetter {
             body = RegisterInfo(name, password, email)
         }
     }
+    suspend fun getReviewInfo(reviewID:Int) :ReviewInfoItem {
+        return client.get("$ADDRESS/reviews/$reviewID")
+    }
 
-    //"$ADDRESS//reviews/29/photo/29"
 }
