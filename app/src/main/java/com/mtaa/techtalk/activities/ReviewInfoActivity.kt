@@ -53,62 +53,66 @@ class ReviewInfoActivity: ComponentActivity() {
 @ExperimentalFoundationApi
 @Composable
 fun ReviewInfoScreen(review: ReviewInfoItem) {
-    Column(
+
+    val list = mutableListOf(review)
+    val scrollState = rememberScrollState()
+    LazyColumn(
         modifier = Modifier
             .padding(top = 20.dp)
-            .fillMaxSize()
-            .verticalScroll(enabled = true, state = rememberScrollState()),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //First line with name, likes, dislikes
-        Row() {
-            Text(text = "L: " + review.likes)
-            Spacer(Modifier.width(80.dp))
-            Text(text = "Review details")
-            Spacer(Modifier.width(80.dp))
-            Text(text = "D: " + review.dislikes)
-        }
-        Spacer(Modifier.size(20.dp))
-
-        //Photos loading
-        LazyRow(
-            modifier = Modifier.height(300.dp)
-        ) {
-            items(review.images) {item->
-                GlideImage(
-                    data = "$ADDRESS/reviews/"+review.review_id+"/photo/"+item.image_id,
-                    contentDescription = "My content description",
-                )
-                Spacer(modifier = Modifier.width(20.dp))
+        item(list) {
+            //First line with name, likes, dislikes
+            Row() {
+                Text(text = "L: " + review.likes)
+                Spacer(Modifier.width(80.dp))
+                Text(text = "Review details")
+                Spacer(Modifier.width(80.dp))
+                Text(text = "D: " + review.dislikes)
             }
-        }
+            Spacer(Modifier.size(20.dp))
 
-        //Positive attributes
-        Spacer(Modifier.size(20.dp))
-        Text(text = "Positive:")
-        Spacer(Modifier.size(10.dp))
-        for (item in review.attributes) {
-            if (item.is_positive) {
-                Text(text = item.text)
-                Spacer(Modifier.size(10.dp))
+            //Photos loading
+            Row(
+                modifier = Modifier.height(300.dp).horizontalScroll(enabled = true, state = scrollState)
+            ) {
+                for(item in review.images) {
+                    GlideImage(
+                        data = "$ADDRESS/reviews/" + review.review_id + "/photo/" + item.image_id,
+                        contentDescription = "My content description", fadeIn = true
+                    )
+                    Spacer(modifier = Modifier.width(20.dp))
+                }
             }
-        }
 
-        //Negative attributs
-        Spacer(Modifier.size(10.dp))
-        Text(text = "Negative:")
-        Spacer(Modifier.size(10.dp))
-        for (item in review.attributes) {
-            if (!item.is_positive) {
-                Text(text = item.text)
-                Spacer(Modifier.size(10.dp))
+            //Positive attributes
+            Spacer(Modifier.size(20.dp))
+            Text(text = "Positive:")
+            Spacer(Modifier.size(10.dp))
+            for (item in review.attributes) {
+                if (item.is_positive) {
+                    Text(text = item.text)
+                    Spacer(Modifier.size(10.dp))
+                }
             }
-        }
 
-        //Text of review
-        Spacer(Modifier.size(10.dp))
-        Text(text = "Review text")
-        Spacer(Modifier.size(10.dp))
-        Text(text = review.text)
+            //Negative attributs
+            Spacer(Modifier.size(10.dp))
+            Text(text = "Negative:")
+            Spacer(Modifier.size(10.dp))
+            for (item in review.attributes) {
+                if (!item.is_positive) {
+                    Text(text = item.text)
+                    Spacer(Modifier.size(10.dp))
+                }
+            }
+
+            //Text of review
+            Spacer(Modifier.size(10.dp))
+            Text(text = "Review text")
+            Spacer(Modifier.size(10.dp))
+            Text(text = review.text)
+        }
     }
 }
