@@ -38,5 +38,6 @@
         <activity android:name=".activities.AccountActivity"/>
         <activity android:name=".activities.AboutAppActivity"/>
         <activity android:name=".activities.EditAccountActivity"/>
+        <activity android:name=".activities.SearchActivity"/>
     </application>
 </manifest>

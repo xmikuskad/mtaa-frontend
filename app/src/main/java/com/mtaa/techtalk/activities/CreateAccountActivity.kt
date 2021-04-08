@@ -67,16 +67,16 @@ fun CreateAccountScreen() {
         val nameState = remember { mutableStateOf(TextFieldValue()) }
         /**
         ^               // start of line
-        [a-zA-Z]{2,}    // will except a name with at least two characters
+        [a-zA-Z]{2,}    // will accept a name with at least two characters
         \s              // will look for white space between name and surname
-        [a-zA-Z]{1,}    // needs at least 1 Character
+        [a-zA-Z]+       // needs at least 1 Character
         \'?-?           // possibility of ' or - for double barreled and hyphenated surnames - John D'Largy
-        [a-zA-Z]{2,}    // will except a name with at least two characters
+        [a-zA-Z]{2,}    // will accept a name with at least two characters
         \s?             // possibility of another whitespace
-        ([a-zA-Z]{1,})? // possibility of a second surname
+        ([a-zA-Z]+)?    // possibility of a second surname
          */
         val usernameRegex = Pattern.compile(
-            "^([a-zA-Z]{2,}\\s[a-zA-Z]{1,}'?-?[a-zA-Z]{2,}\\s?([a-zA-Z]{1,})?)"
+            "^([a-zA-Z]{2,}\\s[a-zA-Z]+'?-?[a-zA-Z]{2,}\\s?([a-zA-Z]+)?)"
         )
         val isValidName = usernameRegex.matcher(nameState.value.text).matches()
         OutlinedTextField(
@@ -156,15 +156,16 @@ fun CreateAccountScreen() {
             },
             trailingIcon = {
                 if (!isValidPassword) {
-                    Icon(
-                        modifier = Modifier.clickable(
-                            onClick = {
-                                showMessage(context, passwordRules, Toast.LENGTH_LONG)
-                            }
-                        ),
-                        painter = rememberVectorPainter(image = Icons.Filled.Info),
-                        contentDescription = null
-                    )
+                    IconButton(
+                        onClick = {
+                            showMessage(context, passwordRules, Toast.LENGTH_LONG)
+                        }
+                    ) {
+                        Icon(
+                            painter = rememberVectorPainter(image = Icons.Filled.Info),
+                            contentDescription = null
+                        )
+                    }
                 } else {
                     Icon(
                         painter = rememberVectorPainter(image = Icons.Filled.CheckCircle),
@@ -224,10 +225,9 @@ fun CreateAccountScreen() {
                 } else {
                     MainScope().launch(Dispatchers.Main) {
                         try {
-                            val createAccountResponse: HttpStatusCode
                             withContext(Dispatchers.IO) {
                                 // do blocking networking on IO thread
-                                createAccountResponse = DataGetter.createAccount(
+                                DataGetter.createAccount(
                                     nameState.value.text,
                                     emailState.value.text,
                                     passwordState.value.text

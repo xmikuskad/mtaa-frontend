@@ -17,6 +17,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -291,17 +292,34 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
             )
         },
         navigationIcon = {
-            Icon(
-                painter = rememberVectorPainter(Icons.Filled.Menu),
-                contentDescription = null,
-                tint = Color.White,
+            IconButton(
+                onClick = { scope.launch { scaffoldState.drawerState.open() } },
                 modifier = Modifier
                     .size(24.dp, 24.dp)
                     .offset(16.dp)
-                    .clickable(onClick = { scope.launch { scaffoldState.drawerState.open() } })
-            )
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.Menu),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
         },
-        backgroundColor = TechTalkGray
+        backgroundColor = TechTalkGray,
+        actions = {
+            IconButton(
+                onClick = {  },
+                modifier = Modifier
+                    .size(24.dp, 24.dp)
+                    .offset((-16).dp)
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.Search),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+        }
     )
 }
 
