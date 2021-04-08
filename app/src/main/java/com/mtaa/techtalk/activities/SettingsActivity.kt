@@ -1,26 +1,21 @@
 package com.mtaa.techtalk.activities
 
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.layout.layout
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
-import com.mtaa.techtalk.activities.DropdownList
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 
 class SettingsActivity : ComponentActivity() {
@@ -37,7 +32,7 @@ class SettingsActivity : ComponentActivity() {
                     topBar = { TopBar(scaffoldState, scope) },
                     drawerContent = { Drawer(prefs) }
                 ) {
-                    SettingsScreen()
+                    SettingsScreen(prefs)
                 }
             }
         }
@@ -45,7 +40,9 @@ class SettingsActivity : ComponentActivity() {
 }
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(prefs: SharedPreferences) {
+    // TODO *Actually* change settings
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -59,45 +56,67 @@ fun SettingsScreen() {
         Spacer(
             modifier = Modifier.size(20.dp)
         )
+
+        val selectedLanguage = remember { mutableStateOf(prefs.getString("language", "English")) }
         DropdownList(
             items = listOf("English", "Slovak"),
-            label = "Select Language"
+            label = "Select Language",
+            selected = selectedLanguage
         )
         Spacer(
             modifier = Modifier.size(10.dp)
         )
+        val selectedScheme = remember { mutableStateOf(prefs.getString("color-scheme", "Dark Mode")) }
         DropdownList(
             items = listOf("Dark Mode", "Light Mode"),
-            label = "Select Color Scheme"
+            label = "Select Color Scheme",
+            selected = selectedScheme
         )
+        Button(
+            onClick = {
+                prefs.edit().putString("language", selectedLanguage.value).apply()
+                prefs.edit().putString("color-scheme", selectedScheme.value).apply()
+                showMessage(context, "Saved", Toast.LENGTH_LONG)
+            },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.Gray
+            ),
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Text(
+                text = "Save Changes",
+                color = Color.Black
+            )
+        }
     }
 }
 
 @Composable
-fun DropdownList(items: List<String>, label: String? = null) {
+fun DropdownList(items: List<String>, label: String? = null, selected: MutableState<String?>) {
     val expanded = remember { mutableStateOf(false) }
-    val selected = remember { mutableStateOf("") }
 
     Box {
-        OutlinedTextField(
-            value = selected.value,
-            onValueChange = { selected.value = it },
-            label = {
-                if (label != null) {
-                    Text(text = label)
+        selected.value?.let { it ->
+            OutlinedTextField(
+                value = it,
+                onValueChange = { selected.value = it },
+                label = {
+                    if (label != null) {
+                        Text(text = label)
+                    }
+                },
+                readOnly = true,
+                enabled = false,
+                trailingIcon = {
+                    IconButton(onClick = { expanded.value = true }) {
+                        Icon(
+                            Icons.Filled.MoreVert,
+                            contentDescription = null
+                        )
+                    }
                 }
-            },
-            readOnly = true,
-            enabled = false,
-            trailingIcon = {
-                IconButton(onClick = { expanded.value = true }) {
-                    Icon(
-                        Icons.Filled.MoreVert,
-                        contentDescription = null
-                    )
-                }
-            }
-        )
+            )
+        }
 
         DropdownMenu(
             expanded = expanded.value,
