@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -50,6 +52,7 @@ const val MAX_REVIEW_TEXT = 80
 class MainMenuActivity : ComponentActivity() {
     private lateinit var viewModel: MainMenuViewModel
 
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -280,17 +283,16 @@ fun Drawer(prefs: SharedPreferences) {
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
     val searchBarOpen = remember { mutableStateOf(false) }
     TopAppBar(
         title = {
-            if (!searchBarOpen.value) {
-                Image(
-                    painter = painterResource(R.drawable.logo_transparent_banner_text),
-                    contentDescription = null
-                )
-            }
+            Image(
+                painter = painterResource(R.drawable.logo_transparent_banner_text),
+                contentDescription = null
+            )
         },
         navigationIcon = {
             IconButton(
@@ -308,9 +310,10 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
         },
         backgroundColor = TechTalkGray,
         actions = {
-            if (searchBarOpen.value) {
+            AnimatedVisibility (searchBarOpen.value) {
                 SearchBar(searchBarOpen)
-            } else {
+            }
+            if (!searchBarOpen.value) {
                 IconButton(
                     onClick = { searchBarOpen.value = true },
                     modifier = Modifier
