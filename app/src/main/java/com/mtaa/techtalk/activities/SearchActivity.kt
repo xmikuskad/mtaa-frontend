@@ -45,59 +45,57 @@ fun SearchScreen(searchInput: String) {
 @Composable
 fun SearchBar(open: MutableState<Boolean>) {
     val searchText = remember { mutableStateOf(TextFieldValue()) }
-    Box {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .size(48.dp),
-            textStyle = TextStyle(
-                fontSize = 12.sp,
-                color = Color.Black
-            ),
-            value = searchText.value,
-            onValueChange = {
-                searchText.value = it
-            },
-            singleLine = true,
-            leadingIcon = {
-                IconButton(
-                    onClick = {
-                        open.value = false
-                    }
-                ) {
-                    Icon(
-                        painter = rememberVectorPainter(Icons.Filled.Close),
-                        contentDescription = null,
-                        tint = Color.Black
-                    )
+    TextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .size(48.dp),
+        textStyle = TextStyle(
+            fontSize = 12.sp,
+            color = Color.Black
+        ),
+        value = searchText.value,
+        onValueChange = {
+            searchText.value = it
+        },
+        singleLine = true,
+        leadingIcon = {
+            IconButton(
+                onClick = {
+                    open.value = false
                 }
-            },
-            trailingIcon = {
-                IconButton(
-                    onClick = {
-                        // TODO Search
-                    }
-                ) {
-                    Icon(
-                        painter = rememberVectorPainter(Icons.Filled.Search),
-                        contentDescription = null,
-                        tint = Color.Black
-                    )
-                }
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.White,
-                focusedIndicatorColor = Color.White
-            ),
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Search
-            ),
-            keyboardActions = KeyboardActions(
-                onSearch = {
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.Close),
+                    contentDescription = null,
+                    tint = Color.Black
+                )
+            }
+        },
+        trailingIcon = {
+            IconButton(
+                onClick = {
                     // TODO Search
                 }
-            )
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.Search),
+                    contentDescription = null,
+                    tint = Color.Black
+                )
+            }
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.White,
+            focusedIndicatorColor = Color.White
+        ),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Search
+        ),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                // TODO Search
+            }
         )
-    }
+    )
 }
