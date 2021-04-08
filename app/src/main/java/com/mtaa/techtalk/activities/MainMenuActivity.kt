@@ -18,10 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -284,12 +282,15 @@ fun Drawer(prefs: SharedPreferences) {
 
 @Composable
 fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
+    val searchBarOpen = remember { mutableStateOf(false) }
     TopAppBar(
         title = {
-            Image(
-                painter = painterResource(R.drawable.logo_transparent_banner_text),
-                contentDescription = null
-            )
+            if (!searchBarOpen.value) {
+                Image(
+                    painter = painterResource(R.drawable.logo_transparent_banner_text),
+                    contentDescription = null
+                )
+            }
         },
         navigationIcon = {
             IconButton(
@@ -307,17 +308,21 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
         },
         backgroundColor = TechTalkGray,
         actions = {
-            IconButton(
-                onClick = {  },
-                modifier = Modifier
-                    .size(24.dp, 24.dp)
-                    .offset((-16).dp)
-            ) {
-                Icon(
-                    painter = rememberVectorPainter(Icons.Filled.Search),
-                    contentDescription = null,
-                    tint = Color.White
-                )
+            if (searchBarOpen.value) {
+                SearchBar(searchBarOpen)
+            } else {
+                IconButton(
+                    onClick = { searchBarOpen.value = true },
+                    modifier = Modifier
+                        .size(24.dp, 24.dp)
+                        .offset((-16).dp)
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(Icons.Filled.Search),
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
             }
         }
     )
