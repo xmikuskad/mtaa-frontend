@@ -78,40 +78,43 @@ fun DropdownList(items: List<String>, label: String? = null) {
     val expanded = remember { mutableStateOf(false) }
     val selected = remember { mutableStateOf("") }
 
-    OutlinedTextField(
-        value = selected.value,
-        onValueChange = { selected.value = it },
-        label = {
-            if (label != null) {
-                Text(text = label)
-            }
-        },
-        readOnly = true,
-        enabled = false,
-        trailingIcon = {
-            IconButton(onClick = { expanded.value = true }) {
-                Icon(
-                    Icons.Filled.MoreVert,
-                    contentDescription = null
-                )
-            }
-        }
-    )
-
-    DropdownMenu(
-        expanded = expanded.value,
-        onDismissRequest = {
-            expanded.value = false
-        }
-    ) {
-        items.forEach {
-            DropdownMenuItem(
-                onClick = {
-                    expanded.value = false
-                    selected.value = it
+    Box {
+        OutlinedTextField(
+            value = selected.value,
+            onValueChange = { selected.value = it },
+            label = {
+                if (label != null) {
+                    Text(text = label)
                 }
-            ) {
-                Text(it)
+            },
+            readOnly = true,
+            enabled = false,
+            trailingIcon = {
+                IconButton(onClick = { expanded.value = true }) {
+                    Icon(
+                        Icons.Filled.MoreVert,
+                        contentDescription = null
+                    )
+                }
+            }
+        )
+
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = {
+                expanded.value = false
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items.forEach {
+                DropdownMenuItem(
+                    onClick = {
+                        expanded.value = false
+                        selected.value = it
+                    }
+                ) {
+                    Text(it)
+                }
             }
         }
     }
