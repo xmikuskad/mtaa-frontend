@@ -74,7 +74,11 @@ object DataGetter {
             body = registerInfo
         }
     }
-
+    suspend fun getUserInfo(authKey: String, page: Int): UserInfo {
+        return client.get("$ADDRESS/users/$page") {
+            header("auth", authKey)
+        }
+    }
 }
 
 class StreamContent(private val image:File): OutgoingContent.WriteChannelContent() {
