@@ -202,7 +202,7 @@ fun Drawer(prefs: SharedPreferences) {
         Text(
             text = "About App",
             modifier = Modifier.clickable(
-                onClick = { print("About App") }
+                onClick = { openScreen(context, AboutAppActivity()) }
             ),
             fontSize = 28.sp
         )
@@ -220,7 +220,7 @@ fun Drawer(prefs: SharedPreferences) {
             Text(
                 text = "Edit Account",
                 modifier = Modifier.clickable(
-                    onClick = { print("Edit Account") }
+                    onClick = { openScreen(context,EditAccountActivity()) }
                 ),
                 fontSize = 28.sp
             )
@@ -380,7 +380,7 @@ fun ReviewBox(reviewInfo: ReviewInfoItem) {
         modifier = Modifier
             .padding(20.dp)
             .fillMaxWidth()
-            .clickable(onClick = { openReviewInfo(context,reviewInfo.review_id) }),
+            .clickable(onClick = { openReviewInfo(context, reviewInfo.review_id) }),
         backgroundColor = Color.DarkGray
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

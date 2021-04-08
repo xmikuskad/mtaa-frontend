@@ -1,8 +1,11 @@
 package com.mtaa.techtalk.activities
 
 import android.content.Intent
+import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
-import android.util.Patterns.EMAIL_ADDRESS
+import android.util.Patterns
+import android.widget.Space
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,6 +17,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,9 +25,14 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.mtaa.techtalk.DataGetter
+import com.mtaa.techtalk.RegisterInfo
+import com.mtaa.techtalk.ReviewAttributePostPutInfo
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.client.features.*
 import io.ktor.http.*
@@ -35,14 +44,21 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.util.regex.Pattern
 
-class CreateAccountActivity : ComponentActivity() {
+class EditAccountActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
         setContent {
             TechTalkTheme(true) {
-                Surface(color = MaterialTheme.colors.background) {
-                    CreateAccountScreen()
+                val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+                val scope = rememberCoroutineScope()
+                Scaffold(
+                    scaffoldState = scaffoldState,
+                    topBar = { TopBar(scaffoldState, scope) },
+                    drawerContent = { Drawer(prefs) }
+                ) {
+                    EditAccountScreen(this,prefs)
                 }
             }
         }
@@ -50,7 +66,7 @@ class CreateAccountActivity : ComponentActivity() {
 }
 
 @Composable
-fun CreateAccountScreen() {
+fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
     val context = LocalContext.current
     val passwordRules = "Your password must include:\n\n" +
             "- minimum eight characters,\n" +
@@ -64,7 +80,12 @@ fun CreateAccountScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        val nameState = remember { mutableStateOf(TextFieldValue()) }
+        Text(text = "Edit account info",modifier = Modifier.fillMaxWidth(),textAlign = TextAlign.Center,style = MaterialTheme.typography.h4)
+        Spacer(modifier = Modifier.height(50.dp))
+
+        val nameState =
+            remember { mutableStateOf(TextFieldValue(prefs.getString("username", "") ?: "")) }
+
         /**
         ^               // start of line
         [a-zA-Z]{2,}    // will except a name with at least two characters
@@ -82,9 +103,9 @@ fun CreateAccountScreen() {
         OutlinedTextField(
             label = {
                 val label = if (isValidName) {
-                    "Enter your name"
+                    "New name"
                 } else {
-                    "Enter your name*"
+                    "New name*"
                 }
                 Text(label)
             },
@@ -103,13 +124,13 @@ fun CreateAccountScreen() {
 
         Spacer(modifier = Modifier.size(10.dp))
         val emailState = remember { mutableStateOf(TextFieldValue()) }
-        val isValidEmail = EMAIL_ADDRESS.matcher(emailState.value.text).matches()
+        val isValidEmail = Patterns.EMAIL_ADDRESS.matcher(emailState.value.text).matches()
         OutlinedTextField(
             label = {
                 val label = if (isValidEmail) {
-                    "Enter e-mail"
+                    "New or old e-mail"
                 } else {
-                    "Enter e-mail*"
+                    "New or old e-mail*"
                 }
                 Text(label)
             },
@@ -136,9 +157,9 @@ fun CreateAccountScreen() {
         OutlinedTextField(
             label = {
                 val label = if (isValidPassword) {
-                    "Enter password"
+                    "New or old password"
                 } else {
-                    "Enter password*"
+                    "New or old password*"
                 }
                 Text(label)
             },
@@ -200,7 +221,9 @@ fun CreateAccountScreen() {
             }
         )
         Button(
-            modifier = Modifier.padding(30.dp).size(250.dp, 55.dp),
+            modifier = Modifier
+                .padding(30.dp)
+                .size(250.dp, 55.dp),
             onClick = {
                 if (!isValidName || !isValidEmail || !isValidPassword || !isValidSecondPassword) {
                     var message = "Invalid:"
@@ -220,27 +243,29 @@ fun CreateAccountScreen() {
                     if (!isValidSecondPassword) {
                         message += "\n $num. Confirmation Password"
                     }
-                    showMessage(context, message, Toast.LENGTH_SHORT)
+                    showMessage(context, message, Toast.LENGTH_LONG)
                 } else {
                     MainScope().launch(Dispatchers.Main) {
                         try {
-                            val createAccountResponse: HttpStatusCode
+                            val auth = prefs.getString("token", "") ?: ""
                             withContext(Dispatchers.IO) {
                                 // do blocking networking on IO thread
-                                createAccountResponse = DataGetter.createAccount(
-                                    nameState.value.text,
-                                    emailState.value.text,
-                                    passwordState.value.text
+
+                                DataGetter.editAccount(
+                                    RegisterInfo(
+                                        nameState.value.text,
+                                        passwordState.value.text,
+                                        emailState.value.text
+                                    ), auth
                                 )
                             }
                             //Need to be called here to prevent blocking UI
-
-                            val intent = Intent(context, RegisterSuccessActivity::class.java)
-                            intent.putExtra("activity", "create-account")
+                            val intent = Intent(context, MainMenuActivity::class.java)
                             intent.flags =
-                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
                             context.startActivity(intent)
 
+                            prefs.edit().putString("username", nameState.value.text).apply()
                         } catch (e: Exception) {
                             println(e.stackTraceToString())
                             when (e) {
@@ -264,7 +289,22 @@ fun CreateAccountScreen() {
         )
         {
             Text(
-                text = "Create Account",
+                text = "Save changes",
+                color = Color.Black,
+                fontSize = 16.sp
+            )
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Button(
+            onClick = { activity.finish() },
+            modifier = Modifier
+                .size(250.dp, 55.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.Gray
+            )
+        ) {
+            Text(
+                text = "Discard changes",
                 color = Color.Black,
                 fontSize = 16.sp
             )

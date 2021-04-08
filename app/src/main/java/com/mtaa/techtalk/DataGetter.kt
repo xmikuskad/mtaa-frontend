@@ -64,42 +64,15 @@ object DataGetter {
     suspend fun uploadPhoto(reviewID: Int, photoURI: Uri,auth:String,context: Context) {
         return client.post("$ADDRESS/reviews/$reviewID/photo") {
             header("auth",auth)
-            //contentType(ContentType.Image.JPEG)
-            //body = ByteArrayContent(File(photoURI.toString()).readBytes(), ContentType.Application.OctetStream)
-            //body = ByteArrayContent(context.contentResolver.openOutputStream(photoURI)?.to, ContentType.Image.Any)
-            //body = context.contentResolver.openOutputStream(photoURI)?.asOutput()!!
-            //body = ByteArrayContent(context.contentResolver., ContentType.Image.Any)
             body = context.contentResolver.openInputStream(photoURI)?.let { ByteArrayContent(it.readBytes(), ContentType.Image.Any) }!!
         }
-
-
-        /*val parts: List<PartData> = formData {
-            // File upload. Param name is "file-1" and file's name is "file.csv"
-
-            // Verbose DSL
-            val headersBuilder = HeadersBuilder()
-            headersBuilder[HttpHeaders.ContentType] = "application/java-archive"
-            this.append(
-                "file-2",
-                InputProvider { File("gradle/wrapper/gradle-wrapper.jar").inputStream().asInput() },
-                headersBuilder.build()
-            )
+    }
+    suspend fun editAccount(registerInfo: RegisterInfo,auth:String) {
+        return client.put("$ADDRESS/users") {
+            contentType(ContentType.Application.Json)
+            header("auth",auth)
+            body = registerInfo
         }
-
-        client.submitFormWithBinaryData<Unit>(formData = parts /* prepared parts */) {
-            url("https://hookb.in/XXX")
-
-            // Query string parameters
-            parameter("param-1", "value-1")
-            parameter("param-2", "value-2-1")
-            parameter("param-2", "value-2-2")
-
-            // Headers
-            headers {
-                this["X-My-Header-1"] = "X-My-Header-1-Value"
-                appendAll("X-My-Header-2", listOf("X-My-Header-2-Value-1", "X-My-Header-2-Value-2"))
-            }
-        }*/
     }
 
 }
