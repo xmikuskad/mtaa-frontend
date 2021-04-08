@@ -39,9 +39,10 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 import kotlin.math.roundToInt
 
+const val PICK_IMAGES_CODE = 0
+
 class AddReviewActivity: ComponentActivity() {
     private lateinit var viewModel: AddReviewViewModel
-    private val pickImagesCode = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,13 +78,13 @@ class AddReviewActivity: ComponentActivity() {
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true)
         intent.action = Intent.ACTION_GET_CONTENT
-        startActivityForResult(Intent.createChooser(intent,"Select images"), pickImagesCode)
+        startActivityForResult(Intent.createChooser(intent,"Select images"), PICK_IMAGES_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == pickImagesCode){
+        if(requestCode == PICK_IMAGES_CODE){
             if(resultCode == Activity.RESULT_OK){
                 if(data!!.clipData != null) {
                     //Multiple images
