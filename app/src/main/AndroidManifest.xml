@@ -35,5 +35,6 @@
         <activity android:name=".activities.SettingsActivity"/>
         <activity android:name=".activities.ReviewInfoActivity"/>
         <activity android:name=".activities.AddReviewActivity"/>
+        <activity android:name=".activities.AccountActivity"/>
     </application>
 </manifest>
