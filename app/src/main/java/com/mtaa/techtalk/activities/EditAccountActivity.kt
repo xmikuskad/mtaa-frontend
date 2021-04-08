@@ -2,13 +2,12 @@ package com.mtaa.techtalk.activities
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Bundle
 import android.util.Patterns
-import android.widget.Space
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -28,14 +27,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.mtaa.techtalk.DataGetter
 import com.mtaa.techtalk.RegisterInfo
-import com.mtaa.techtalk.ReviewAttributePostPutInfo
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.client.features.*
-import io.ktor.http.*
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -45,6 +40,7 @@ import java.lang.Exception
 import java.util.regex.Pattern
 
 class EditAccountActivity : ComponentActivity() {
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)

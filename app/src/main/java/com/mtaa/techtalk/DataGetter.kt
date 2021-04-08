@@ -1,8 +1,6 @@
 package com.mtaa.techtalk
 
-import android.content.ContentResolver
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import io.ktor.client.*
 import io.ktor.client.features.json.*
@@ -12,11 +10,6 @@ import io.ktor.http.content.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.nio.*
 import java.io.File
-import android.provider.MediaStore
-import androidx.core.net.toFile
-import io.ktor.utils.io.streams.*
-import java.io.ByteArrayOutputStream
-
 
 const val ADDRESS = "http://10.0.2.2:8080"
 

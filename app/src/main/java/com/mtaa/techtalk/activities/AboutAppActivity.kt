@@ -13,21 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
-import androidx.core.content.ContextCompat.startActivity
-
 import android.content.Intent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.core.content.ContextCompat
 import com.mtaa.techtalk.R
 
 
 class AboutAppActivity : ComponentActivity() {
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
