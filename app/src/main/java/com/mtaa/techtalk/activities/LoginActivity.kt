@@ -60,7 +60,7 @@ fun LoginScreen(prefs: SharedPreferences) {
     ) {
         val emailState = remember { mutableStateOf(TextFieldValue()) }
         val isValidEmail = EMAIL_ADDRESS.matcher(emailState.value.text).matches()
-        TextField(
+        OutlinedTextField(
             label = {
                 val label = if (isValidEmail) {
                     "Enter e-mail"
@@ -72,7 +72,7 @@ fun LoginScreen(prefs: SharedPreferences) {
             value = emailState.value,
             onValueChange = { emailState.value = it },
             singleLine = true,
-            modifier = Modifier.size(250.dp, 55.dp),
+            modifier = Modifier.size(250.dp, 64.dp),
             isError = !isValidEmail,
             leadingIcon = {
                 Icon(
@@ -85,7 +85,7 @@ fun LoginScreen(prefs: SharedPreferences) {
         Spacer(modifier = Modifier.size(10.dp))
         val passwordState = remember { mutableStateOf(TextFieldValue()) }
         val isValidPassword = passwordState.value.text != ""
-        TextField(
+        OutlinedTextField(
             label = {
                 val label = if (isValidPassword) {
                     "Enter password"
@@ -98,7 +98,7 @@ fun LoginScreen(prefs: SharedPreferences) {
             onValueChange = { passwordState.value = it },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
-            modifier = Modifier.size(250.dp, 55.dp),
+            modifier = Modifier.size(250.dp, 64.dp),
             isError = !isValidPassword,
             leadingIcon = {
                 Icon(
@@ -110,7 +110,7 @@ fun LoginScreen(prefs: SharedPreferences) {
         Button(
             modifier = Modifier
                 .padding(30.dp)
-                .size(250.dp, 50.dp),
+                .size(250.dp, 55.dp),
             onClick = {
                 if (!isValidEmail && !isValidPassword) {
                     showMessage(context, "Invalid e-mail or password!", Toast.LENGTH_SHORT)

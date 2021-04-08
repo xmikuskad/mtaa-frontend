@@ -1,37 +1,30 @@
 package com.mtaa.techtalk.activities
 
-import android.Manifest
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.startActivityForResult
-import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -44,10 +37,11 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import kotlin.math.roundToInt
 
 class AddReviewActivity: ComponentActivity() {
-    lateinit var viewModel: AddReviewViewModel
-    val PICK_IMAGES_CODE = 0
+    private lateinit var viewModel: AddReviewViewModel
+    private val pickImagesCode = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +59,14 @@ class AddReviewActivity: ComponentActivity() {
                     topBar = { TopBar(scaffoldState, scope) },
                     drawerContent = { Drawer(prefs) }
                 ) {
-                    AddReviewScreen(this,livePositives = viewModel.livePositive, liveNegatives = viewModel.liveNegative,viewModel,productID,prefs)
+                    AddReviewScreen(
+                        addReviewActivity = this,
+                        livePositives = viewModel.livePositive,
+                        liveNegatives = viewModel.liveNegative,
+                        viewModel = viewModel,
+                        productID = productID,
+                        prefs = prefs
+                    )
                 }
             }
         }
@@ -76,13 +77,13 @@ class AddReviewActivity: ComponentActivity() {
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true)
         intent.action = Intent.ACTION_GET_CONTENT
-        startActivityForResult(Intent.createChooser(intent,"Select images"),PICK_IMAGES_CODE)
+        startActivityForResult(Intent.createChooser(intent,"Select images"), pickImagesCode)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == PICK_IMAGES_CODE){
+        if(requestCode == pickImagesCode){
             if(resultCode == Activity.RESULT_OK){
                 if(data!!.clipData != null) {
                     //Multiple images
@@ -109,19 +110,27 @@ class AddReviewViewModel: ViewModel() {
     val liveImage= MutableLiveData<List<Uri>>()
 
     fun addPositive(text:String){
-        livePositive.value = livePositive.value?.plus(ReviewAttributePostPutInfo(text,true)) ?: mutableListOf(ReviewAttributePostPutInfo(text,true))
+        livePositive.value = livePositive.value?.plus(
+            ReviewAttributePostPutInfo(text,true)
+        ) ?: mutableListOf(ReviewAttributePostPutInfo(text,true))
     }
 
     fun deletePositive(text: String){
-        livePositive.value = livePositive.value?.minus(ReviewAttributePostPutInfo(text,true))
+        livePositive.value = livePositive.value?.minus(
+            ReviewAttributePostPutInfo(text,true)
+        )
     }
 
     fun addNegative(text:String){
-        liveNegative.value = liveNegative.value?.plus(ReviewAttributePostPutInfo(text,false)) ?: mutableListOf(ReviewAttributePostPutInfo(text,false))
+        liveNegative.value = liveNegative.value?.plus(
+            ReviewAttributePostPutInfo(text,false)
+        ) ?: mutableListOf(ReviewAttributePostPutInfo(text,false))
     }
 
     fun deleteNegative(text:String){
-        liveNegative.value = liveNegative.value?.minus(ReviewAttributePostPutInfo(text,false))
+        liveNegative.value = liveNegative.value?.minus(
+            ReviewAttributePostPutInfo(text,false)
+        )
     }
 
     fun addPhoto(uri:Uri?){
@@ -130,18 +139,27 @@ class AddReviewViewModel: ViewModel() {
 }
 
 @Composable
-fun AddReviewScreen(addReviewActivity: AddReviewActivity,livePositives: LiveData<List<ReviewAttributePostPutInfo>>,
-                    liveNegatives: LiveData<List<ReviewAttributePostPutInfo>>,viewModel: AddReviewViewModel, productID:Int,prefs:SharedPreferences) {
+fun AddReviewScreen(
+    addReviewActivity: AddReviewActivity,
+    livePositives: LiveData<List<ReviewAttributePostPutInfo>>,
+    liveNegatives: LiveData<List<ReviewAttributePostPutInfo>>,
+    viewModel: AddReviewViewModel,
+    productID:Int,
+    prefs:SharedPreferences
+) {
     val positives by livePositives.observeAsState(initial = mutableListOf())
     val negatives by liveNegatives.observeAsState(initial = mutableListOf())
     val images by viewModel.liveImage.observeAsState(initial = mutableListOf())
 
-    var positiveText by remember { mutableStateOf(TextFieldValue("Text123")) }
-    var negativeText by remember { mutableStateOf(TextFieldValue("Text123")) }
-    var reviewText by remember { mutableStateOf(TextFieldValue("Text123")) }
+    var positiveText by remember { mutableStateOf(TextFieldValue("")) }
+    var negativeText by remember { mutableStateOf(TextFieldValue("")) }
+    var reviewText by remember { mutableStateOf(TextFieldValue("")) }
     var sliderPosition by remember { mutableStateOf(0f) }
 
-    var context = LocalContext.current
+    val context = LocalContext.current
+
+    var negativesCount by remember { mutableStateOf(1) }
+    var positivesCount by remember { mutableStateOf(1) }
 
     Column(
         modifier = Modifier
@@ -158,60 +176,87 @@ fun AddReviewScreen(addReviewActivity: AddReviewActivity,livePositives: LiveData
         Spacer(Modifier.size(10.dp))
 
         for (item in positives) {
-            Row() {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(text = item.text)
                 Spacer(Modifier.size(10.dp))
-                Button(onClick = {
+                IconButton(
+                    onClick = {
                     viewModel.deletePositive(item.text)
-                }) {
-                    Text(text = "Remove")
+                    positivesCount--
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(36.dp),
+                        painter = rememberVectorPainter(Icons.Filled.RemoveCircle),
+                        contentDescription = null
+                    )
                 }
             }
             Spacer(Modifier.size(10.dp))
         }
 
-        Row() {
-            TextField(
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                label =  { Text("Positive $positivesCount") },
                 value = positiveText,
                 onValueChange = {
                     positiveText = it
                 },
-                singleLine = true,
+                singleLine = true
             )
             Spacer(Modifier.size(20.dp))
-            Button(
+            IconButton(
                 onClick = {
                     if (positiveText.text.isEmpty())
-                        return@Button
+                        return@IconButton
                     viewModel.addPositive(positiveText.text)
                     positiveText = TextFieldValue("")
+                    positivesCount++
                 }
             ) {
-                Text(text = "Add")
-
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    painter = rememberVectorPainter(Icons.Filled.AddCircle),
+                    contentDescription = null
+                )
             }
         }
 
         //Negative attributes
-
         Text(text = "Negative attributes")
         Spacer(Modifier.size(10.dp))
 
         for (item in negatives) {
-            Row() {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(text = item.text)
                 Spacer(Modifier.size(10.dp))
-                Button(onClick = {
+                IconButton(
+                    onClick = {
                     viewModel.deleteNegative(item.text)
-                }) {
-                    Text(text = "Remove")
+                    negativesCount--
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(36.dp),
+                        painter = rememberVectorPainter(Icons.Filled.RemoveCircle),
+                        contentDescription = null
+                    )
                 }
             }
             Spacer(Modifier.size(10.dp))
         }
 
-        Row() {
-            TextField(
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                label =  { Text("Negative $negativesCount") },
                 value = negativeText,
                 onValueChange = {
                     negativeText = it
@@ -219,16 +264,20 @@ fun AddReviewScreen(addReviewActivity: AddReviewActivity,livePositives: LiveData
                 singleLine = true,
             )
             Spacer(Modifier.size(20.dp))
-            Button(
+            IconButton(
                 onClick = {
                     if (negativeText.text.isEmpty())
-                        return@Button
+                        return@IconButton
                     viewModel.addNegative(negativeText.text)
                     negativeText = TextFieldValue("")
+                    negativesCount++
                 }
             ) {
-                Text(text = "Add")
-
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    painter = rememberVectorPainter(Icons.Filled.AddCircle),
+                    contentDescription = null
+                )
             }
         }
 
@@ -236,7 +285,10 @@ fun AddReviewScreen(addReviewActivity: AddReviewActivity,livePositives: LiveData
         Spacer(Modifier.size(20.dp))
         Text(text = "Review text")
         Spacer(Modifier.size(10.dp))
-        TextField(
+        OutlinedTextField(
+            label = {
+                Text("Review Text")
+            },
             value = reviewText,
             onValueChange = {
                 reviewText = it
@@ -254,23 +306,42 @@ fun AddReviewScreen(addReviewActivity: AddReviewActivity,livePositives: LiveData
         Slider(
             value = sliderPosition,
             onValueChange = { sliderPosition = it },
-            modifier = Modifier.width(280.dp)
+            modifier = Modifier.width(280.dp),
+            colors = SliderDefaults.colors(
+                thumbColor = Color.Gray,
+                activeTrackColor = Color.LightGray,
+                inactiveTrackColor = Color.DarkGray
+            )
         )
-        Text(text = (Math.round(sliderPosition * 100) / 10.0).toString())
+        Text(text = ((sliderPosition * 100).roundToInt() / 10.0).toString())
 
         //Load images
         Spacer(Modifier.size(20.dp))
-        Button(onClick = {
-            addReviewActivity.loadImagesFromGallery()
-        }) {
-            Text(text = "Add photos")
+        Button(
+            onClick = {
+                addReviewActivity.loadImagesFromGallery()
+            },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.Gray
+            )
+        ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Filled.AddPhotoAlternate),
+                tint = Color.Black,
+                contentDescription = null
+            )
+            Text(
+                text = "Add photos",
+                color = Color.Black
+            )
         }
 
         Spacer(Modifier.size(20.dp))
         for (image in images) {
             GlideImage(
                 data = image,
-                contentDescription = "My content description", fadeIn = true,
+                contentDescription = "My content description",
+                fadeIn = true,
                 modifier = Modifier.clickable(onClick = {
                     println(image)  //TODO delete photo
                 })
@@ -279,36 +350,42 @@ fun AddReviewScreen(addReviewActivity: AddReviewActivity,livePositives: LiveData
         }
 
         //Add review
-        Button(onClick = {
-            MainScope().launch(Dispatchers.Main) {
-                try {
-                    val auth = prefs.getString("token","") ?: ""
-                    val recentReviews: ReviewsInfo
-                    withContext(Dispatchers.IO) {
-                        // do blocking networking on IO thread
-                        //recentReviews = DataGetter.getRecentReviews()
-                        var info = DataGetter.createReview(
-                            ReviewPostInfo(
-                                reviewText.text,
-                                (positives + negatives) as MutableList<ReviewAttributePostPutInfo>,
-                                productID,Math.round(sliderPosition*100)
-                            ),auth
-                        )
-                        //println("NEW REVIEW ID IS "+info.id)
-                        for(image in images) {
-                            //DataGetter.uploadPhoto(info.id,image,auth)
-                            DataGetter.uploadPhoto(info.id,image,auth,context)
+        Button(
+            onClick = {
+                MainScope().launch(Dispatchers.Main) {
+                    try {
+                        val auth = prefs.getString("token","") ?: ""
+                        withContext(Dispatchers.IO) {
+                            // do blocking networking on IO thread
+                            //recentReviews = DataGetter.getRecentReviews()
+                            val info = DataGetter.createReview(
+                                ReviewPostInfo(
+                                    reviewText.text,
+                                    (positives + negatives) as MutableList<ReviewAttributePostPutInfo>,
+                                    productID, (sliderPosition * 100).roundToInt()
+                                ),auth
+                            )
+                            //println("NEW REVIEW ID IS "+info.id)
+                            for(image in images) {
+                                //DataGetter.uploadPhoto(info.id,image,auth)
+                                DataGetter.uploadPhoto(info.id,image,auth,context)
+                            }
                         }
+                        //Need to be called here to prevent blocking UI
+                        openScreen(context, MainMenuActivity())
+                    } catch (e: Exception) {
+                        println(e.stackTraceToString())
                     }
-                    //Need to be called here to prevent blocking UI
-                    openScreen(context, MainMenuActivity())
-                } catch (e: Exception) {
-                    println(e.stackTraceToString())
                 }
-            }
-        }) {
-            Text(text = "Add review")
-
+            },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.Gray
+            )
+        ) {
+            Text(
+                text = "Add review",
+                color = Color.Black
+            )
         }
     }
 

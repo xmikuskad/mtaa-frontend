@@ -66,7 +66,7 @@ fun CreateAccountScreen() {
 
         val nameState = remember { mutableStateOf(TextFieldValue()) }
         val isValidName = nameState.value.text != ""
-        TextField(
+        OutlinedTextField(
             label = {
                 val label = if (isValidName) {
                     "Enter your name"
@@ -78,7 +78,7 @@ fun CreateAccountScreen() {
             value = nameState.value,
             onValueChange = { nameState.value = it },
             singleLine = true,
-            modifier = Modifier.size(250.dp, 55.dp),
+            modifier = Modifier.size(250.dp, 64.dp),
             isError = !isValidName,
             leadingIcon = {
                 Icon(
@@ -91,7 +91,7 @@ fun CreateAccountScreen() {
         Spacer(modifier = Modifier.size(10.dp))
         val emailState = remember { mutableStateOf(TextFieldValue()) }
         val isValidEmail = EMAIL_ADDRESS.matcher(emailState.value.text).matches()
-        TextField(
+        OutlinedTextField(
             label = {
                 val label = if (isValidEmail) {
                     "Enter e-mail"
@@ -103,7 +103,7 @@ fun CreateAccountScreen() {
             value = emailState.value,
             onValueChange = { emailState.value = it },
             singleLine = true,
-            modifier = Modifier.size(250.dp, 55.dp),
+            modifier = Modifier.size(250.dp, 64.dp),
             isError = !isValidEmail,
             leadingIcon = {
                 Icon(
@@ -120,7 +120,7 @@ fun CreateAccountScreen() {
             "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@\$%^&*-]).{8,}\$"
         )
         val isValidPassword = passwordRegex.matcher(passwordState.value.text).matches()
-        TextField(
+        OutlinedTextField(
             label = {
                 val label = if (isValidPassword) {
                     "Enter password"
@@ -133,7 +133,7 @@ fun CreateAccountScreen() {
             onValueChange = { passwordState.value = it },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
-            modifier = Modifier.size(250.dp, 55.dp),
+            modifier = Modifier.size(250.dp, 64.dp),
             isError = !isValidPassword,
             leadingIcon = {
                 Icon(
@@ -164,7 +164,7 @@ fun CreateAccountScreen() {
         Spacer(modifier = Modifier.size(10.dp))
         val secondPasswordState = remember { mutableStateOf(TextFieldValue()) }
         val isValidSecondPassword = secondPasswordState.value.text == passwordState.value.text
-        TextField(
+        OutlinedTextField(
             label = {
                 val label = if (isValidSecondPassword) {
                     "Confirm password"
@@ -177,7 +177,7 @@ fun CreateAccountScreen() {
             onValueChange = { secondPasswordState.value = it },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
-            modifier = Modifier.size(250.dp, 55.dp),
+            modifier = Modifier.size(250.dp, 64.dp),
             isError = !isValidSecondPassword,
             leadingIcon = {
                 Icon(
@@ -187,7 +187,7 @@ fun CreateAccountScreen() {
             }
         )
         Button(
-            modifier = Modifier.padding(30.dp).size(250.dp, 50.dp),
+            modifier = Modifier.padding(30.dp).size(250.dp, 55.dp),
             onClick = {
                 if (!isValidName || !isValidEmail || !isValidPassword || !isValidSecondPassword) {
                     var message = "Invalid:"
