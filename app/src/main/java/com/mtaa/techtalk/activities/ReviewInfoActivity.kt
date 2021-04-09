@@ -3,6 +3,7 @@ package com.mtaa.techtalk.activities
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -30,6 +31,7 @@ import java.lang.Exception
 class ReviewInfoActivity: ComponentActivity() {
     lateinit var viewModel: ReviewInfoViewModel
 
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

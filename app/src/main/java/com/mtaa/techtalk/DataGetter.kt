@@ -1,23 +1,14 @@
 package com.mtaa.techtalk
 
-import android.content.ContentResolver
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import io.ktor.client.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.utils.io.*
-import io.ktor.utils.io.jvm.nio.*
-import java.io.File
-import android.provider.MediaStore
-import androidx.core.net.toFile
 import com.mtaa.techtalk.activities.PRICE_MULTIPLIER
 import com.mtaa.techtalk.activities.ProductsActivity
-import io.ktor.utils.io.streams.*
-import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
 
@@ -101,7 +92,15 @@ object DataGetter {
     suspend fun getCategoryBrands(categoryID: Int) :BrandsInfo {
         return client.get("$ADDRESS/categories/$categoryID/brands")
     }
-
+    suspend fun getUserInfo(authKey: String, page: Int): UserInfo {
+        return client.get("$ADDRESS/users/$page") {
+            header("auth", authKey)
+        }
+    }
+    suspend fun search(searchInput: String, page: Int): ProductsInfo {
+        return client.post("$ADDRESS/products/search/$page") {
+            contentType(ContentType.Application.Json)
+            body = NameInfo(searchInput)
+        }
+    }
 }
-
-

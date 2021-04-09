@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,10 +19,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +52,7 @@ const val MAX_REVIEW_TEXT = 80
 class MainMenuActivity : ComponentActivity() {
     private lateinit var viewModel: MainMenuViewModel
 
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -135,7 +137,15 @@ fun Drawer(prefs: SharedPreferences) {
             modifier = Modifier
             .clickable(
                 onClick = {
-                    println("Open user info")
+                    if (authToken != "" && name != "") {
+                        val intent = Intent(context, AccountActivity::class.java)
+                        intent.putExtra("activity", "drawer")
+                        intent.putExtra("token", authToken)
+                        intent.putExtra("username", name)
+                        context.startActivity(intent)
+                    } else {
+                        showMessage(context, "You are not logged-in", Toast.LENGTH_SHORT)
+                    }
                 }
             ),
             verticalAlignment = Alignment.CenterVertically
@@ -273,8 +283,10 @@ fun Drawer(prefs: SharedPreferences) {
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
+    val searchBarOpen = remember { mutableStateOf(false) }
     TopAppBar(
         title = {
             Image(
@@ -283,17 +295,39 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
             )
         },
         navigationIcon = {
-            Icon(
-                painter = rememberVectorPainter(Icons.Filled.Menu),
-                contentDescription = null,
-                tint = Color.White,
+            IconButton(
+                onClick = { scope.launch { scaffoldState.drawerState.open() } },
                 modifier = Modifier
                     .size(24.dp, 24.dp)
                     .offset(16.dp)
-                    .clickable(onClick = { scope.launch { scaffoldState.drawerState.open() } })
-            )
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.Menu),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
         },
-        backgroundColor = TechTalkGray
+        backgroundColor = TechTalkGray,
+        actions = {
+            AnimatedVisibility (searchBarOpen.value) {
+                SearchBar(searchBarOpen)
+            }
+            if (!searchBarOpen.value) {
+                IconButton(
+                    onClick = { searchBarOpen.value = true },
+                    modifier = Modifier
+                        .size(24.dp, 24.dp)
+                        .offset((-16).dp)
+                ) {
+                    Icon(
+                        painter = rememberVectorPainter(Icons.Filled.Search),
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+            }
+        }
     )
 }
 

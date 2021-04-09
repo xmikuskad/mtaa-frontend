@@ -2,7 +2,6 @@ package com.mtaa.techtalk
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
-import java.io.Serializable
 
 data class RegisterInfo(val name: String, val password: String, val email: String)
 data class LoginInfo(val password: String, val email: String)
