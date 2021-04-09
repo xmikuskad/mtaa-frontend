@@ -14,8 +14,11 @@ import io.ktor.utils.io.jvm.nio.*
 import java.io.File
 import android.provider.MediaStore
 import androidx.core.net.toFile
+import com.mtaa.techtalk.activities.PRICE_MULTIPLIER
+import com.mtaa.techtalk.activities.ProductsActivity
 import io.ktor.utils.io.streams.*
 import java.io.ByteArrayOutputStream
+import kotlin.math.roundToInt
 
 
 const val ADDRESS = "http://10.0.2.2:8080"
@@ -33,8 +36,17 @@ object DataGetter {
     suspend fun getCategories(): CategoriesInfo {
         return client.get("$ADDRESS/categories")
     }
-    suspend fun getProducts(categoryID:Int, page:Int): ProductsInfo {
-        return client.get("$ADDRESS/categories/$categoryID/$page")
+    suspend fun getProducts(categoryID:Int, page:Int, obj: ProductsActivity.QueryAttributes): ProductsInfo {
+        return client.get("$ADDRESS/categories/$categoryID/$page") {
+            if (obj.min_price > 0.0001f)
+                parameter("min_price",(obj.min_price* PRICE_MULTIPLIER*100).roundToInt())  //*100 converts to cents
+            if (obj.max_price < 0.9999f)
+                parameter("max_price",(obj.max_price* PRICE_MULTIPLIER*100).roundToInt())  //*100 converts to cents
+            if (obj.min_score> 0.0001f)
+                parameter("min_score",(obj.min_score*100).roundToInt())
+            if (obj.brands.isNotEmpty())
+                parameter("brands",obj.brands)
+        }
     }
     suspend fun getReviews(productID:Int, page:Int): ReviewsInfo {
         return client.get("$ADDRESS/products/$productID/$page")
@@ -74,19 +86,10 @@ object DataGetter {
             body = registerInfo
         }
     }
-
-}
-
-class StreamContent(private val image:File): OutgoingContent.WriteChannelContent() {
-    override suspend fun writeTo(channel: ByteWriteChannel) {
-        val readChannel = image.inputStream().channel
-        var copiedBytes: Long
-        do {
-            copiedBytes = readChannel.copyTo(channel, 1024)
-        } while (copiedBytes > 0)
+    suspend fun getCategoryBrands(categoryID: Int) :BrandsInfo {
+        return client.get("$ADDRESS/categories/$categoryID/brands")
     }
-    override val contentType = ContentType.Image.Any
-    override val contentLength: Long = image.length()
 
 }
+
 
