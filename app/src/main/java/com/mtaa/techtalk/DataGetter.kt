@@ -7,9 +7,6 @@ import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.utils.io.*
-import io.ktor.utils.io.jvm.nio.*
-import java.io.File
 
 const val ADDRESS = "http://10.0.2.2:8080"
 
@@ -72,18 +69,10 @@ object DataGetter {
             header("auth", authKey)
         }
     }
-}
-
-class StreamContent(private val image:File): OutgoingContent.WriteChannelContent() {
-    override suspend fun writeTo(channel: ByteWriteChannel) {
-        val readChannel = image.inputStream().channel
-        var copiedBytes: Long
-        do {
-            copiedBytes = readChannel.copyTo(channel, 1024)
-        } while (copiedBytes > 0)
+    suspend fun search(searchInput: String, page: Int): ProductsInfo {
+        return client.post("$ADDRESS/products/search/$page") {
+            contentType(ContentType.Application.Json)
+            body = NameInfo(searchInput)
+        }
     }
-    override val contentType = ContentType.Image.Any
-    override val contentLength: Long = image.length()
-
 }
-
