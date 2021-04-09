@@ -147,12 +147,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
         val brands by viewModel.liveBrands.observeAsState(initial = emptyList())
         var minPrice by remember { mutableStateOf(obj.min_price) }
         var maxPrice by remember { mutableStateOf(obj.max_price) }
-
-        //When using this variable, dont forget to substract bonusScore !!
         var score by remember { mutableStateOf(obj.min_score) }
-
-        //Used to force UI update - cant be done better
-        var bonusScore by remember { mutableStateOf(0f) }
 
         //Storing status of checkboxes
         val map by remember { mutableStateOf(HashMap<Int, Boolean>()) }
@@ -211,7 +206,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             Spacer(modifier = Modifier.height(30.dp))
             Text(text = "Minimum score")
             Slider(
-                value = score - bonusScore,
+                value = score,
                 onValueChange = { score = it },
                 modifier = Modifier.width(280.dp),
                 colors = SliderDefaults.colors(
@@ -220,7 +215,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                     inactiveTrackColor = Color.DarkGray
                 )
             )
-            Text(text = (((score - bonusScore) * 100).roundToInt() / 10.0).toString())
+            Text(text = (((score) * 100).roundToInt() / 10.0).toString())
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -242,7 +237,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
 
                             //Updating to force UI recomposition
                             score += 0.01f
-                            bonusScore += 0.01f
+                            score -= 0.01f
                         }
                     )
                     Text(text = brand.name)
@@ -254,7 +249,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             Button(onClick = {
                 obj.min_price = minPrice
                 obj.max_price = maxPrice
-                obj.min_score = score - bonusScore
+                obj.min_score = score
                 var brandString = ""
                 for (brand in brands) {
                     if (map[brand.brand_id] == true) {
@@ -281,8 +276,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                 obj.min_price = 0f
                 maxPrice = 1f
                 obj.max_price = 1f
-                score = 0.001f
-                bonusScore = 0.001f
+                score = 0f
                 obj.min_score = 0f
 
                 viewModel.reloadProducts(categoryId, obj)
