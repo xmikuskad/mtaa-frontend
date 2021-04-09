@@ -39,13 +39,25 @@ object DataGetter {
     suspend fun getProducts(categoryID:Int, page:Int, obj: ProductsActivity.QueryAttributes): ProductsInfo {
         return client.get("$ADDRESS/categories/$categoryID/$page") {
             if (obj.min_price > 0.0001f)
-                parameter("min_price",(obj.min_price* PRICE_MULTIPLIER*100).roundToInt())  //*100 converts to cents
+                parameter(
+                    "min_price",
+                    (obj.min_price * PRICE_MULTIPLIER * 100).roundToInt()
+                )  //*100 converts to cents
             if (obj.max_price < 0.9999f)
-                parameter("max_price",(obj.max_price* PRICE_MULTIPLIER*100).roundToInt())  //*100 converts to cents
-            if (obj.min_score> 0.0001f)
-                parameter("min_score",(obj.min_score*100).roundToInt())
+                parameter(
+                    "max_price",
+                    (obj.max_price * PRICE_MULTIPLIER * 100).roundToInt()
+                )  //*100 converts to cents
+            if (obj.min_score > 0.0001f)
+                parameter("min_score", (obj.min_score * 100).roundToInt())
             if (obj.brands.isNotEmpty())
-                parameter("brands",obj.brands)
+                parameter("brands", obj.brands)
+            if (obj.order_by.isNotEmpty()) {
+                parameter("order_by", obj.order_by)
+            }
+            if (obj.order_type.isNotEmpty()) {
+                parameter("order_type", obj.order_type)
+            }
         }
     }
     suspend fun getReviews(productID:Int, page:Int): ReviewsInfo {

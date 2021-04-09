@@ -57,7 +57,7 @@ fun SettingsScreen(prefs: SharedPreferences) {
             modifier = Modifier.size(20.dp)
         )
 
-        val selectedLanguage = remember { mutableStateOf(prefs.getString("language", "English")) }
+        val selectedLanguage = remember { mutableStateOf(prefs.getString("language", "English")?:"English") }
         DropdownList(
             items = listOf("English", "Slovak"),
             label = "Select Language",
@@ -66,7 +66,7 @@ fun SettingsScreen(prefs: SharedPreferences) {
         Spacer(
             modifier = Modifier.size(10.dp)
         )
-        val selectedScheme = remember { mutableStateOf(prefs.getString("color-scheme", "Dark Mode")) }
+        val selectedScheme = remember { mutableStateOf(prefs.getString("color-scheme", "Dark Mode")?:"Dark Mode") }
         DropdownList(
             items = listOf("Dark Mode", "Light Mode"),
             label = "Select Color Scheme",
@@ -92,31 +92,29 @@ fun SettingsScreen(prefs: SharedPreferences) {
 }
 
 @Composable
-fun DropdownList(items: List<String>, label: String? = null, selected: MutableState<String?>) {
+fun DropdownList(items: List<String>, label: String? = null, selected: MutableState<String>) {
     val expanded = remember { mutableStateOf(false) }
 
     Box {
-        selected.value?.let { it ->
-            OutlinedTextField(
-                value = it,
-                onValueChange = { selected.value = it },
-                label = {
-                    if (label != null) {
-                        Text(text = label)
-                    }
-                },
-                readOnly = true,
-                enabled = false,
-                trailingIcon = {
-                    IconButton(onClick = { expanded.value = true }) {
-                        Icon(
-                            Icons.Filled.MoreVert,
-                            contentDescription = null
-                        )
-                    }
+        OutlinedTextField(
+            value = selected.value,
+            onValueChange = { selected.value = it },
+            label = {
+                if (label != null) {
+                    Text(text = label)
                 }
-            )
-        }
+            },
+            readOnly = true,
+            enabled = false,
+            trailingIcon = {
+                IconButton(onClick = { expanded.value = true }) {
+                    Icon(
+                        Icons.Filled.MoreVert,
+                        contentDescription = null
+                    )
+                }
+            }
+        )
 
         DropdownMenu(
             expanded = expanded.value,
