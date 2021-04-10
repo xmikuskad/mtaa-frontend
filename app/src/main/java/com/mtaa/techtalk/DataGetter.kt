@@ -27,7 +27,7 @@ object DataGetter {
     suspend fun getCategories(): CategoriesInfo {
         return client.get("$ADDRESS/categories")
     }
-    suspend fun getProducts(categoryID:Int, page:Int, obj: ProductsActivity.QueryAttributes): ProductsInfo {
+    suspend fun getProducts(categoryID:Int, page:Int, obj: QueryAttributes): ProductsInfo {
         return client.get("$ADDRESS/categories/$categoryID/$page") {
             if (obj.min_price > 0.0001f)
                 parameter(

@@ -50,14 +50,15 @@ class ProductsActivity : ComponentActivity() {
     private lateinit var categoryName: String
     private var categoryId: Int = 0
 
-    companion object QueryAttributes {
+    /*companion object QueryAttributes {
         var order_by = ""
         var order_type = ""
         var brands = ""
         var min_price = 0f
         var max_price = 1f
         var min_score = 0f
-    }
+    }*/
+    private var queryAttributes = QueryAttributes("","","",0f,1f,0f)
 
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,12 +79,12 @@ class ProductsActivity : ComponentActivity() {
                     topBar = { TopBar(scaffoldState, scope) },
                     drawerContent = { Drawer(prefs) }
                 ) {
-                    ProductsScreen(categoryId, categoryName, viewModel, QueryAttributes)
+                    ProductsScreen(categoryId, categoryName, viewModel, queryAttributes)
                 }
             }
         }
 
-        viewModel.loadProducts(categoryId,QueryAttributes)
+        viewModel.loadProducts(categoryId,queryAttributes)
         viewModel.loadBrands(categoryId)
     }
 }
@@ -97,7 +98,7 @@ class ProductScreenViewModel: ViewModel() {
 
     private var page = 1
 
-    fun loadProducts(categoryId: Int, obj:ProductsActivity.QueryAttributes) {
+    fun loadProducts(categoryId: Int, obj:QueryAttributes) {
         MainScope().launch(Dispatchers.Main) {
             try {
                 val products: ProductsInfo
@@ -113,7 +114,7 @@ class ProductScreenViewModel: ViewModel() {
         }
     }
 
-    fun reloadProducts(categoryId: Int, obj:ProductsActivity.QueryAttributes)
+    fun reloadProducts(categoryId: Int, obj:QueryAttributes)
     {
         liveProducts.value = mutableListOf()
         page = 1
@@ -138,7 +139,7 @@ class ProductScreenViewModel: ViewModel() {
 }
 
 @Composable
-fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenViewModel, obj:ProductsActivity.QueryAttributes) {
+fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenViewModel, obj:QueryAttributes) {
     val products by viewModel.liveProducts.observeAsState(initial = emptyList())
     val filterState = remember { mutableStateOf(DrawerValue.Closed) }
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }

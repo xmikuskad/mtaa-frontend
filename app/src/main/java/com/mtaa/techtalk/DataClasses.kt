@@ -64,3 +64,9 @@ data class ReviewAttributePostPutInfo(val text: String, val is_positive: Boolean
 data class ReviewPutInfo(val text: String, val attributes: MutableList<ReviewAttributePostPutInfo>, val score: Int)
 data class ReviewVotesInfo(val likes:Int, val dislikes:Int)
 data class ReviewIdInfo(val id:Int)
+
+/***
+ * Other data classes
+ */
+
+data class QueryAttributes(var order_by:String, var order_type:String, var brands:String, var min_price :Float, var max_price:Float, var min_score:Float)
