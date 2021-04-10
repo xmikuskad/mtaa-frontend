@@ -280,6 +280,10 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                 score = 0f
                 obj.min_score = 0f
 
+                //Updating to force UI recomposition
+                score += 0.01f
+                score -= 0.01f
+
                 viewModel.reloadProducts(categoryId, obj)
             }) {
                 Text("Clear filter")
