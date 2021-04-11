@@ -131,7 +131,7 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
                 .padding(top = 10.dp)
         ) {
             itemsIndexed(reviews) { index,item ->
-                ReviewBox(reviewInfo = item)
+                ReviewBox(reviewInfo = item,canEdit = false)
                 if(index == reviews.lastIndex) {
                     viewModel.loadReviews(productId)
                 }

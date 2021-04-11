@@ -39,5 +39,6 @@
         <activity android:name=".activities.AboutAppActivity"/>
         <activity android:name=".activities.EditAccountActivity"/>
         <activity android:name=".activities.SearchActivity"/>
+        <activity android:name=".activities.EditReviewActivity"/>
     </application>
 </manifest>

@@ -8,7 +8,6 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import com.mtaa.techtalk.activities.PRICE_MULTIPLIER
-import com.mtaa.techtalk.activities.ProductsActivity
 import kotlin.math.roundToInt
 
 
@@ -66,7 +65,7 @@ object DataGetter {
             body = RegisterInfo(name, password, email)
         }
     }
-    suspend fun getReviewInfo(reviewID:Int) :ReviewInfoItem {
+    suspend fun getReviewInfo(reviewID:Int) :ReviewInfo {
         return client.get("$ADDRESS/reviews/$reviewID")
     }
     suspend fun createReview(review:ReviewPostInfo, auth:String):ReviewIdInfo {
@@ -74,6 +73,18 @@ object DataGetter {
             contentType(ContentType.Application.Json)
             header("auth",auth)
             body = review
+        }
+    }
+    suspend fun updateReview(review: ReviewPutInfo, reviewID: Int, auth:String) {
+        return client.put("$ADDRESS/reviews/${reviewID}") {
+            contentType(ContentType.Application.Json)
+            header("auth",auth)
+            body = review
+        }
+    }
+    suspend fun deleteReview(reviewID: Int, auth:String) {
+        return client.delete("$ADDRESS/reviews/${reviewID}") {
+            header("auth",auth)
         }
     }
     suspend fun uploadPhoto(reviewID: Int, photoURI: Uri,auth:String,context: Context) {

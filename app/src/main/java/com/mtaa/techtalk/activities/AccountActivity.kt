@@ -118,7 +118,7 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
                 .padding(top = 10.dp)
         ) {
             itemsIndexed(userReviews) { index, item ->
-                ReviewBox(reviewInfo = item)
+                ReviewBox(reviewInfo = item,canEdit = true)
                 if(index == userReviews.lastIndex) {
                     if (authKey != null) {
                         viewModel.loadUserReviews(authKey)

@@ -373,7 +373,7 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
         )
         LazyColumn(modifier = Modifier.padding(top = 15.dp)) {
             items(reviews) { item ->
-                ReviewBox(item)
+                ReviewBox(item,false)
             }
         }
     }
@@ -397,14 +397,14 @@ fun CategoryMainMenu(item:CategoryInfo,context: Context){
 }
 
 @Composable
-fun ReviewBox(reviewInfo: ReviewInfoItem) {
+fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
     val context = LocalContext.current
 
     //Calculate before showing
     var positives = 0
     var negatives = 0
-    for(attr in reviewInfo.attributes){
-        if(attr.is_positive)
+    for (attr in reviewInfo.attributes) {
+        if (attr.is_positive)
             positives++
         else
             negatives++
@@ -414,12 +414,16 @@ fun ReviewBox(reviewInfo: ReviewInfoItem) {
         modifier = Modifier
             .padding(20.dp)
             .fillMaxWidth()
-            .clickable(onClick = { openReviewInfo(context, reviewInfo.review_id) }),
+            .clickable(onClick = {
+                if (canEdit) openReviewEdit(context, reviewInfo.review_id) else {
+                    openReviewInfo(context, reviewInfo.review_id)
+                }
+            }),
         backgroundColor = Color.DarkGray
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = reviewInfo.text.take(MAX_REVIEW_TEXT)+"..." ,
+                text = reviewInfo.text.take(MAX_REVIEW_TEXT) + "...",
                 modifier = Modifier.padding(5.dp)
             )
             Spacer(Modifier.size(10.dp))
@@ -434,7 +438,10 @@ fun ReviewBox(reviewInfo: ReviewInfoItem) {
                 Spacer(Modifier.size(10.dp))
                 Text(text = "${reviewInfo.dislikes} dislikes", modifier = Modifier.padding(5.dp))
                 Spacer(Modifier.size(50.dp))
-                Text(text = "Score ${reviewInfo.score.div(10.0)}/10", modifier = Modifier.padding(5.dp))
+                Text(
+                    text = "Score ${reviewInfo.score.div(10.0)}/10",
+                    modifier = Modifier.padding(5.dp)
+                )
             }
         }
     }
@@ -448,6 +455,12 @@ fun openCategories(context:Context){
 
 fun openReviewInfo(context: Context,reviewID: Int) {
     val intent = Intent(context, ReviewInfoActivity::class.java)
+    intent.putExtra("reviewID",reviewID)
+    context.startActivity(intent)
+}
+
+fun openReviewEdit(context: Context,reviewID: Int) {
+    val intent = Intent(context, EditReviewActivity::class.java)
     intent.putExtra("reviewID",reviewID)
     context.startActivity(intent)
 }

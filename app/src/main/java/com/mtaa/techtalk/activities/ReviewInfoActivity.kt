@@ -15,7 +15,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -65,7 +64,7 @@ class ReviewInfoActivity: ComponentActivity() {
     private fun loadReviewData(reviewID:Int){
         MainScope().launch(Dispatchers.Main) {
             try {
-                val review: ReviewInfoItem
+                val review: ReviewInfo
                 withContext(Dispatchers.IO) {
                     // do blocking networking on IO thread
                     review = DataGetter.getReviewInfo(reviewID)
@@ -81,15 +80,15 @@ class ReviewInfoActivity: ComponentActivity() {
 }
 
 class ReviewInfoViewModel: ViewModel() {
-    val liveReview= MutableLiveData<ReviewInfoItem>()
+    val liveReview= MutableLiveData<ReviewInfo>()
 
-    fun loadReviewData(review:ReviewInfoItem) {
+    fun loadReviewData(review: ReviewInfo) {
         liveReview.value = review
     }
 }
 
 @Composable
-fun ReviewInfoScreen(liveReview: LiveData<ReviewInfoItem>, reviewID: Int) {
+fun ReviewInfoScreen(liveReview: MutableLiveData<ReviewInfo>, reviewID: Int) {
     val reviewData by liveReview.observeAsState(initial = null)
     val scrollState = rememberScrollState()
 
@@ -101,7 +100,7 @@ fun ReviewInfoScreen(liveReview: LiveData<ReviewInfoItem>, reviewID: Int) {
     ) {
         item {
             if(reviewData!=null) {
-                ReviewDetails(review = reviewData!!, scrollState = scrollState,id = reviewID)
+                ReviewDetails(review = reviewData!!, scrollState = scrollState, id = reviewID)
             }
             else{
                 //TODO add loading animation or something
@@ -112,7 +111,7 @@ fun ReviewInfoScreen(liveReview: LiveData<ReviewInfoItem>, reviewID: Int) {
 }
 
 @Composable
-fun ReviewDetails(review: ReviewInfoItem, scrollState:ScrollState, id:Int){
+fun ReviewDetails(review: ReviewInfo, scrollState:ScrollState, id:Int){
     println(review)
     //First line with name, likes, dislikes
     Row() {
