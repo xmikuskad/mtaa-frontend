@@ -139,9 +139,6 @@ fun Drawer(prefs: SharedPreferences) {
                 onClick = {
                     if (authToken != "" && name != "") {
                         val intent = Intent(context, AccountActivity::class.java)
-                        intent.putExtra("activity", "drawer")
-                        intent.putExtra("token", authToken)
-                        intent.putExtra("username", name)
                         context.startActivity(intent)
                     } else {
                         showMessage(context, "You are not logged-in", Toast.LENGTH_SHORT)

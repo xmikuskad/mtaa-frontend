@@ -503,8 +503,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                             }*/
                         }
                         //Need to be called here to prevent blocking UI
-                        //openScreen(context, MainMenuActivity())
-                        activity.finish()
+                        openScreen(context, AccountActivity())
                     } catch (e: Exception) {
                         println(e.stackTraceToString())
                     }
@@ -550,13 +549,11 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                             }*/
                         }
                         //Need to be called here to prevent blocking UI
-                        //openScreen(context, MainMenuActivity())
-                        activity.finish()
+                        openScreen(context, AccountActivity())
                     } catch (e: Exception) {
                         println(e.stackTraceToString())
                     }
                 }
-
             },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Gray

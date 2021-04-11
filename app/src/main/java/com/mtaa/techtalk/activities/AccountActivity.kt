@@ -38,8 +38,8 @@ class AccountActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
-        val authKey = intent.getStringExtra("token")
-        val name = intent.getStringExtra("username")
+        val authKey = prefs.getString("token", "") ?: ""
+        val name = prefs.getString("username", "") ?: ""
         viewModel = ViewModelProvider(this).get(UserReviewsViewModel::class.java)
 
         setContent {
@@ -53,7 +53,7 @@ class AccountActivity : ComponentActivity() {
                 ) {
 
                     AccountScreen(viewModel, authKey, name)
-                    if (authKey != null) {
+                    if (authKey.isNotEmpty()) {
                         viewModel.loadUserReviews(authKey)
                     }
                 }
