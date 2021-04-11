@@ -232,7 +232,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Checkbox(
-                        checked = map[brand.brand_id] ?: true,
+                        checked = map[brand.brand_id] ?: false,
                         onCheckedChange = {
                             map[brand.brand_id] = it
 
@@ -244,7 +244,6 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                     Text(text = brand.name)
                 }
             }
-
 
             Spacer(modifier = Modifier.height(30.dp))
             Button(onClick = {
