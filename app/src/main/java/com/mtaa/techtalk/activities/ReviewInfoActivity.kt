@@ -1,5 +1,6 @@
 package com.mtaa.techtalk.activities
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -48,7 +49,7 @@ class ReviewInfoActivity: ComponentActivity() {
                     drawerContent = { Drawer(prefs) }
                 ){
                     if (reviewID > 0) {
-                        ReviewInfoScreen(viewModel.liveReview, reviewID)
+                        ReviewInfoScreen(viewModel, reviewID,prefs)
                     }
                     else {
                         //TODO better error handling
@@ -81,15 +82,26 @@ class ReviewInfoActivity: ComponentActivity() {
 
 class ReviewInfoViewModel: ViewModel() {
     val liveReview= MutableLiveData<ReviewInfo>()
+    val liveLikes = MutableLiveData<Int>()
+    val liveDislikes = MutableLiveData<Int>()
 
     fun loadReviewData(review: ReviewInfo) {
         liveReview.value = review
+        liveLikes.value = review.likes
+        liveDislikes.value = review.dislikes
+    }
+
+    fun loadVotes(info:ReviewVotesInfo) {
+        liveLikes.value = info.likes
+        liveDislikes.value = info.dislikes
     }
 }
 
 @Composable
-fun ReviewInfoScreen(liveReview: MutableLiveData<ReviewInfo>, reviewID: Int) {
-    val reviewData by liveReview.observeAsState(initial = null)
+fun ReviewInfoScreen(viewModel:ReviewInfoViewModel, reviewID: Int, prefs:SharedPreferences) {
+    val reviewData by viewModel.liveReview.observeAsState(initial = null)
+    val likes by viewModel.liveLikes.observeAsState(initial = 0)
+    val dislikes by viewModel.liveDislikes.observeAsState(initial = 0)
     val scrollState = rememberScrollState()
 
     LazyColumn(
@@ -100,7 +112,7 @@ fun ReviewInfoScreen(liveReview: MutableLiveData<ReviewInfo>, reviewID: Int) {
     ) {
         item {
             if(reviewData!=null) {
-                ReviewDetails(review = reviewData!!, scrollState = scrollState, id = reviewID)
+                ReviewDetails(viewModel,ReviewVotesInfo(likes,dislikes),reviewData!!,scrollState,reviewID,prefs)
             }
             else{
                 //TODO add loading animation or something
@@ -111,15 +123,24 @@ fun ReviewInfoScreen(liveReview: MutableLiveData<ReviewInfo>, reviewID: Int) {
 }
 
 @Composable
-fun ReviewDetails(review: ReviewInfo, scrollState:ScrollState, id:Int){
-    println(review)
+fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: ReviewInfo, scrollState:ScrollState, id:Int, prefs:SharedPreferences){
     //First line with name, likes, dislikes
     Row() {
-        Text(text = "L: " + review.likes)
+        Column{
+            Button(onClick = { addVote(viewModel,true,id,prefs) }) {
+                Text(text = "L")
+            }
+            Text(text = "${votes.likes}")
+        }
         Spacer(Modifier.width(80.dp))
         Text(text = "Review details")
         Spacer(Modifier.width(80.dp))
-        Text(text = "D: " + review.dislikes)
+        Column{
+            Button(onClick = { addVote(viewModel,false,id,prefs) }) {
+                Text(text = "D")
+            }
+            Text(text = "${votes.dislikes}")
+        }
     }
     Spacer(Modifier.size(20.dp))
 
@@ -168,4 +189,28 @@ fun ReviewDetails(review: ReviewInfo, scrollState:ScrollState, id:Int){
     Text(text = "Review text")
     Spacer(Modifier.size(10.dp))
     Text(text = review.text)
+}
+
+fun addVote(viewModel: ReviewInfoViewModel,shouldLike:Boolean,reviewID: Int,prefs:SharedPreferences) {
+    val auth = prefs.getString("token","")?:""
+
+    if(auth.isEmpty())
+    {
+        //TODO show not logged in warning
+        return
+    }
+    MainScope().launch(Dispatchers.Main) {
+        try {
+            val votes: ReviewVotesInfo
+            withContext(Dispatchers.IO) {
+                // do blocking networking on IO thread
+                votes = DataGetter.addVoteToReview(shouldLike,reviewID,auth)
+            }
+            //Need to be called here to prevent blocking UI
+            viewModel.loadVotes(votes)
+        } catch (e: Exception) {
+            //Review wasnt found
+            println(e.stackTraceToString())
+        }
+    }
 }

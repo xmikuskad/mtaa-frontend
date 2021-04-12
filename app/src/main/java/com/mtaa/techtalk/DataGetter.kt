@@ -82,6 +82,12 @@ object DataGetter {
             body = review
         }
     }
+    suspend fun addVoteToReview(shouldLike:Boolean, reviewID: Int, auth:String):ReviewVotesInfo {
+        val link = if(shouldLike) "like" else "dislike"
+        return client.put("$ADDRESS/reviews/${reviewID}/$link") {
+            header("auth",auth)
+        }
+    }
     suspend fun deleteReview(reviewID: Int, auth:String) {
         return client.delete("$ADDRESS/reviews/${reviewID}") {
             header("auth",auth)
