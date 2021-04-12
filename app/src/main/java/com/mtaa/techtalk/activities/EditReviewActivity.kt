@@ -1,5 +1,7 @@
 package com.mtaa.techtalk.activities
 
+import android.app.Activity
+import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
@@ -47,7 +49,7 @@ class EditReviewActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
         viewModel = ViewModelProvider(this).get(EditReviewViewModel::class.java)
-        var reviewID = intent.getIntExtra("reviewID",-1)
+        val reviewID = intent.getIntExtra("reviewID",-1)
 
         setContent {
             TechTalkTheme(true) {
@@ -78,6 +80,36 @@ class EditReviewActivity : ComponentActivity() {
             } catch (e: Exception) {
                 //Review wasnt found
                 println(e.stackTraceToString())
+            }
+        }
+    }
+
+    fun loadImagesFromGallery(){
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true)
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(Intent.createChooser(intent,"Select images"), PICK_IMAGES_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if(requestCode == PICK_IMAGES_CODE){
+            if(resultCode == Activity.RESULT_OK){
+                if(data!!.clipData != null) {
+                    //Multiple images
+                    val count = data.clipData?.itemCount ?: 0 //Number of images
+                    for(i in 0 until count) {
+                        val imageUri = data.clipData!!.getItemAt(i).uri
+                        viewModel.addPhoto(imageUri)
+                    }
+                }
+                else {
+                    //One image
+                    val imageUri = data.data
+                    viewModel.addPhoto(imageUri)
+                }
             }
         }
     }
@@ -140,8 +172,8 @@ class EditReviewViewModel: ViewModel() {
         liveImage.value = (liveImage.value?.plus(uri) ?: mutableListOf(uri)) as List<Uri>?
     }
 
-    fun removePhoto(){
-
+    fun deletePhoto(uri: Uri?){
+        liveImage.value = (liveImage.value?.minus(uri) ?: mutableListOf(uri)) as List<Uri>?
     }
 }
 
@@ -174,6 +206,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
     val positiveStrings by remember { mutableStateOf(mutableListOf<String>()) }
     val negativeStrings by remember { mutableStateOf(mutableListOf<String>()) }
 
+    var showPhotos by remember { mutableStateOf(false) }
+    val deletePhotos by remember { mutableStateOf(mutableListOf<Int>()) }
+
     //Loading
     if (review == null) {
         //TODO do better loading anim
@@ -181,7 +216,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
         return
     }
     var reviewText by remember { mutableStateOf(TextFieldValue(review!!.text)) }
-    var sliderPosition by remember { mutableStateOf(review!!.score/100f) }
+    var sliderPosition by remember { mutableStateOf(review!!.score / 100f) }
 
     Column(
         modifier = Modifier
@@ -428,11 +463,10 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
 
         //Load images
         //Spacer(modifier = Modifier.height(20.dp))
-        Row() {
+        Row {
             Button(
                 onClick = {
-                    //addReviewActivity.loadImagesFromGallery()
-                    // TODO add images from gallery
+                    activity.loadImagesFromGallery()
                 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Gray
@@ -451,8 +485,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             //Spacer(modifier = Modifier.width(20.dp))
             Button(
                 onClick = {
-                    //addReviewActivity.loadImagesFromGallery() /
-                    // TODO remove images (on server + just added)
+                    showPhotos = !showPhotos
                 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Gray
@@ -464,23 +497,62 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     contentDescription = null
                 )
                 Text(
-                    text = "Remove photos",
+                    text = if (showPhotos) "Hide photos" else "Show photos",
                     color = Color.Black
                 )
             }
         }
 
-        //Spacer(modifier = Modifier.height(20.dp))
-        for (image in images) {
-            GlideImage(
-                data = image,
-                contentDescription = "My content description",
-                fadeIn = true,
-                modifier = Modifier.clickable(onClick = {
-                    println(image)  //TODO delete photo
-                })
-            )
-            //Spacer(modifier = Modifier.height(10.dp))
+        if (showPhotos) {
+            //Spacer(modifier = Modifier.height(20.dp))
+            for (image in images) {
+                Box {
+                    GlideImage(
+                        data = image,
+                        contentDescription = "My content description",
+                        fadeIn = true,
+                        modifier = Modifier.clickable(onClick = {
+                            println(image)
+                        }),
+                    )
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+                        Button(onClick = { viewModel.deletePhoto(image) }) {
+                            Text("Delete")
+                        }
+                        //Spacer(modifier = Modifier.height(10.dp))
+                    }
+                }
+            }
+
+            for (image in review!!.images) {
+                if (image.image_id !in deletePhotos) {
+                    Box {
+                        GlideImage(
+                            data = "$ADDRESS/reviews/$reviewID/photo/${image.image_id}",
+                            contentDescription = "My content description",
+                            fadeIn = true,
+                            modifier = Modifier.clickable(onClick = {
+                                println(image)
+                            })
+                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.BottomEnd
+                        ) {
+                            Button(onClick = {
+                                deletePhotos.add(image.image_id)
+                                //Force UI update
+                                sliderPosition += 0.01f
+                                sliderPosition -= 0.01f
+                            }) {
+                                Text("Delete")
+                            }
+                            //Spacer(modifier = Modifier.height(10.dp))
+                        }
+                    }
+                }
+                //Spacer(modifier = Modifier.height(10.dp))
+            }
         }
 
         //Add review
@@ -491,16 +563,19 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                         val auth = prefs.getString("token", "") ?: ""
                         withContext(Dispatchers.IO) {
                             // do blocking networking on IO thread
-                            val info = DataGetter.updateReview(
+                            DataGetter.updateReview(
                                 ReviewPutInfo(
                                     reviewText.text,
                                     (positives + negatives) as MutableList<ReviewAttributePostPutInfo>,
                                     (sliderPosition * 100).roundToInt()
                                 ), reviewID, auth
                             )
-                            /*for(image in images) {
-                                DataGetter.uploadPhoto(info.id,image,auth,context)
-                            }*/
+                            for (image in images) {
+                                DataGetter.uploadPhoto(reviewID, image, auth, context)
+                            }
+                            for(image in deletePhotos) {
+                                DataGetter.deletePhoto(reviewID,image,auth)
+                            }
                         }
                         //Need to be called here to prevent blocking UI
                         openScreen(context, AccountActivity())
@@ -544,9 +619,6 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                         withContext(Dispatchers.IO) {
                             // do blocking networking on IO thread
                             DataGetter.deleteReview(reviewID, auth)
-                            /*for(image in images) {
-                                DataGetter.uploadPhoto(info.id,image,auth,context)
-                            }*/
                         }
                         //Need to be called here to prevent blocking UI
                         openScreen(context, AccountActivity())

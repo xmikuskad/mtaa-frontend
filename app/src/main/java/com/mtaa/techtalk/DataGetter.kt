@@ -93,6 +93,11 @@ object DataGetter {
             body = context.contentResolver.openInputStream(photoURI)?.let { ByteArrayContent(it.readBytes(), ContentType.Image.Any) }!!
         }
     }
+    suspend fun deletePhoto(reviewID: Int,photoID: Int, auth:String) {
+        return client.delete("$ADDRESS/reviews/${reviewID}/photo/$photoID") {
+            header("auth",auth)
+        }
+    }
     suspend fun editAccount(registerInfo: RegisterInfo,auth:String) {
         return client.put("$ADDRESS/users") {
             contentType(ContentType.Application.Json)
