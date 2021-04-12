@@ -139,6 +139,10 @@ class AddReviewViewModel: ViewModel() {
     fun addPhoto(uri:Uri?){
         liveImage.value = (liveImage.value?.plus(uri) ?: mutableListOf(uri)) as List<Uri>?
     }
+
+    fun deletePhoto(uri: Uri?){
+        liveImage.value = (liveImage.value?.minus(uri) ?: mutableListOf(uri)) as List<Uri>?
+    }
 }
 
 @Composable
@@ -341,14 +345,21 @@ fun AddReviewScreen(
 
         Spacer(Modifier.size(20.dp))
         for (image in images) {
-            GlideImage(
-                data = image,
-                contentDescription = "My content description",
-                fadeIn = true,
-                modifier = Modifier.clickable(onClick = {
-                    println(image)  //TODO delete photo
-                })
-            )
+            Box {
+                GlideImage(
+                    data = image,
+                    contentDescription = "My content description",
+                    fadeIn = true,
+                    modifier = Modifier.clickable(onClick = {
+                        println(image)
+                    }),
+                )
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+                    Button(onClick = { viewModel.deletePhoto(image) }) {
+                        Text("Delete")
+                    }
+                }
+            }
             Spacer(Modifier.size(10.dp))
         }
 
@@ -360,7 +371,6 @@ fun AddReviewScreen(
                         val auth = prefs.getString("token","") ?: ""
                         withContext(Dispatchers.IO) {
                             // do blocking networking on IO thread
-                            //recentReviews = DataGetter.getRecentReviews()
                             val info = DataGetter.createReview(
                                 ReviewPostInfo(
                                     reviewText.text,
@@ -368,9 +378,7 @@ fun AddReviewScreen(
                                     productID, (sliderPosition * 100).roundToInt()
                                 ),auth
                             )
-                            //println("NEW REVIEW ID IS "+info.id)
                             for(image in images) {
-                                //DataGetter.uploadPhoto(info.id,image,auth)
                                 DataGetter.uploadPhoto(info.id,image,auth,context)
                             }
                         }
