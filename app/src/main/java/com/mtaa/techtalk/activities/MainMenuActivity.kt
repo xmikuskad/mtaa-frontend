@@ -18,8 +18,21 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ThumbDown
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Login
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.ManageAccounts
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.TableRows
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -175,44 +188,80 @@ fun Drawer(prefs: SharedPreferences) {
             .padding(top = 30.dp, start = 30.dp, bottom = 30.dp)
             .fillMaxWidth()
     ) {
-        Text(
-            text = "Main Menu",
-            modifier = Modifier.clickable(
-                onClick = { openScreen(context,MainMenuActivity()) }
-            ),
-            fontSize = 28.sp
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Filled.Home),
+                contentDescription = null
+            )
+            Spacer(Modifier.size(10.dp))
+            Text(
+                text = "Main Menu",
+                modifier = Modifier.clickable(
+                    onClick = { openScreen(context, MainMenuActivity()) }
+                ),
+                fontSize = 28.sp
+            )
+        }
         Spacer(Modifier.size(20.dp))
-        Text(
-            text = "Categories",
-            modifier = Modifier.clickable(
-                onClick = {
-                    // TODO Don't open if already on category screen
-                    openCategories(context)
-                }
-            ),
-            fontSize = 28.sp
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Filled.TableRows),
+                contentDescription = null
+            )
+            Spacer(Modifier.size(10.dp))
+            Text(
+                text = "Categories",
+                modifier = Modifier.clickable(
+                    onClick = {
+                        openCategories(context)
+                    }
+                ),
+                fontSize = 28.sp
+            )
+        }
         Spacer(Modifier.size(20.dp))
-        Text(
-            text = "Settings",
-            modifier = Modifier.clickable(
-                onClick = {
-                    val intent = Intent(context, SettingsActivity::class.java)
-                    intent.putExtra("activity", "drawer")
-                    context.startActivity(intent)
-                }
-            ),
-            fontSize = 28.sp
-        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Filled.Settings),
+                contentDescription = null
+            )
+            Spacer(Modifier.size(10.dp))
+            Text(
+                text = "Settings",
+                modifier = Modifier.clickable(
+                    onClick = {
+                        val intent = Intent(context, SettingsActivity::class.java)
+                        intent.putExtra("activity", "drawer")
+                        context.startActivity(intent)
+                    }
+                ),
+                fontSize = 28.sp
+            )
+        }
         Spacer(Modifier.size(20.dp))
-        Text(
-            text = "About App",
-            modifier = Modifier.clickable(
-                onClick = { openScreen(context, AboutAppActivity()) }
-            ),
-            fontSize = 28.sp
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Filled.Info),
+                contentDescription = null
+            )
+            Spacer(Modifier.size(10.dp))
+            Text(
+                text = "About App",
+                modifier = Modifier.clickable(
+                    onClick = { openScreen(context, AboutAppActivity()) }
+                ),
+                fontSize = 28.sp
+            )
+        }
     }
     Divider(
         color = Color.Black,
@@ -224,58 +273,94 @@ fun Drawer(prefs: SharedPreferences) {
             .fillMaxWidth()
     ) {
         if (name != "" && authToken != "") {
-            Text(
-                text = "Edit Account",
-                modifier = Modifier.clickable(
-                    onClick = { openScreen(context,EditAccountActivity()) }
-                ),
-                fontSize = 28.sp
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.ManageAccounts),
+                    contentDescription = null
+                )
+                Spacer(Modifier.size(10.dp))
+                Text(
+                    text = "Edit Account",
+                    modifier = Modifier.clickable(
+                        onClick = { openScreen(context, EditAccountActivity()) }
+                    ),
+                    fontSize = 28.sp
+                )
+            }
             Spacer(Modifier.size(20.dp))
-            Text(
-                text = "Log-Out",
-                modifier = Modifier.clickable(
-                    onClick = {
-                        prefs.edit().remove("token").apply()
-                        prefs.edit().remove("username").apply()
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.Logout),
+                    contentDescription = null
+                )
+                Spacer(Modifier.size(10.dp))
+                Text(
+                    text = "Log-Out",
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            prefs.edit().remove("token").apply()
+                            prefs.edit().remove("username").apply()
 
-                        val intent = Intent(context, FirstLaunchActivity::class.java)
-                        intent.putExtra("activity", "menu-log-out")
-                        intent.flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        context.startActivity(intent)
-                    }
-                ),
-                fontSize = 28.sp
-            )
+                            val intent = Intent(context, FirstLaunchActivity::class.java)
+                            intent.putExtra("activity", "menu-log-out")
+                            intent.flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            context.startActivity(intent)
+                        }
+                    ),
+                    fontSize = 28.sp
+                )
+            }
         } else if (name == "" && authToken == "") {
-            Text(
-                text = "Log-In",
-                modifier = Modifier.clickable(
-                    onClick = {
-                        val intent = Intent(context, LoginActivity::class.java)
-                        intent.putExtra("activity", "first-launch")
-                        intent.flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
-                    }
-                ),
-                fontSize = 28.sp
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.Login),
+                    contentDescription = null
+                )
+                Spacer(Modifier.size(10.dp))
+                Text(
+                    text = "Log-In",
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            val intent = Intent(context, LoginActivity::class.java)
+                            intent.putExtra("activity", "first-launch")
+                            intent.flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(intent)
+                        }
+                    ),
+                    fontSize = 28.sp
+                )
+            }
             Spacer(Modifier.size(20.dp))
-            Text(
-                text = "Create account",
-                modifier = Modifier.clickable(
-                    onClick = {
-                        val intent = Intent(context, CreateAccountActivity::class.java)
-                        intent.putExtra("activity", "first-launch")
-                        intent.flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
-                    }
-                ),
-                fontSize = 28.sp
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = rememberVectorPainter(Icons.Filled.PersonAdd),
+                    contentDescription = null
+                )
+                Spacer(Modifier.size(10.dp))
+                Text(
+                    text = "Create account",
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            val intent = Intent(context, CreateAccountActivity::class.java)
+                            intent.putExtra("activity", "first-launch")
+                            intent.flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(intent)
+                        }
+                    ),
+                    fontSize = 28.sp
+                )
+            }
         }
     }
 }
@@ -336,7 +421,7 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
 
     Column(
         modifier = Modifier
-            .padding(top = 20.dp)
+            .padding(top = 10.dp)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -368,7 +453,7 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
             style = TextStyle(fontSize = 25.sp),
             textAlign = TextAlign.Center
         )
-        LazyColumn(modifier = Modifier.padding(top = 15.dp)) {
+        LazyColumn(modifier = Modifier.padding(top = 5.dp)) {
             items(reviews) { item ->
                 ReviewBox(item,false)
             }
@@ -381,14 +466,15 @@ fun CategoryMainMenu(item:CategoryInfo,context: Context){
     Card(
         modifier = Modifier
             .padding(top = 10.dp)
-            .size(150.dp, 30.dp)
+            .size(150.dp, 35.dp)
             .clickable(onClick = { openProductsMenu(item, context) }),
         backgroundColor = Color.DarkGray,
     ) {
         Text(
-            item.name,
+            text = item.name,
             modifier = Modifier.padding(5.dp),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            style = TextStyle(fontSize = 18.sp),
         )
     }
 }
@@ -421,23 +507,52 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = reviewInfo.text.take(MAX_REVIEW_TEXT) + "...",
-                modifier = Modifier.padding(5.dp)
+                modifier = Modifier.padding(15.dp)
             )
-            Spacer(Modifier.size(10.dp))
+            //Spacer(Modifier.size(15.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "$positives positives", modifier = Modifier.padding(5.dp))
-                Spacer(Modifier.size(10.dp))
-                Text(text = "$negatives negatives", modifier = Modifier.padding(5.dp))
+                Icon(
+                    modifier = Modifier.size(25.dp),
+                    painter = rememberVectorPainter(Icons.Filled.AddCircle),
+                    contentDescription = null
+                )
+                Spacer(Modifier.size(5.dp))
+                Text(text = "$positives positives")
+                Spacer(Modifier.size(20.dp))
+                Icon(
+                    modifier = Modifier.size(25.dp),
+                    painter = rememberVectorPainter(Icons.Filled.RemoveCircle),
+                    contentDescription = null
+                )
+                Spacer(Modifier.size(5.dp))
+                Text(text = "$negatives negatives")
             }
-            Spacer(Modifier.size(10.dp))
+            Spacer(Modifier.size(25.dp))
             Row {
-                Text(text = "${reviewInfo.likes} likes", modifier = Modifier.padding(5.dp))
-                Spacer(Modifier.size(10.dp))
-                Text(text = "${reviewInfo.dislikes} dislikes", modifier = Modifier.padding(5.dp))
+                Text(text = "${reviewInfo.likes}")
+                Spacer(Modifier.size(5.dp))
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    painter = rememberVectorPainter(Icons.Filled.ThumbUp),
+                    contentDescription = null
+                )
+                Spacer(Modifier.size(20.dp))
+                Text(text = "${reviewInfo.dislikes}")
+                Spacer(Modifier.size(5.dp))
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    painter = rememberVectorPainter(Icons.Filled.ThumbDown),
+                    contentDescription = null
+                )
                 Spacer(Modifier.size(50.dp))
                 Text(
-                    text = "Score ${reviewInfo.score.div(10.0)}/10",
-                    modifier = Modifier.padding(5.dp)
+                    text = "${reviewInfo.score.div(10.0)} / 10"
+                )
+                Spacer(Modifier.size(5.dp))
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(R.drawable.ic_star),
+                    contentDescription = null
                 )
             }
         }

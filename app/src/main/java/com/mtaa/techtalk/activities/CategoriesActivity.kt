@@ -59,10 +59,12 @@ fun CategoryScreen() {
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "Categories",
-            style = TextStyle(fontSize = 25.sp),
-            textAlign = TextAlign.Center
+            text = "Categories",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h4
         )
+        Spacer(modifier=Modifier.height(10.dp))
         LazyColumn(
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -70,16 +72,16 @@ fun CategoryScreen() {
             items(categories) { item ->
                 Card(
                     modifier = Modifier
-                        .padding(top = 15.dp)
+                        .padding(15.dp)
                         .fillMaxWidth()
                         .clickable(onClick = { openProductsMenu(item, context) }),
                     backgroundColor = Color.DarkGray,
                 ) {
                     Text(
-                        item.name,
-                        modifier = Modifier.padding(15.dp),
+                        text = item.name,
+                        modifier = Modifier.padding(15.dp).fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        style = TextStyle(fontSize = 20.sp)
+                        style = MaterialTheme.typography.h6
                     )
                 }
             }

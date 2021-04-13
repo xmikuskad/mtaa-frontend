@@ -9,24 +9,36 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.typography
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material.icons.filled.ThumbDown
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.accompanist.glide.GlideImage
 import com.mtaa.techtalk.*
+import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import androidx.compose.material.icons.filled.ThumbUp
 
 class ReviewInfoActivity: ComponentActivity() {
     lateinit var viewModel: ReviewInfoViewModel
@@ -106,9 +118,7 @@ fun ReviewInfoScreen(viewModel:ReviewInfoViewModel, reviewID: Int, prefs:SharedP
 
     LazyColumn(
         modifier = Modifier
-            .padding(top = 20.dp)
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
             if(reviewData!=null) {
@@ -125,21 +135,75 @@ fun ReviewInfoScreen(viewModel:ReviewInfoViewModel, reviewID: Int, prefs:SharedP
 @Composable
 fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: ReviewInfo, scrollState:ScrollState, id:Int, prefs:SharedPreferences){
     //First line with name, likes, dislikes
-    Row() {
-        Column{
-            Button(onClick = { addVote(viewModel,true,id,prefs) }) {
-                Text(text = "L")
+    Column(modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Row {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(
+                    onClick = {
+                        addVote(viewModel, true, id, prefs)
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(25.dp),
+                        painter = rememberVectorPainter(Icons.Filled.ThumbUp),
+                        contentDescription = null
+                    )
+                }
+                Text(
+                    text = "${votes.likes}",
+                    textAlign = TextAlign.Center,
+                )
             }
-            Text(text = "${votes.likes}")
-        }
-        Spacer(Modifier.width(80.dp))
-        Text(text = "Review details")
-        Spacer(Modifier.width(80.dp))
-        Column{
-            Button(onClick = { addVote(viewModel,false,id,prefs) }) {
-                Text(text = "D")
+
+            Spacer(Modifier.width(40.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Review details",
+                    textAlign = TextAlign.Center,
+                    style = typography.h5,
+                    modifier = Modifier.padding(top=10.dp,bottom = 5.dp)
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(
+                        text = "${review.score.div(10.0)} / 10",
+                        textAlign = TextAlign.Center,
+                        style = typography.h6,
+                    )
+                    Spacer(Modifier.size(5.dp))
+                    Icon(
+                        modifier = Modifier.size(15.dp),
+                        painter = painterResource(R.drawable.ic_star),
+                        contentDescription = null
+                    )
+                }
             }
-            Text(text = "${votes.dislikes}")
+            Spacer(Modifier.width(40.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(
+                    onClick = {
+                        addVote(viewModel, false, id, prefs)
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(25.dp),
+                        painter = rememberVectorPainter(Icons.Filled.ThumbDown),
+                        contentDescription = null
+                    )
+                }
+                Text(
+                    text = "${votes.dislikes}",
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
     Spacer(Modifier.size(20.dp))
@@ -161,34 +225,84 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
         }
     }
 
+    //Positive attributs
+    Row(
+        modifier = Modifier.padding(start=20.dp,top=10.dp,end = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            modifier = Modifier.size(20.dp),
+            painter = rememberVectorPainter(Icons.Filled.AddCircle),
+            contentDescription = null
+        )
+        Spacer(Modifier.size(5.dp))
+        Text(
+            text = "Positive attributes",
+            textAlign = TextAlign.Center,
+            style = typography.h5
+        )
+    }
 
-    //Positive attributes
+    Column(modifier = Modifier.fillMaxWidth())
+    {
+        for (item in review.attributes) {
+            if (item.is_positive) {
+                Text(text = "- "+item.text,modifier = Modifier.padding(start=30.dp,top=5.dp,end=15.dp))
+            }
+        }
+    }
+
     Spacer(Modifier.size(20.dp))
-    Text(text = "Positive:")
-    Spacer(Modifier.size(10.dp))
-    for (item in review.attributes) {
-        if (item.is_positive) {
-            Text(text = item.text)
-            Spacer(Modifier.size(10.dp))
-        }
-    }
-
     //Negative attributs
-    Spacer(Modifier.size(10.dp))
-    Text(text = "Negative:")
-    Spacer(Modifier.size(10.dp))
-    for (item in review.attributes) {
-        if (!item.is_positive) {
-            Text(text = item.text)
-            Spacer(Modifier.size(10.dp))
+    Row(
+        modifier = Modifier.padding(start=20.dp,top=10.dp,end = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            modifier = Modifier.size(20.dp),
+            painter = rememberVectorPainter(Icons.Filled.RemoveCircle),
+            contentDescription = null
+        )
+        Spacer(Modifier.size(5.dp))
+        Text(
+            text = "Negative attributes",
+            textAlign = TextAlign.Center,
+            style = typography.h5
+        )
+    }
+
+    Column(modifier = Modifier.fillMaxWidth())
+    {
+        for (item in review.attributes) {
+            if (!item.is_positive) {
+                Text(text = "- "+item.text,modifier = Modifier.padding(start=30.dp,top=5.dp,end=15.dp))
+            }
         }
     }
 
+    Spacer(Modifier.size(20.dp))
     //Text of review
-    Spacer(Modifier.size(10.dp))
-    Text(text = "Review text")
-    Spacer(Modifier.size(10.dp))
-    Text(text = review.text)
+    Column(
+        modifier = Modifier.padding(start=20.dp,top=10.dp,end = 10.dp,bottom = 20.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                modifier = Modifier.size(20.dp),
+                painter = rememberVectorPainter(Icons.Filled.Article),
+                contentDescription = null
+            )
+            Spacer(Modifier.size(5.dp))
+            Text(
+                text = "Review text",
+                textAlign = TextAlign.Center,
+                style = typography.h5
+            )
+        }
+        Spacer(Modifier.size(10.dp))
+        Text(text = review.text)
+    }
 }
 
 fun addVote(viewModel: ReviewInfoViewModel,shouldLike:Boolean,reviewID: Int,prefs:SharedPreferences) {

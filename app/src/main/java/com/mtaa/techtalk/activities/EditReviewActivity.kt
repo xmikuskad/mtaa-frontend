@@ -16,6 +16,12 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.Collections
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EditOff
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -39,6 +45,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.painterResource
 
 class EditReviewActivity : ComponentActivity() {
 
@@ -195,9 +202,6 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
 
     val context = LocalContext.current
 
-    var negativesCount by remember { mutableStateOf(1) }
-    var positivesCount by remember { mutableStateOf(1) }
-
     //Tracking if we should use textField or just text
     val positiveStatus by remember { mutableStateOf(mutableListOf(false)) }
     val negativeStatus by remember { mutableStateOf(mutableListOf(false)) }
@@ -220,22 +224,25 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
 
     Column(
         modifier = Modifier
-            .padding(top = 20.dp)
+            .padding(20.dp)
             .verticalScroll(enabled = true, state = rememberScrollState())
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Add review to product",
-            modifier = Modifier.fillMaxWidth(),
+            text = "Edit review",
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h4
         )
-        //Spacer(modifier = Modifier.height(20.dp))
 
         //Positive attributes
-        Text(text = "Positive attributes")
-        //Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = "Positive attributes",
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h6
+        )
 
         for ((count, item) in positives.withIndex()) {
             while (positiveStatus.size <= count) {
@@ -249,7 +256,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (!positiveStatus[count]) {
-                    Text(text = item.text)
+                    Text(text = item.text,modifier = Modifier.width(200.dp))
                 } else {
                     OutlinedTextField(
                         label = { Text("Edit positive") },
@@ -260,22 +267,35 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                             sliderPosition += 0.01f
                             sliderPosition -= 0.01f
                         },
-                        singleLine = true
+                        singleLine = true,
+                        modifier = Modifier.width(250.dp)
                     )
                 }
-
-
-                ////Spacer(modifier = Modifier.width(10.dp))
-                Button(onClick = {
-                    if (positiveStatus[count]) {
-                        viewModel.editPositive(positiveStrings[count], count)
+                IconButton(
+                    onClick = {
+                        if (positiveStatus[count]) {
+                            viewModel.editPositive(positiveStrings[count], count)
+                        }
+                        positiveStatus[count] = !positiveStatus[count]
+                        //Force UI update
+                        sliderPosition += 0.01f
+                        sliderPosition -= 0.01f
                     }
-                    positiveStatus[count] = !positiveStatus[count]
-                    //Force UI update
-                    sliderPosition += 0.01f
-                    sliderPosition -= 0.01f
-                }) {
-                    Text(text = "Edit")
+                ) {
+                    if (!positiveStatus[count]) {
+                        Icon(
+                            modifier = Modifier.size(36.dp).padding(start = 10.dp),
+                            painter = rememberVectorPainter(Icons.Filled.Edit),
+                            contentDescription = null
+                        )
+                    }
+                    else {
+                        Icon(
+                            modifier = Modifier.size(36.dp).padding(start = 10.dp),
+                            painter = rememberVectorPainter(Icons.Filled.Save),
+                            contentDescription = null
+                        )
+                    }
                 }
 
                 IconButton(
@@ -283,41 +303,38 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                         viewModel.deletePositive(item.text)
                         positiveStatus.removeAt(count)
                         positiveStrings.removeAt(count)
-                        positivesCount--
                         //Force UI update
                         sliderPosition += 0.01f
                         sliderPosition -= 0.01f
                     }
                 ) {
                     Icon(
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier.size(36.dp).padding(start=10.dp),
                         painter = rememberVectorPainter(Icons.Filled.RemoveCircle),
                         contentDescription = null
                     )
                 }
             }
-            //Spacer(modifier = Modifier.height(10.dp))
         }
 
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                label = { Text("Positive $positivesCount") },
+                label = { Text("Positive attribute") },
                 value = positiveText,
                 onValueChange = {
                     positiveText = it
                 },
-                singleLine = true
+                singleLine = true,
+                modifier = Modifier.width(250.dp)
             )
-            //Spacer(modifier = Modifier.width(20.dp))
             IconButton(
                 onClick = {
                     if (positiveText.text.isEmpty())
                         return@IconButton
                     viewModel.addPositive(positiveText.text)
                     positiveText = TextFieldValue("")
-                    positivesCount++
                 }
             ) {
                 Icon(
@@ -328,12 +345,13 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             }
         }
 
-        ////Spacer(modifier = Modifier.width(20.dp)) - THIS WILL CRASH APP !
-
         //Negative attributes
-        Text(text = "Negative attributes", modifier = Modifier.padding(20.dp))
-
-        ////Spacer(modifier = Modifier.height(10.dp)) - THIS WILL CRASH APP !
+        Text(
+            text = "Negative attributes",
+            modifier = Modifier.fillMaxWidth().padding(top = 30.dp,bottom = 10.dp),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h6
+        )
 
         for ((count, item) in negatives.withIndex()) {
 
@@ -349,7 +367,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             ) {
 
                 if (!negativeStatus[count]) {
-                    Text(text = item.text)
+                    Text(text = item.text,modifier = Modifier.width(200.dp))
                 } else {
                     OutlinedTextField(
                         label = { Text("Edit positive") },
@@ -360,21 +378,36 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                             sliderPosition += 0.01f
                             sliderPosition -= 0.01f
                         },
-                        singleLine = true
+                        singleLine = true,
+                        modifier = Modifier.width(250.dp)
                     )
                 }
 
-                //Spacer(modifier = Modifier.width(10.dp))
-                Button(onClick = {
-                    if (negativeStatus[count]) {
-                        viewModel.editNegative(negativeStrings[count], count)
+                IconButton(
+                    onClick = {
+                        if (negativeStatus[count]) {
+                            viewModel.editNegative(negativeStrings[count], count)
+                        }
+                        negativeStatus[count] = !negativeStatus[count]
+                        //Force UI update
+                        sliderPosition += 0.01f
+                        sliderPosition -= 0.01f
                     }
-                    negativeStatus[count] = !negativeStatus[count]
-                    //Force UI update
-                    sliderPosition += 0.01f
-                    sliderPosition -= 0.01f
-                }) {
-                    Text(text = "Edit")
+                ) {
+                    if (!negativeStatus[count]) {
+                        Icon(
+                            modifier = Modifier.size(36.dp).padding(start = 10.dp),
+                            painter = rememberVectorPainter(Icons.Filled.Edit),
+                            contentDescription = null
+                        )
+                    }
+                    else {
+                        Icon(
+                            modifier = Modifier.size(36.dp).padding(start = 10.dp),
+                            painter = rememberVectorPainter(Icons.Filled.Save),
+                            contentDescription = null
+                        )
+                    }
                 }
 
                 IconButton(
@@ -382,14 +415,13 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                         viewModel.deleteNegative(item.text)
                         negativeStatus.removeAt(count)
                         negativeStrings.removeAt(count)
-                        negativesCount--
                         //Force UI update
                         sliderPosition += 0.01f
                         sliderPosition -= 0.01f
                     }
                 ) {
                     Icon(
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier.size(36.dp).padding(start = 10.dp),
                         painter = rememberVectorPainter(Icons.Filled.RemoveCircle),
                         contentDescription = null
                     )
@@ -402,12 +434,13 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                label = { Text("Negative $negativesCount") },
+                label = { Text("Negative attribute") },
                 value = negativeText,
                 onValueChange = {
                     negativeText = it
                 },
                 singleLine = true,
+                modifier = Modifier.width(250.dp)
             )
             //Spacer(modifier = Modifier.width(20.dp))
             IconButton(
@@ -416,7 +449,6 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                         return@IconButton
                     viewModel.addNegative(negativeText.text)
                     negativeText = TextFieldValue("")
-                    negativesCount++
                 }
             ) {
                 Icon(
@@ -428,8 +460,23 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
         }
 
         //Review text
-        //Spacer(modifier = Modifier.height(20.dp))
-        Text(text = "Review text")
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 30.dp,bottom = 10.dp),
+        ) {
+            Icon(
+                modifier = Modifier.size(20.dp),
+                painter = rememberVectorPainter(Icons.Filled.Article),
+                contentDescription = null
+            )
+            Text(
+                text = "Review Text",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(start = 5.dp),
+                style = MaterialTheme.typography.h6
+            )
+        }
+
         //Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             label = {
@@ -446,9 +493,12 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
         )
 
         //Score
-        //Spacer(modifier = Modifier.height(20.dp))
-        Text(text = "Score")
-        //Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = "Score",
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h6,
+            modifier = Modifier.padding(top = 20.dp),
+        )
         Slider(
             value = sliderPosition,
             onValueChange = { sliderPosition = it },
@@ -459,18 +509,33 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 inactiveTrackColor = Color.DarkGray
             )
         )
-        Text(text = ((sliderPosition * 100).roundToInt() / 10.0).toString())
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = "${((sliderPosition * 100).roundToInt() / 10.0)} / 10",
+                textAlign = TextAlign.Center
+            )
+            Icon(
+                modifier = Modifier.size(25.dp).padding(start=5.dp),
+                painter = painterResource(com.mtaa.techtalk.R.drawable.ic_star),
+                contentDescription = null
+            )
+        }
 
         //Load images
-        //Spacer(modifier = Modifier.height(20.dp))
-        Row {
+        Row(
+            modifier = Modifier.padding(top=20.dp,bottom = 20.dp)
+        ) {
             Button(
                 onClick = {
                     activity.loadImagesFromGallery()
                 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Gray
-                )
+                ),
+                modifier = Modifier.padding(end=10.dp)
             ) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Filled.AddPhotoAlternate),
@@ -482,17 +547,17 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     color = Color.Black
                 )
             }
-            //Spacer(modifier = Modifier.width(20.dp))
             Button(
                 onClick = {
                     showPhotos = !showPhotos
                 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Gray
-                )
+                ),
+                modifier = Modifier.padding(start=10.dp)
             ) {
                 Icon(
-                    painter = rememberVectorPainter(Icons.Filled.AddPhotoAlternate),
+                    painter = rememberVectorPainter(Icons.Filled.Collections),
                     tint = Color.Black,
                     contentDescription = null
                 )
@@ -506,7 +571,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
         if (showPhotos) {
             //Spacer(modifier = Modifier.height(20.dp))
             for (image in images) {
-                Box {
+                Box(
+                    modifier = Modifier.padding(top=20.dp)
+                ){
                     GlideImage(
                         data = image,
                         contentDescription = "My content description",
@@ -526,7 +593,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
 
             for (image in review!!.images) {
                 if (image.image_id !in deletePhotos) {
-                    Box {
+                    Box(
+                        modifier = Modifier.padding(top=20.dp)
+                    ) {
                         GlideImage(
                             data = "$ADDRESS/reviews/$reviewID/photo/${image.image_id}",
                             contentDescription = "My content description",
@@ -547,11 +616,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                             }) {
                                 Text("Delete")
                             }
-                            //Spacer(modifier = Modifier.height(10.dp))
                         }
                     }
                 }
-                //Spacer(modifier = Modifier.height(10.dp))
             }
         }
 
@@ -586,8 +653,14 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Gray
-            )
+            ),
+            modifier = Modifier.padding(top=15.dp)
         ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Filled.Save),
+                tint = Color.Black,
+                contentDescription = null
+            )
             Text(
                 text = "Save changes",
                 color = Color.Black
@@ -602,8 +675,14 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Gray
-            )
+            ),
+            modifier = Modifier.padding(top=15.dp)
         ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Filled.EditOff),
+                tint = Color.Black,
+                contentDescription = null
+            )
             Text(
                 text = "Discard changes",
                 color = Color.Black
@@ -629,8 +708,14 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Gray
-            )
+            ),
+            modifier = Modifier.padding(top=15.dp)
         ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Filled.Delete),
+                tint = Color.Black,
+                contentDescription = null
+            )
             Text(
                 text = "Delete review",
                 color = Color.Black

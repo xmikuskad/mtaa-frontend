@@ -14,8 +14,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -24,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -32,6 +36,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.accompanist.glide.GlideImage
 import com.mtaa.techtalk.*
+import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -52,6 +57,7 @@ class AddReviewActivity: ComponentActivity() {
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
         viewModel = ViewModelProvider(this).get(AddReviewViewModel::class.java)
         val productID = intent.getIntExtra("productID",-1)
+        val productName = intent.getStringExtra("productName")?:""
 
         setContent {
             TechTalkTheme(true) {
@@ -68,7 +74,8 @@ class AddReviewActivity: ComponentActivity() {
                         liveNegatives = viewModel.liveNegative,
                         viewModel = viewModel,
                         productID = productID,
-                        prefs = prefs
+                        prefs = prefs,
+                        productName = productName
                     )
                 }
             }
@@ -152,7 +159,8 @@ fun AddReviewScreen(
     liveNegatives: LiveData<List<ReviewAttributePostPutInfo>>,
     viewModel: AddReviewViewModel,
     productID:Int,
-    prefs:SharedPreferences
+    prefs:SharedPreferences,
+    productName:String
 ) {
     val positives by livePositives.observeAsState(initial = mutableListOf())
     val negatives by liveNegatives.observeAsState(initial = mutableListOf())
@@ -170,24 +178,40 @@ fun AddReviewScreen(
 
     Column(
         modifier = Modifier
-            .padding(top = 20.dp)
+            .padding(20.dp)
             .verticalScroll(enabled = true, state = rememberScrollState())
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Add review to product")
+        Text(
+            text = "Add review to $productName",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h5
+        )
         Spacer(Modifier.size(20.dp))
 
         //Positive attributes
-        Text(text = "Positive attributes")
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(Modifier.size(5.dp))
+            Text(
+                text = "Positive attributes",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.h6
+            )
+        }
+
         Spacer(Modifier.size(10.dp))
 
         for (item in positives) {
+            Spacer(Modifier.size(5.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = item.text)
-                Spacer(Modifier.size(10.dp))
+                Spacer(Modifier.width(10.dp))
                 IconButton(
                     onClick = {
                     viewModel.deletePositive(item.text)
@@ -201,7 +225,6 @@ fun AddReviewScreen(
                     )
                 }
             }
-            Spacer(Modifier.size(10.dp))
         }
 
         Row(
@@ -232,17 +255,28 @@ fun AddReviewScreen(
                 )
             }
         }
-
+        Spacer(Modifier.size(20.dp))
         //Negative attributes
-        Text(text = "Negative attributes")
+        Row(
+            modifier = Modifier.padding(start=20.dp,top=10.dp,end = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(Modifier.size(5.dp))
+            Text(
+                text = "Negative attributes",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.h6
+            )
+        }
         Spacer(Modifier.size(10.dp))
 
         for (item in negatives) {
+            Spacer(Modifier.size(5.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = item.text)
-                Spacer(Modifier.size(10.dp))
+                Spacer(Modifier.width(10.dp))
                 IconButton(
                     onClick = {
                     viewModel.deleteNegative(item.text)
@@ -256,7 +290,6 @@ fun AddReviewScreen(
                     )
                 }
             }
-            Spacer(Modifier.size(10.dp))
         }
 
         Row(
@@ -288,10 +321,26 @@ fun AddReviewScreen(
             }
         }
 
+
+        //---------------
+        Spacer(Modifier.size(30.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                modifier = Modifier.size(20.dp),
+                painter = rememberVectorPainter(Icons.Filled.Article),
+                contentDescription = null
+            )
+            Spacer(Modifier.size(5.dp))
+            Text(
+                text = "Review text",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.h6
+            )
+        }
+
         //Review text
-        Spacer(Modifier.size(20.dp))
-        Text(text = "Review text")
-        Spacer(Modifier.size(10.dp))
         OutlinedTextField(
             label = {
                 Text("Review Text")
@@ -302,14 +351,18 @@ fun AddReviewScreen(
             },
             singleLine = false,
             modifier = Modifier
-                .padding(20.dp)
+                .padding(10.dp)
                 .fillMaxWidth()
         )
 
         //Score
-        Spacer(Modifier.size(20.dp))
-        Text(text = "Score")
         Spacer(Modifier.size(10.dp))
+        Text(
+            text = "Score",
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h6,
+        )
+
         Slider(
             value = sliderPosition,
             onValueChange = { sliderPosition = it },
@@ -320,7 +373,22 @@ fun AddReviewScreen(
                 inactiveTrackColor = Color.DarkGray
             )
         )
-        Text(text = ((sliderPosition * 100).roundToInt() / 10.0).toString())
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = "${((sliderPosition * 100).roundToInt() / 10.0)} / 10",
+                textAlign = TextAlign.Center
+            )
+            Spacer(Modifier.size(5.dp))
+            Icon(
+                modifier = Modifier.size(15.dp),
+                painter = painterResource(R.drawable.ic_star),
+                contentDescription = null
+            )
+        }
+
 
         //Load images
         Spacer(Modifier.size(20.dp))
@@ -337,6 +405,7 @@ fun AddReviewScreen(
                 tint = Color.Black,
                 contentDescription = null
             )
+            Spacer(modifier = Modifier.size(5.dp))
             Text(
                 text = "Add photos",
                 color = Color.Black
@@ -393,6 +462,12 @@ fun AddReviewScreen(
                 backgroundColor = Color.Gray
             )
         ) {
+            Icon(
+                painter = rememberVectorPainter(Icons.Filled.Add),
+                tint = Color.Black,
+                contentDescription = null
+            )
+            Spacer(modifier = Modifier.size(5.dp))
             Text(
                 text = "Add review",
                 color = Color.Black

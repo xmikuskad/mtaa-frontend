@@ -66,7 +66,7 @@ class ReviewsActivity : ComponentActivity() {
                     drawerContent = { Drawer(prefs) },
                     floatingActionButton = {
                         ExtendedFloatingActionButton(
-                            onClick = { openAddReview(this,productId) },
+                            onClick = { openAddReview(this,productId,productName) },
                             text = {Text(text="Add review")},
                             icon = {
                                 Icon(
@@ -140,10 +140,11 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
     }
 }
 
-fun openAddReview(context: Context, productId: Int)
+fun openAddReview(context: Context, productId: Int, productName: String)
 {
     val intent = Intent(context, AddReviewActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     intent.putExtra("productID",productId)
+    intent.putExtra("productName",productName)
     context.startActivity(intent)
 }

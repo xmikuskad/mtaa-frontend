@@ -1,5 +1,6 @@
 package com.mtaa.techtalk.activities
 
+import com.mtaa.techtalk.R
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -16,12 +17,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +47,7 @@ import java.lang.Exception
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.painterResource
 
 const val PRICE_MULTIPLIER = 10000
 
@@ -49,15 +56,6 @@ class ProductsActivity : ComponentActivity() {
     private lateinit var viewModel: ProductScreenViewModel
     private lateinit var categoryName: String
     private var categoryId: Int = 0
-
-    /*companion object QueryAttributes {
-        var order_by = ""
-        var order_type = ""
-        var brands = ""
-        var min_price = 0f
-        var max_price = 1f
-        var min_score = 0f
-    }*/
     private var queryAttributes = QueryAttributes("","","",0f,1f,0f)
 
     @ExperimentalAnimationApi
@@ -306,12 +304,11 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             )
             {
                 Column(
-                    modifier = Modifier.width(300.dp).height(250.dp),
+                    modifier = Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Text("Order by", style = typography.h5)
                     Spacer(modifier = Modifier.height(20.dp))
-                    Text("Order by", style = typography.h4)
-                    Spacer(modifier = Modifier.height(30.dp))
                     val selectedOrder = remember { mutableStateOf("Newest") }
                     DropdownList(
                         items = listOf(
@@ -324,7 +321,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                         label = "Order by",
                         selected = selectedOrder
                     )
-                    Spacer(modifier = Modifier.height(40.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
                     Button(onClick = {
                         val values = selectedOrder.value.split(" ")
                         if (values.size == 2) {
@@ -351,18 +348,34 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row() {
-            Button(onClick = { orderState.value = DrawerValue.Open }) {
-                Text(text = "Order")
+            IconButton(
+                onClick = {
+                    orderState.value = DrawerValue.Open
+                }
+            ) {
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    painter = painterResource(R.drawable.ic_sort),
+                    contentDescription = null
+                )
             }
-            Spacer(modifier = Modifier.width(20.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Text(
-                "Category $categoryName",
-                style = TextStyle(fontSize = 25.sp),
-                textAlign = TextAlign.Center
+                text = categoryName,
+                textAlign = TextAlign.Center,
+                style = typography.h4
             )
-            Spacer(modifier = Modifier.width(20.dp))
-            Button(onClick = { filterState.value = DrawerValue.Open }) {
-                Text(text = "Filter")
+            Spacer(modifier = Modifier.width(10.dp))
+            IconButton(
+                onClick = {
+                    filterState.value = DrawerValue.Open
+                }
+            ) {
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    painter = painterResource(R.drawable.ic_filter),
+                    contentDescription = null
+                )
             }
         }
         LazyColumn(
@@ -384,22 +397,35 @@ fun ProductBox(product: ProductInfo) {
     val context = LocalContext.current
     Card(
         modifier = Modifier
-            .padding(20.dp)
+            .padding(15.dp)
             .fillMaxWidth()
             .clickable(onClick = { openReviewsMenu(product, context) }),
         backgroundColor = Color.DarkGray
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = product.name ,
-                modifier = Modifier.padding(5.dp),
-                style = TextStyle(fontSize = 18.sp,fontWeight = FontWeight.Bold)
+                text = product.name,
+                modifier = Modifier.padding(top=10.dp),
+                textAlign = TextAlign.Center,
+                style = typography.h6
             )
-            Spacer(Modifier.size(10.dp))
+            Spacer(Modifier.size(20.dp))
             Row {
-                Text(text = "${product.price.div(100.0)} Euro", modifier = Modifier.padding(5.dp))
+                Text(text = "${product.price.div(100.0)}")
+                Spacer(Modifier.size(5.dp))
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(R.drawable.ic_euro),
+                    contentDescription = null
+                )
                 Spacer(Modifier.size(50.dp))
-                Text(text = "Score ${product.score.div(10.0)}/10", modifier = Modifier.padding(5.dp))
+                Text(text = "${product.score.div(10.0)} / 10")
+                Spacer(Modifier.size(5.dp))
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(R.drawable.ic_star),
+                    contentDescription = null
+                )
             }
         }
     }
