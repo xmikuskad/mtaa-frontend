@@ -14,11 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.AddPhotoAlternate
-import androidx.compose.material.icons.filled.Article
-import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -384,7 +380,7 @@ fun AddReviewScreen(
             Spacer(Modifier.size(5.dp))
             Icon(
                 modifier = Modifier.size(15.dp),
-                painter = painterResource(R.drawable.ic_star),
+                painter = rememberVectorPainter(Icons.Filled.Star),
                 contentDescription = null
             )
         }

@@ -13,13 +13,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.RemoveCircle
-import androidx.compose.material.icons.filled.ThumbDown
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -28,11 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -47,7 +42,6 @@ import java.lang.Exception
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.roundToInt
-import androidx.compose.ui.res.painterResource
 
 const val PRICE_MULTIPLIER = 10000
 
@@ -355,7 +349,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             ) {
                 Icon(
                     modifier = Modifier.size(36.dp),
-                    painter = painterResource(R.drawable.ic_sort),
+                    painter = rememberVectorPainter(Icons.Filled.Sort),
                     contentDescription = null
                 )
             }
@@ -373,7 +367,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             ) {
                 Icon(
                     modifier = Modifier.size(36.dp),
-                    painter = painterResource(R.drawable.ic_filter),
+                    painter = rememberVectorPainter(Icons.Filled.FilterAlt),
                     contentDescription = null
                 )
             }
@@ -415,7 +409,7 @@ fun ProductBox(product: ProductInfo) {
                 Spacer(Modifier.size(5.dp))
                 Icon(
                     modifier = Modifier.size(20.dp),
-                    painter = painterResource(R.drawable.ic_euro),
+                    painter = rememberVectorPainter(Icons.Filled.Euro),
                     contentDescription = null
                 )
                 Spacer(Modifier.size(50.dp))
@@ -423,7 +417,7 @@ fun ProductBox(product: ProductInfo) {
                 Spacer(Modifier.size(5.dp))
                 Icon(
                     modifier = Modifier.size(20.dp),
-                    painter = painterResource(R.drawable.ic_star),
+                    painter = rememberVectorPainter(Icons.Filled.Star),
                     contentDescription = null
                 )
             }

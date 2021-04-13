@@ -14,15 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.AddPhotoAlternate
-import androidx.compose.material.icons.filled.Article
-import androidx.compose.material.icons.filled.Collections
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.EditOff
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.RemoveCircle
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -519,7 +511,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             )
             Icon(
                 modifier = Modifier.size(25.dp).padding(start=5.dp),
-                painter = painterResource(com.mtaa.techtalk.R.drawable.ic_star),
+                painter = rememberVectorPainter(Icons.Filled.Star),
                 contentDescription = null
             )
         }

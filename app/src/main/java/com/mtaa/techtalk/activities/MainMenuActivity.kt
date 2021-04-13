@@ -17,22 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.RemoveCircle
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ThumbDown
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Login
-import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.ManageAccounts
-import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.TableRows
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -551,7 +536,7 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
                 Spacer(Modifier.size(5.dp))
                 Icon(
                     modifier = Modifier.size(20.dp),
-                    painter = painterResource(R.drawable.ic_star),
+                    painter = rememberVectorPainter(Icons.Filled.Star),
                     contentDescription = null
                 )
             }

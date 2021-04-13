@@ -11,11 +11,7 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Article
-import androidx.compose.material.icons.filled.RemoveCircle
-import androidx.compose.material.icons.filled.ThumbDown
-import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -38,7 +34,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
-import androidx.compose.material.icons.filled.ThumbUp
 
 class ReviewInfoActivity: ComponentActivity() {
     lateinit var viewModel: ReviewInfoViewModel
@@ -179,7 +174,7 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
                     Spacer(Modifier.size(5.dp))
                     Icon(
                         modifier = Modifier.size(15.dp),
-                        painter = painterResource(R.drawable.ic_star),
+                        painter = rememberVectorPainter(Icons.Filled.Star),
                         contentDescription = null
                     )
                 }
