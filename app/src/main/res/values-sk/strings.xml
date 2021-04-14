@@ -11,11 +11,11 @@
     <string name="confirm_password">Potrvdenie hesla</string>
     <string name="confirm_password_fail">Potrvdenie hesla*</string>
     <string name="create_account">Vytvoriť účet</string>
-    <string name="password_rules">Vaše heslo musí obsahovať:
-        - minimálne osem znakov,
-        - minimálne jedno veľké písmeno,
-        - minimálne jedno malé písmeno,
-        - minimálne jednu číslicu,
+    <string name="password_rules">Vaše heslo musí obsahovať:\n\n
+        - minimálne osem znakov,\n
+        - minimálne jedno veľké písmeno,\n
+        - minimálne jedno malé písmeno,\n
+        - minimálne jednu číslicu,\n
         - minimálne jeden špeciálny znak (#?!@$%^&amp;*-)</string>
     <string name="continue_to_techtalk">Pokračovať do TechTalk</string>
     <string name="popular_categories">Populárne kategórie</string>

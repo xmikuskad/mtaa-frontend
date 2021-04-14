@@ -10,11 +10,11 @@
     <string name="confirm_password">Confirm password</string>
     <string name="confirm_password_fail">Confirm password*</string>
     <string name="create_account">Create Account</string>
-    <string name="password_rules">Your password must include:
-        - minimum eight characters,
-        - at least one uppercase letter,
-        - at least one lowercase letter,
-        - at least one digit,
+    <string name="password_rules">Your password must include:\n\n
+        - minimum eight characters,\n
+        - at least one uppercase letter,\n
+        - at least one lowercase letter,\n
+        - at least one digit,\n
         - at least one special character (#?!@$%^&amp;*-)</string>
     <string name="continue_to_techtalk">Continue to TechTalk</string>
     <string name="popular_categories">Popular categories</string>
