@@ -38,6 +38,7 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.painterResource
+import com.mtaa.techtalk.R
 
 class EditReviewActivity : ComponentActivity() {
 
@@ -49,6 +50,8 @@ class EditReviewActivity : ComponentActivity() {
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
         viewModel = ViewModelProvider(this).get(EditReviewViewModel::class.java)
         val reviewID = intent.getIntExtra("reviewID",-1)
+
+        setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -222,7 +225,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Edit review",
+            text = context.getString(R.string.edit_review),
             modifier = Modifier.fillMaxWidth().padding(10.dp),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h4
@@ -230,7 +233,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
 
         //Positive attributes
         Text(
-            text = "Positive attributes",
+            text = context.getString(R.string.positive_attributes),
             modifier = Modifier.fillMaxWidth().padding(10.dp),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h6
@@ -251,7 +254,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     Text(text = item.text,modifier = Modifier.width(200.dp))
                 } else {
                     OutlinedTextField(
-                        label = { Text("Edit positive") },
+                        label = { Text(context.getString(R.string.edit_positive)) },
                         value = positiveStrings[count],
                         onValueChange = {
                             positiveStrings[count] = it
@@ -313,7 +316,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                label = { Text("Positive attribute") },
+                label = { Text(context.getString(R.string.positive_attribute)) },
                 value = positiveText,
                 onValueChange = {
                     positiveText = it
@@ -339,7 +342,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
 
         //Negative attributes
         Text(
-            text = "Negative attributes",
+            text = context.getString(R.string.negative_attributes),
             modifier = Modifier.fillMaxWidth().padding(top = 30.dp,bottom = 10.dp),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h6
@@ -362,7 +365,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     Text(text = item.text,modifier = Modifier.width(200.dp))
                 } else {
                     OutlinedTextField(
-                        label = { Text("Edit positive") },
+                        label = { Text(context.getString(R.string.edit_negative)) },
                         value = negativeStrings[count],
                         onValueChange = {
                             negativeStrings[count] = it
@@ -426,7 +429,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                label = { Text("Negative attribute") },
+                label = { Text(context.getString(R.string.negative_attribute)) },
                 value = negativeText,
                 onValueChange = {
                     negativeText = it
@@ -462,7 +465,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 contentDescription = null
             )
             Text(
-                text = "Review Text",
+                text = context.getString(R.string.review_text),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(start = 5.dp),
                 style = MaterialTheme.typography.h6
@@ -472,7 +475,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
         //Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             label = {
-                Text("Review Text")
+                Text(context.getString(R.string.review_text))
             },
             value = reviewText,
             onValueChange = {
@@ -486,7 +489,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
 
         //Score
         Text(
-            text = "Score",
+            text = context.getString(R.string.score),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(top = 20.dp),
@@ -535,7 +538,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     contentDescription = null
                 )
                 Text(
-                    text = "Add photos",
+                    text = context.getString(R.string.add_photos),
                     color = Color.Black
                 )
             }
@@ -554,7 +557,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     contentDescription = null
                 )
                 Text(
-                    text = if (showPhotos) "Hide photos" else "Show photos",
+                    text = if (showPhotos) {
+                        context.getString(R.string.hide_photos)
+                    } else context.getString(R.string.show_photos),
                     color = Color.Black
                 )
             }
@@ -576,7 +581,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     )
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
                         Button(onClick = { viewModel.deletePhoto(image) }) {
-                            Text("Delete")
+                            Text(context.getString(R.string.delete))
                         }
                         //Spacer(modifier = Modifier.height(10.dp))
                     }
@@ -606,7 +611,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                                 sliderPosition += 0.01f
                                 sliderPosition -= 0.01f
                             }) {
-                                Text("Delete")
+                                Text(context.getString(R.string.delete))
                             }
                         }
                     }
@@ -654,7 +659,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 contentDescription = null
             )
             Text(
-                text = "Save changes",
+                text = context.getString(R.string.save_changes),
                 color = Color.Black
             )
         }
@@ -676,7 +681,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 contentDescription = null
             )
             Text(
-                text = "Discard changes",
+                text = context.getString(R.string.discard_changes),
                 color = Color.Black
             )
         }
@@ -709,7 +714,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 contentDescription = null
             )
             Text(
-                text = "Delete review",
+                text = context.getString(R.string.delete_review),
                 color = Color.Black
             )
         }

@@ -40,6 +40,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.mtaa.techtalk.DataGetter
 import com.mtaa.techtalk.ProductInfo
 import com.mtaa.techtalk.ProductsInfo
+import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -58,6 +59,8 @@ class SearchActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(SearchViewModel::class.java)
         searchInput = intent.getStringExtra("search-input") ?: ""
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+
+        setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -100,6 +103,8 @@ class SearchViewModel: ViewModel() {
 @Composable
 fun SearchScreen(searchInput: String, viewModel: SearchViewModel) {
     val searchResultProducts by viewModel.liveSearchResultProducts.observeAsState(initial = emptyList())
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .padding(20.dp)
@@ -107,7 +112,7 @@ fun SearchScreen(searchInput: String, viewModel: SearchViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "Search results for '$searchInput'",
+            "${context.getString(R.string.search_results_for)} '$searchInput'",
             style = TextStyle(fontSize = 20.sp),
             textAlign = TextAlign.Center
         )
@@ -162,7 +167,7 @@ fun SearchBar(open: MutableState<Boolean>) {
                     if (searchText.value.text.isNotEmpty()) {
                         openSearchScreen(context, searchText.value.text)
                     } else {
-                        showMessage(context, "No search input!", Toast.LENGTH_SHORT)
+                        showMessage(context, context.getString(R.string.no_search_input), Toast.LENGTH_SHORT)
                     }
                 }
             ) {
@@ -185,7 +190,7 @@ fun SearchBar(open: MutableState<Boolean>) {
                 if (searchText.value.text.isNotEmpty()) {
                     openSearchScreen(context, searchText.value.text)
                 } else {
-                    showMessage(context, "No search input!", Toast.LENGTH_SHORT)
+                    showMessage(context, context.getString(R.string.no_search_input), Toast.LENGTH_SHORT)
                 }
             }
         )

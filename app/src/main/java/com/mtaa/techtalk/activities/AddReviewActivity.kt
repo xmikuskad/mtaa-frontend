@@ -55,6 +55,8 @@ class AddReviewActivity: ComponentActivity() {
         val productID = intent.getIntExtra("productID",-1)
         val productName = intent.getStringExtra("productName")?:""
 
+        setLanguage(prefs.getString("language", "en"), this)
+
         setContent {
             TechTalkTheme(true) {
                 val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
@@ -180,7 +182,7 @@ fun AddReviewScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Add review to $productName",
+            text = "${context.getString(R.string.add_review_to)} $productName",
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h5
@@ -193,7 +195,7 @@ fun AddReviewScreen(
         ) {
             Spacer(Modifier.size(5.dp))
             Text(
-                text = "Positive attributes",
+                text = context.getString(R.string.positive_attributes),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.h6
             )
@@ -227,7 +229,7 @@ fun AddReviewScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                label =  { Text("Positive $positivesCount") },
+                label =  { Text("${context.getString(R.string.positive)} $positivesCount") },
                 value = positiveText,
                 onValueChange = {
                     positiveText = it
@@ -259,7 +261,7 @@ fun AddReviewScreen(
         ) {
             Spacer(Modifier.size(5.dp))
             Text(
-                text = "Negative attributes",
+                text = context.getString(R.string.negative_attributes),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.h6
             )
@@ -292,7 +294,7 @@ fun AddReviewScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                label =  { Text("Negative $negativesCount") },
+                label =  { Text("${context.getString(R.string.negative)} $negativesCount") },
                 value = negativeText,
                 onValueChange = {
                     negativeText = it
@@ -330,7 +332,7 @@ fun AddReviewScreen(
             )
             Spacer(Modifier.size(5.dp))
             Text(
-                text = "Review text",
+                text = context.getString(R.string.review_text),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.h6
             )
@@ -339,7 +341,7 @@ fun AddReviewScreen(
         //Review text
         OutlinedTextField(
             label = {
-                Text("Review Text")
+                Text(context.getString(R.string.review_text))
             },
             value = reviewText,
             onValueChange = {
@@ -354,7 +356,7 @@ fun AddReviewScreen(
         //Score
         Spacer(Modifier.size(10.dp))
         Text(
-            text = "Score",
+            text = context.getString(R.string.score),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h6,
         )
@@ -403,7 +405,7 @@ fun AddReviewScreen(
             )
             Spacer(modifier = Modifier.size(5.dp))
             Text(
-                text = "Add photos",
+                text = context.getString(R.string.add_photos),
                 color = Color.Black
             )
         }
@@ -421,7 +423,7 @@ fun AddReviewScreen(
                 )
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
                     Button(onClick = { viewModel.deletePhoto(image) }) {
-                        Text("Delete")
+                        Text(context.getString(R.string.delete))
                     }
                 }
             }
@@ -465,7 +467,7 @@ fun AddReviewScreen(
             )
             Spacer(modifier = Modifier.size(5.dp))
             Text(
-                text = "Add review",
+                text = context.getString(R.string.add_review),
                 color = Color.Black
             )
         }

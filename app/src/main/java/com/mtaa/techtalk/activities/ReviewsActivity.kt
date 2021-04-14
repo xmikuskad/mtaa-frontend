@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.mtaa.techtalk.*
+import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkGray
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +58,8 @@ class ReviewsActivity : ComponentActivity() {
         productName = intent.getStringExtra("productName") ?: "Unknown name"
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
+        setLanguage(prefs.getString("language", "en"), this)
+
         setContent {
             TechTalkTheme(true) {
                 val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
@@ -67,7 +71,7 @@ class ReviewsActivity : ComponentActivity() {
                     floatingActionButton = {
                         ExtendedFloatingActionButton(
                             onClick = { openAddReview(this,productId,productName) },
-                            text = {Text(text="Add review")},
+                            text = {Text(text=getString(R.string.add_review))},
                             icon = {
                                 Icon(
                                 modifier = Modifier.size(40.dp, 40.dp),
@@ -115,6 +119,7 @@ class ReviewScreenViewModel: ViewModel() {
 @Composable
 fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewModel) {
     val reviews by viewModel.liveReviews.observeAsState(initial = emptyList())
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -122,7 +127,7 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "Reviews of $productName",
+            "${context.getString(R.string.reviews_of)} $productName",
             style = TextStyle(fontSize = 25.sp),
             textAlign = TextAlign.Center
         )

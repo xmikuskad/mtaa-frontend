@@ -25,6 +25,9 @@ class RegisterSuccessActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+        setLanguage(prefs.getString("language", "en"), this)
+
         setContent {
             TechTalkTheme(true) {
                 Surface(color = MaterialTheme.colors.background) {
@@ -63,7 +66,7 @@ fun RegisterSuccessScreen() {
             )
         ) {
             Text(
-                text = "Continue to TechTalk",
+                text = context.getString(R.string.continue_to_techtalk),
                 color = Color.Black,
                 fontSize = 16.sp
             )
@@ -91,7 +94,7 @@ fun RegisterSuccessScreen() {
                 tint = Color.Black
             )
             Text(
-                text = "Log-In",
+                text = context.getString(R.string.log_in),
                 color = Color.Black,
                 fontSize = 16.sp
             )

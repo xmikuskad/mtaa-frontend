@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtaa.techtalk.DataGetter
+import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.client.features.*
 import io.ktor.http.*
@@ -38,6 +39,9 @@ import java.util.regex.Pattern
 class CreateAccountActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+
+        setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -52,12 +56,7 @@ class CreateAccountActivity : ComponentActivity() {
 @Composable
 fun CreateAccountScreen() {
     val context = LocalContext.current
-    val passwordRules = "Your password must include:\n\n" +
-            "- minimum eight characters,\n" +
-            "- at least one uppercase letter,\n" +
-            "- one lowercase letter,\n" +
-            "- one digit,\n" +
-            "- one special character (#?!@\$%^&*-)"
+    val passwordRules = context.getString(R.string.password_rules)
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -82,9 +81,9 @@ fun CreateAccountScreen() {
         OutlinedTextField(
             label = {
                 val label = if (isValidName) {
-                    "Enter your name"
+                    context.getString(R.string.enter_name)
                 } else {
-                    "Enter your name*"
+                    context.getString(R.string.enter_name_fail)
                 }
                 Text(label)
             },
@@ -107,9 +106,9 @@ fun CreateAccountScreen() {
         OutlinedTextField(
             label = {
                 val label = if (isValidEmail) {
-                    "Enter e-mail"
+                    context.getString(R.string.enter_email)
                 } else {
-                    "Enter e-mail*"
+                    context.getString(R.string.enter_email_fail)
                 }
                 Text(label)
             },
@@ -136,9 +135,9 @@ fun CreateAccountScreen() {
         OutlinedTextField(
             label = {
                 val label = if (isValidPassword) {
-                    "Enter password"
+                    context.getString(R.string.enter_password)
                 } else {
-                    "Enter password*"
+                    context.getString(R.string.enter_password_fail)
                 }
                 Text(label)
             },
@@ -181,9 +180,9 @@ fun CreateAccountScreen() {
         OutlinedTextField(
             label = {
                 val label = if (isValidSecondPassword) {
-                    "Confirm password"
+                    context.getString(R.string.confirm_password)
                 } else {
-                    "Confirm password*"
+                    context.getString(R.string.confirm_password_fail)
                 }
                 Text(label)
             },
@@ -201,13 +200,15 @@ fun CreateAccountScreen() {
             }
         )
         Button(
-            modifier = Modifier.padding(30.dp).size(250.dp, 55.dp),
+            modifier = Modifier
+                .padding(30.dp)
+                .size(250.dp, 55.dp),
             onClick = {
                 if (!isValidName || !isValidEmail || !isValidPassword || !isValidSecondPassword) {
-                    var message = "Invalid:"
+                    var message = context.getString(R.string.invalid)
                     var num = 1
                     if (!isValidName) {
-                        message += "\n $num. Name"
+                        message += "\n $num. ${context.getString(R.string.name)}"
                         num++
                     }
                     if (!isValidEmail) {
@@ -215,11 +216,11 @@ fun CreateAccountScreen() {
                         num++
                     }
                     if (!isValidPassword) {
-                        message += "\n $num. Password"
+                        message += "\n $num. ${context.getString(R.string.password)}"
                         num++
                     }
                     if (!isValidSecondPassword) {
-                        message += "\n $num. Confirmation Password"
+                        message += "\n $num. ${context.getString(R.string.confirmation_password)}"
                     }
                     showMessage(context, message, Toast.LENGTH_SHORT)
                 } else {
@@ -250,7 +251,7 @@ fun CreateAccountScreen() {
                                 is ClientRequestException ->
                                     showMessage(
                                         context,
-                                        "There already is an account with this e-mail!",
+                                        context.getString(R.string.duplicate_account),
                                         Toast.LENGTH_SHORT
                                     )
                             }
@@ -264,7 +265,7 @@ fun CreateAccountScreen() {
         )
         {
             Text(
-                text = "Create Account",
+                text = context.getString(R.string.create_account),
                 color = Color.Black,
                 fontSize = 16.sp
             )

@@ -57,6 +57,8 @@ class MainMenuActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(MainMenuViewModel::class.java)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
+        setLanguage(prefs.getString("language", "en"), this)
+
         setContent {
             TechTalkTheme(true) {
                 val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
@@ -139,7 +141,7 @@ fun Drawer(prefs: SharedPreferences) {
                         val intent = Intent(context, AccountActivity::class.java)
                         context.startActivity(intent)
                     } else {
-                        showMessage(context, "You are not logged-in", Toast.LENGTH_SHORT)
+                        showMessage(context, context.getString(R.string.not_logged_in), Toast.LENGTH_SHORT)
                     }
                 }
             ),
@@ -155,7 +157,7 @@ fun Drawer(prefs: SharedPreferences) {
             if (name != "") {
                 name
             } else {
-                "Guest"
+                context.getString(R.string.guest)
             }?.let {
                 Text(
                     text = it,
@@ -182,7 +184,7 @@ fun Drawer(prefs: SharedPreferences) {
             )
             Spacer(Modifier.size(10.dp))
             Text(
-                text = "Main Menu",
+                text = context.getString(R.string.main_menu),
                 modifier = Modifier.clickable(
                     onClick = { openScreen(context, MainMenuActivity()) }
                 ),
@@ -199,7 +201,7 @@ fun Drawer(prefs: SharedPreferences) {
             )
             Spacer(Modifier.size(10.dp))
             Text(
-                text = "Categories",
+                text = context.getString(R.string.categories),
                 modifier = Modifier.clickable(
                     onClick = {
                         openCategories(context)
@@ -219,7 +221,7 @@ fun Drawer(prefs: SharedPreferences) {
             )
             Spacer(Modifier.size(10.dp))
             Text(
-                text = "Settings",
+                text = context.getString(R.string.settings),
                 modifier = Modifier.clickable(
                     onClick = {
                         val intent = Intent(context, SettingsActivity::class.java)
@@ -240,7 +242,7 @@ fun Drawer(prefs: SharedPreferences) {
             )
             Spacer(Modifier.size(10.dp))
             Text(
-                text = "About App",
+                text = context.getString(R.string.about),
                 modifier = Modifier.clickable(
                     onClick = { openScreen(context, AboutAppActivity()) }
                 ),
@@ -267,7 +269,7 @@ fun Drawer(prefs: SharedPreferences) {
                 )
                 Spacer(Modifier.size(10.dp))
                 Text(
-                    text = "Edit Account",
+                    text = context.getString(R.string.edit_account),
                     modifier = Modifier.clickable(
                         onClick = { openScreen(context, EditAccountActivity()) }
                     ),
@@ -284,7 +286,7 @@ fun Drawer(prefs: SharedPreferences) {
                 )
                 Spacer(Modifier.size(10.dp))
                 Text(
-                    text = "Log-Out",
+                    text = context.getString(R.string.log_out),
                     modifier = Modifier.clickable(
                         onClick = {
                             prefs.edit().remove("token").apply()
@@ -310,7 +312,7 @@ fun Drawer(prefs: SharedPreferences) {
                 )
                 Spacer(Modifier.size(10.dp))
                 Text(
-                    text = "Log-In",
+                    text = context.getString(R.string.log_in),
                     modifier = Modifier.clickable(
                         onClick = {
                             val intent = Intent(context, LoginActivity::class.java)
@@ -333,7 +335,7 @@ fun Drawer(prefs: SharedPreferences) {
                 )
                 Spacer(Modifier.size(10.dp))
                 Text(
-                    text = "Create account",
+                    text = context.getString(R.string.create_account),
                     modifier = Modifier.clickable(
                         onClick = {
                             val intent = Intent(context, CreateAccountActivity::class.java)
@@ -410,7 +412,7 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "Most popular categories",
+            text = context.getString(R.string.popular_categories),
             style = TextStyle(fontSize = 25.sp),
             textAlign = TextAlign.Center
         )
@@ -434,7 +436,7 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
             }
         }
         Text(
-            "Most recent reviews",
+            text = context.getString(R.string.recent_reviews),
             style = TextStyle(fontSize = 25.sp),
             textAlign = TextAlign.Center
         )
@@ -502,7 +504,7 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
                     contentDescription = null
                 )
                 Spacer(Modifier.size(5.dp))
-                Text(text = "$positives positives")
+                Text(text = "$positives ${context.getString(R.string.positives_num)}")
                 Spacer(Modifier.size(20.dp))
                 Icon(
                     modifier = Modifier.size(25.dp),
@@ -510,7 +512,7 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
                     contentDescription = null
                 )
                 Spacer(Modifier.size(5.dp))
-                Text(text = "$negatives negatives")
+                Text(text = "$negatives ${context.getString(R.string.negatives_num)}")
             }
             Spacer(Modifier.size(25.dp))
             Row {

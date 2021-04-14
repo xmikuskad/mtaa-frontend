@@ -19,6 +19,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,8 @@ class ReviewInfoActivity: ComponentActivity() {
         val reviewID = intent.getIntExtra("reviewID",-1)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
         viewModel = ViewModelProvider(this).get(ReviewInfoViewModel::class.java)
+
+        setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -129,6 +132,7 @@ fun ReviewInfoScreen(viewModel:ReviewInfoViewModel, reviewID: Int, prefs:SharedP
 
 @Composable
 fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: ReviewInfo, scrollState:ScrollState, id:Int, prefs:SharedPreferences){
+    val context = LocalContext.current
     //First line with name, likes, dislikes
     Column(modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally) {
@@ -158,7 +162,7 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Review details",
+                    text = context.getString(R.string.review_details),
                     textAlign = TextAlign.Center,
                     style = typography.h5,
                     modifier = Modifier.padding(top=10.dp,bottom = 5.dp)
@@ -232,7 +236,7 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
         )
         Spacer(Modifier.size(5.dp))
         Text(
-            text = "Positive attributes",
+            text = context.getString(R.string.positive_attributes),
             textAlign = TextAlign.Center,
             style = typography.h5
         )
@@ -260,7 +264,7 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
         )
         Spacer(Modifier.size(5.dp))
         Text(
-            text = "Negative attributes",
+            text = context.getString(R.string.negative_attributes),
             textAlign = TextAlign.Center,
             style = typography.h5
         )
@@ -290,7 +294,7 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
             )
             Spacer(Modifier.size(5.dp))
             Text(
-                text = "Review text",
+                text = context.getString(R.string.review_text),
                 textAlign = TextAlign.Center,
                 style = typography.h5
             )

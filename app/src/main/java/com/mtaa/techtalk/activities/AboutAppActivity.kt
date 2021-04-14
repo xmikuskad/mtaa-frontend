@@ -29,6 +29,8 @@ class AboutAppActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
+        setLanguage(prefs.getString("language", "en"), this)
+
         setContent {
             TechTalkTheme(true) {
                 val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
@@ -57,17 +59,22 @@ fun AboutAppScreen() {
     )
     {
         Spacer(modifier = Modifier.height(15.dp))
-        Text(text = "About app",modifier = Modifier.fillMaxWidth(),textAlign = TextAlign.Center,style = typography.h4)
+        Text(
+            text = context.getString(R.string.about),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = typography.h4
+        )
         Spacer(modifier = Modifier.height(40.dp))
-        Row() {
-            Text(text = "App version")
+        Row {
+            Text(text = context.getString(R.string.app_version))
             Spacer(modifier = Modifier.width(50.dp))
             Text(text = "v1.0")
         }
 
         Spacer(modifier = Modifier.height(30.dp))
-        Row() {
-            Text(text = "Authors")
+        Row {
+            Text(text = context.getString(R.string.authors))
             Spacer(modifier = Modifier.width(80.dp))
             Column() {
                 Text(text = "Dominik Mikuška")
@@ -77,7 +84,7 @@ fun AboutAppScreen() {
         }
 
         Spacer(modifier = Modifier.height(30.dp))
-        Text(text = "Bug reports")
+        Text(text = context.getString(R.string.bugs))
         Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = "https://github.com/xmikuskad/mtaa-frontend",

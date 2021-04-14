@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtaa.techtalk.AuthInfo
 import com.mtaa.techtalk.DataGetter.login
+import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.client.features.*
 import io.ktor.network.sockets.*
@@ -39,6 +40,8 @@ class LoginActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+
+        setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -63,9 +66,9 @@ fun LoginScreen(prefs: SharedPreferences) {
         OutlinedTextField(
             label = {
                 val label = if (isValidEmail) {
-                    "Enter e-mail"
+                    context.getString(R.string.enter_email)
                 } else {
-                    "Enter e-mail*"
+                    context.getString(R.string.enter_email_fail)
                 }
                 Text(label)
             },
@@ -88,9 +91,9 @@ fun LoginScreen(prefs: SharedPreferences) {
         OutlinedTextField(
             label = {
                 val label = if (isValidPassword) {
-                    "Enter password"
+                    context.getString(R.string.enter_password)
                 } else {
-                    "Enter password*"
+                    context.getString(R.string.enter_password_fail)
                 }
                 Text(label)
             },
@@ -113,13 +116,13 @@ fun LoginScreen(prefs: SharedPreferences) {
                 .size(250.dp, 55.dp),
             onClick = {
                 if (!isValidEmail && !isValidPassword) {
-                    showMessage(context, "Invalid e-mail or password!", Toast.LENGTH_SHORT)
+                    showMessage(context, context.getString(R.string.invalid_pass_mail), Toast.LENGTH_SHORT)
                 }
                 else if (!isValidEmail) {
-                    showMessage(context, "Invalid e-mail!", Toast.LENGTH_SHORT)
+                    showMessage(context, context.getString(R.string.invalid_mail), Toast.LENGTH_SHORT)
                 }
                 else if (!isValidPassword) {
-                    showMessage(context, "Invalid password!", Toast.LENGTH_SHORT)
+                    showMessage(context, context.getString(R.string.invalid_pass), Toast.LENGTH_SHORT)
                 }
                 else {
                     MainScope().launch(Dispatchers.Main) {
@@ -146,7 +149,8 @@ fun LoginScreen(prefs: SharedPreferences) {
                                 //User or server is offline TODO handle - show warning
                                 is ConnectTimeoutException -> println("server or user offline")
                                 // TODO
-                                is ClientRequestException -> showMessage(context, "This account does not exist!", Toast.LENGTH_SHORT)
+                                is ClientRequestException ->
+                                    showMessage(context, context.getString(R.string.account_not_found), Toast.LENGTH_SHORT)
                             }
                         }
                     }
@@ -157,7 +161,7 @@ fun LoginScreen(prefs: SharedPreferences) {
             )
         ) {
             Text(
-                text = "Log-In",
+                text = context.getString(R.string.log_in),
                 color = Color.Black,
                 fontSize = 16.sp
             )

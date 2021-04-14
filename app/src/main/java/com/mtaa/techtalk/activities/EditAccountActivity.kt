@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtaa.techtalk.DataGetter
+import com.mtaa.techtalk.R
 import com.mtaa.techtalk.RegisterInfo
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.client.features.*
@@ -44,6 +45,8 @@ class EditAccountActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+
+        setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -64,19 +67,19 @@ class EditAccountActivity : ComponentActivity() {
 @Composable
 fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
     val context = LocalContext.current
-    val passwordRules = "Your password must include:\n\n" +
-            "- minimum eight characters,\n" +
-            "- at least one uppercase letter,\n" +
-            "- one lowercase letter,\n" +
-            "- one digit,\n" +
-            "- one special character (#?!@\$%^&*-)"
+    val passwordRules = context.getString(R.string.password_rules)
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(text = "Edit account info",modifier = Modifier.fillMaxWidth(),textAlign = TextAlign.Center,style = MaterialTheme.typography.h4)
+        Text(
+            text = context.getString(R.string.edit_account_info),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h4
+        )
         Spacer(modifier = Modifier.height(50.dp))
 
         val nameState =
@@ -99,9 +102,9 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
         OutlinedTextField(
             label = {
                 val label = if (isValidName) {
-                    "New name"
+                    context.getString(R.string.new_name)
                 } else {
-                    "New name*"
+                    context.getString(R.string.new_name_fail)
                 }
                 Text(label)
             },
@@ -124,9 +127,9 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
         OutlinedTextField(
             label = {
                 val label = if (isValidEmail) {
-                    "New or old e-mail"
+                    context.getString(R.string.new_or_old_email)
                 } else {
-                    "New or old e-mail*"
+                    context.getString(R.string.new_or_old_email_fail)
                 }
                 Text(label)
             },
@@ -153,9 +156,9 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
         OutlinedTextField(
             label = {
                 val label = if (isValidPassword) {
-                    "New or old password"
+                    context.getString(R.string.new_or_old_password)
                 } else {
-                    "New or old password*"
+                    context.getString(R.string.new_or_old_password_fail)
                 }
                 Text(label)
             },
@@ -197,9 +200,9 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
         OutlinedTextField(
             label = {
                 val label = if (isValidSecondPassword) {
-                    "Confirm password"
+                    context.getString(R.string.confirm_password)
                 } else {
-                    "Confirm password*"
+                    context.getString(R.string.confirm_password_fail)
                 }
                 Text(label)
             },
@@ -222,10 +225,10 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
                 .size(250.dp, 55.dp),
             onClick = {
                 if (!isValidName || !isValidEmail || !isValidPassword || !isValidSecondPassword) {
-                    var message = "Invalid:"
+                    var message =  context.getString(R.string.invalid)
                     var num = 1
                     if (!isValidName) {
-                        message += "\n $num. Name"
+                        message += "\n $num. ${context.getString(R.string.name)}"
                         num++
                     }
                     if (!isValidEmail) {
@@ -233,11 +236,11 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
                         num++
                     }
                     if (!isValidPassword) {
-                        message += "\n $num. Password"
+                        message += "\n $num. ${context.getString(R.string.password)}"
                         num++
                     }
                     if (!isValidSecondPassword) {
-                        message += "\n $num. Confirmation Password"
+                        message += "\n $num. ${context.getString(R.string.confirmation_password)}"
                     }
                     showMessage(context, message, Toast.LENGTH_LONG)
                 } else {
@@ -271,7 +274,7 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
                                 is ClientRequestException ->
                                     showMessage(
                                         context,
-                                        "There already is an account with this e-mail!",
+                                        context.getString(R.string.duplicate_account),
                                         Toast.LENGTH_SHORT
                                     )
                             }
@@ -285,7 +288,7 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
         )
         {
             Text(
-                text = "Save changes",
+                text = context.getString(R.string.save_changes),
                 color = Color.Black,
                 fontSize = 16.sp
             )
@@ -300,7 +303,7 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
             )
         ) {
             Text(
-                text = "Discard changes",
+                text = context.getString(R.string.discard_changes),
                 color = Color.Black,
                 fontSize = 16.sp
             )

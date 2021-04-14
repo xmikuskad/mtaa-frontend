@@ -17,12 +17,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.mtaa.techtalk.*
+import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -41,6 +43,8 @@ class AccountActivity : ComponentActivity() {
         val authKey = prefs.getString("token", "") ?: ""
         val name = prefs.getString("username", "") ?: ""
         viewModel = ViewModelProvider(this).get(UserReviewsViewModel::class.java)
+
+        setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -89,6 +93,7 @@ class UserReviewsViewModel: ViewModel() {
 fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: String?) {
     val userReviews by viewModel.liveUserReviews.observeAsState(initial = emptyList())
     val trustScore by viewModel.trustScore.observeAsState(initial = 0)
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -103,12 +108,12 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
             )
         }
         Text(
-            text = "Fan score: $trustScore",
+            text = "${context.getString(R.string.fan_score)}: $trustScore",
             modifier = Modifier.padding(top = 15.dp, start = 25.dp),
             fontSize = 24.sp
         )
         Text(
-            text = "Reviews:",
+            text = context.getString(R.string.reviews),
             modifier = Modifier.padding(top = 15.dp, start = 25.dp),
             fontSize = 24.sp
         )

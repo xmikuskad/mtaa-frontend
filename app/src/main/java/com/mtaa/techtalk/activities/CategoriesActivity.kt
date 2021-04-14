@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtaa.techtalk.CategoryInfo
+import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 
 class CategoriesActivity : ComponentActivity() {
@@ -30,6 +31,8 @@ class CategoriesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+
+        setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -59,7 +62,7 @@ fun CategoryScreen() {
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Categories",
+            text = context.getString(R.string.categories),
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h4

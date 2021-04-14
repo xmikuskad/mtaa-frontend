@@ -61,6 +61,8 @@ class ProductsActivity : ComponentActivity() {
         categoryName = intent.getStringExtra("categoryName") ?: "Unknown name"
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
+        setLanguage(prefs.getString("language", "en"), this)
+
         setContent {
             TechTalkTheme(true) {
                 val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
@@ -136,6 +138,8 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
     val filterState = remember { mutableStateOf(DrawerValue.Closed) }
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
 
+    val context = LocalContext.current
+
     if (filterState.value == DrawerValue.Open) {
         val brands by viewModel.liveBrands.observeAsState(initial = emptyList())
         var minPrice by remember { mutableStateOf(obj.min_price) }
@@ -169,7 +173,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             )
 
             Spacer(modifier = Modifier.height(30.dp))
-            Text(text = "Minimum price")
+            Text(text = context.getString(R.string.min_price))
             Slider(
                 value = minPrice,
                 onValueChange = { minPrice = it },
@@ -183,7 +187,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             Text(text = ((minPrice * PRICE_MULTIPLIER).roundToInt()).toString())
 
             Spacer(modifier = Modifier.height(30.dp))
-            Text(text = "Maximum price")
+            Text(text = context.getString(R.string.max_price))
             Slider(
                 value = maxPrice,
                 onValueChange = { maxPrice = it },
@@ -197,7 +201,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             Text(text = ((maxPrice * PRICE_MULTIPLIER).roundToInt()).toString())
 
             Spacer(modifier = Modifier.height(30.dp))
-            Text(text = "Minimum score")
+            Text(text = context.getString(R.string.min_score))
             Slider(
                 value = score,
                 onValueChange = { score = it },
@@ -213,7 +217,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             Spacer(modifier = Modifier.height(30.dp))
 
             if (brands.isNotEmpty()) {
-                Text(text = "Brands")
+                Text(text = context.getString(R.string.brands))
                 Spacer(modifier = Modifier.height(10.dp))
             }
 
@@ -255,7 +259,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                 viewModel.reloadProducts(categoryId, obj)
                 filterState.value = DrawerValue.Closed
             }) {
-                Text("Apply filter")
+                Text(context.getString(R.string.apply_filter))
             }
             Spacer(modifier = Modifier.height(20.dp))
             Button(onClick = {
@@ -277,13 +281,13 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
 
                 viewModel.reloadProducts(categoryId, obj)
             }) {
-                Text("Clear filter")
+                Text(context.getString(R.string.clear_filter))
             }
             Spacer(modifier = Modifier.height(20.dp))
             Button(onClick = {
                 filterState.value = DrawerValue.Closed
             }) {
-                Text("Close")
+                Text(context.getString(R.string.close))
             }
 
         }
@@ -301,18 +305,18 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                     modifier = Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Order by", style = typography.h5)
+                    Text(context.getString(R.string.order_by), style = typography.h5)
                     Spacer(modifier = Modifier.height(20.dp))
-                    val selectedOrder = remember { mutableStateOf("Newest") }
+                    val selectedOrder = remember { mutableStateOf(context.getString(R.string.newest)) }
                     DropdownList(
                         items = listOf(
-                            "Newest",
-                            "Price asc",
-                            "Price desc",
-                            "Score asc",
-                            "Score desc"
+                            context.getString(R.string.newest),
+                            context.getString(R.string.price_asc),
+                            context.getString(R.string.price_desc),
+                            context.getString(R.string.score_asc),
+                            context.getString(R.string.score_desc)
                         ),
-                        label = "Order by",
+                        label = context.getString(R.string.order_by),
                         selected = selectedOrder
                     )
                     Spacer(modifier = Modifier.height(20.dp))
@@ -329,7 +333,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                         viewModel.reloadProducts(categoryId, obj)
                         orderState.value = DrawerValue.Closed
                     }) {
-                        Text("Save")
+                        Text(context.getString(R.string.save))
                     }
                 }
             }

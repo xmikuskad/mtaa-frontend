@@ -1,5 +1,6 @@
 package com.mtaa.techtalk.activities
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 
 class SettingsActivity : ComponentActivity() {
@@ -24,6 +26,8 @@ class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+
+        setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -52,7 +56,7 @@ fun SettingsScreen(prefs: SharedPreferences) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Settings",
+            text = context.getString(R.string.settings),
             fontSize = 28.sp
         )
         Spacer(
@@ -61,8 +65,8 @@ fun SettingsScreen(prefs: SharedPreferences) {
 
         val selectedLanguage = remember { mutableStateOf(prefs.getString("language", "English")?:"English") }
         DropdownList(
-            items = listOf("English", "Slovak"),
-            label = "Select Language",
+            items = listOf("English", "Slovenčina"),
+            label = context.getString(R.string.select_language),
             selected = selectedLanguage
         )
         Spacer(
@@ -71,14 +75,20 @@ fun SettingsScreen(prefs: SharedPreferences) {
         val selectedScheme = remember { mutableStateOf(prefs.getString("color-scheme", "Dark Mode")?:"Dark Mode") }
         DropdownList(
             items = listOf("Dark Mode", "Light Mode"),
-            label = "Select Color Scheme",
+            label = context.getString(R.string.select_color),
             selected = selectedScheme
         )
         Button(
             onClick = {
-                prefs.edit().putString("language", selectedLanguage.value).apply()
+                val language = if (selectedLanguage.value == "English") { "en" } else { "sk" }
+                prefs.edit().putString("language", language).apply()
                 prefs.edit().putString("color-scheme", selectedScheme.value).apply()
-                showMessage(context, "Saved", Toast.LENGTH_LONG)
+                showMessage(context, context.getString(R.string.saved), Toast.LENGTH_LONG)
+
+                val intent = Intent(context, MainMenuActivity::class.java)
+                intent.putExtra("activity","settings")
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                context.startActivity(intent)
             },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Gray
@@ -86,7 +96,7 @@ fun SettingsScreen(prefs: SharedPreferences) {
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "Save Changes",
+                text = context.getString(R.string.save_changes),
                 color = Color.Black
             )
         }

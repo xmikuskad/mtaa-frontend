@@ -24,6 +24,9 @@ import com.mtaa.techtalk.ui.theme.TechTalkTheme
 class FirstLaunchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+
+        setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -71,7 +74,7 @@ fun FirstLaunchScreen() {
                 tint = Color.Black
             )
             Text(
-                text = "Log-In",
+                text = context.getString(R.string.log_in),
                 color = Color.Black,
                 fontSize = 16.sp
             )
@@ -93,7 +96,7 @@ fun FirstLaunchScreen() {
         )
         {
             Text(
-                text = "Create Account",
+                text = context.getString(R.string.create_account),
                 color = Color.Black,
                 fontSize = 16.sp
             )
@@ -114,7 +117,7 @@ fun FirstLaunchScreen() {
             )
         ) {
             Text(
-                text = "Continue without Account",
+                text = context.getString(R.string.continue_without_account),
                 color = Color.Black,
                 fontSize = 16.sp
             )
