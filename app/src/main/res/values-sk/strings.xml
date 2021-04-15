@@ -98,4 +98,8 @@
     <string name="reviews_of">Recenzie o</string>
     <string name="search_results_for">Výsledky hľadania</string>
     <string name="no_search_input">Prázdne textové pole!</string>
+    <string name="loading_user_info">Načítavanie informácií používateľa...</string>
+    <string name="loading_reviews">Načítavanie recenzií...</string>
+    <string name="loading_details">Načítavanie podrobností...</string>
+    <string name="no_reviews_found">Žiadne recenzie</string>
 </resources>

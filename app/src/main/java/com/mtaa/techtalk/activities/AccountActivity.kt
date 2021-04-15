@@ -99,7 +99,7 @@ class UserReviewsViewModel: ViewModel() {
 
 @Composable
 fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: String?, obj: OrderAttributes) {
-    val userReviews by viewModel.liveUserReviews.observeAsState(initial = emptyList())
+    val userReviews by viewModel.liveUserReviews.observeAsState(initial = null)
     val trustScore by viewModel.trustScore.observeAsState(initial = 0)
     val context = LocalContext.current
 
@@ -160,54 +160,61 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
         }
     }
 
-
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        if (name != null) {
-            Text(
-                text = name,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(top = 15.dp),
-                fontSize = 24.sp
-            )
-        }
-        Text(
-            text = "${context.getString(R.string.fan_score)} $trustScore",
-            modifier = Modifier.padding(top = 15.dp, start = 25.dp),
-            fontSize = 24.sp
-        )
-        Row(
-            modifier = Modifier.padding(top = 15.dp, start = 20.dp),
-            verticalAlignment = Alignment.CenterVertically
+    if (userReviews == null) {
+        LoadingScreen(context.getString(R.string.loading_user_info))
+    } else {
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            IconButton(
-                onClick = {
-                    orderState.value = DrawerValue.Open
-                }
-            ) {
-                Icon(
-                    modifier = Modifier.size(36.dp),
-                    painter = rememberVectorPainter(Icons.Filled.Sort),
-                    contentDescription = null
+            if (name != null) {
+                Text(
+                    text = name,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 15.dp),
+                    fontSize = 24.sp
                 )
             }
             Text(
-                text = context.getString(R.string.reviews),
+                text = "${context.getString(R.string.fan_score)} $trustScore",
+                modifier = Modifier.padding(top = 15.dp, start = 25.dp),
                 fontSize = 24.sp
             )
-        }
+            Row(
+                modifier = Modifier.padding(top = 15.dp, start = 20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = {
+                        orderState.value = DrawerValue.Open
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(36.dp),
+                        painter = rememberVectorPainter(Icons.Filled.Sort),
+                        contentDescription = null
+                    )
+                }
+                Text(
+                    text = context.getString(R.string.reviews),
+                    fontSize = 24.sp
+                )
+            }
 
-        LazyColumn(
-            modifier = Modifier
-                .padding(top = 10.dp)
-        ) {
-            itemsIndexed(userReviews) { index, item ->
-                ReviewBox(reviewInfo = item,canEdit = true)
-                if(index == userReviews.lastIndex) {
-                    if (authKey != null) {
-                        viewModel.loadUserReviews(authKey,obj)
+            if (userReviews!!.isEmpty()) {
+                NotFoundScreen(context)
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                ) {
+                    itemsIndexed(userReviews!!) { index, item ->
+                        ReviewBox(reviewInfo = item, canEdit = true)
+                        if (index == userReviews!!.lastIndex) {
+                            if (authKey != null) {
+                                viewModel.loadUserReviews(authKey, obj)
+                            }
+                        }
                     }
                 }
             }

@@ -131,7 +131,7 @@ class ReviewScreenViewModel: ViewModel() {
 
 @Composable
 fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewModel, obj:OrderAttributes) {
-    val reviews by viewModel.liveReviews.observeAsState(initial = emptyList())
+    val reviews by viewModel.liveReviews.observeAsState(initial = null)
     val context = LocalContext.current
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
 
@@ -190,38 +190,47 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
         }
     }
 
-    Column(
-        modifier = Modifier
-            .padding(20.dp)
-            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    if (reviews == null) {
+        LoadingScreen(context.getString(R.string.loading_reviews))
+    } else {
+        Column(
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(
-                onClick = {
-                    orderState.value = DrawerValue.Open
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
+                    onClick = {
+                        orderState.value = DrawerValue.Open
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(28.dp),
+                        painter = rememberVectorPainter(Icons.Filled.Sort),
+                        contentDescription = null
+                    )
                 }
-            ) {
-                Icon(
-                    modifier = Modifier.size(28.dp),
-                    painter = rememberVectorPainter(Icons.Filled.Sort),
-                    contentDescription = null
+                Text(
+                    "${context.getString(R.string.reviews_of)} $productName",
+                    style = TextStyle(fontSize = 22.sp),
+                    textAlign = TextAlign.Center
                 )
             }
-            Text(
-                "${context.getString(R.string.reviews_of)} $productName",
-                style = TextStyle(fontSize = 22.sp),
-                textAlign = TextAlign.Center
-            )
-        }
-        LazyColumn(
-            modifier = Modifier
-                .padding(top = 10.dp)
-        ) {
-            itemsIndexed(reviews) { index,item ->
-                ReviewBox(reviewInfo = item,canEdit = false)
-                if(index == reviews.lastIndex) {
-                    viewModel.loadReviews(productId,obj)
+
+            if (reviews!!.isEmpty()) {
+                NotFoundScreen(context)
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                ) {
+                    itemsIndexed(reviews!!) { index, item ->
+                        ReviewBox(reviewInfo = item, canEdit = false)
+                        if (index == reviews!!.lastIndex) {
+                            viewModel.loadReviews(productId, obj)
+                        }
+                    }
                 }
             }
         }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -109,5 +110,28 @@ fun SplashScreen() {
             )
         }
         CircularProgressIndicator(color = TechTalkGray)
+    }
+}
+
+@Composable
+fun LoadingScreen(label: String) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator(color = TechTalkGray)
+        Text(text = label)
+    }
+}
+
+@Composable
+fun NotFoundScreen(context: Context) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = context.getString(R.string.no_reviews_found))
     }
 }

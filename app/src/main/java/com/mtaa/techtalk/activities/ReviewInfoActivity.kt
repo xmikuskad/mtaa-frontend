@@ -117,14 +117,7 @@ fun ReviewInfoScreen(viewModel:ReviewInfoViewModel, reviewID: Int, prefs:SharedP
     val scrollState = rememberScrollState()
 
     if (reviewData == null) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            CircularProgressIndicator(color = TechTalkGray)
-            Text(text = "Loading details...")
-        }
+        LoadingScreen(LocalContext.current.getString(R.string.loading_details))
     } else {
         LazyColumn(
             modifier = Modifier
