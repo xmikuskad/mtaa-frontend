@@ -6,19 +6,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.Sort
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -40,6 +38,9 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.util.*
+
+const val CREATED_AT = "created_at"
 
 class ReviewsActivity : ComponentActivity() {
 
@@ -57,6 +58,7 @@ class ReviewsActivity : ComponentActivity() {
         productId = intent.getIntExtra("productId", 0)
         productName = intent.getStringExtra("productName") ?: "Unknown name"
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+        val queryParams = OrderAttributes("","")
 
         setLanguage(prefs.getString("language", "en"), this)
 
@@ -83,8 +85,8 @@ class ReviewsActivity : ComponentActivity() {
                         )
                     }
                 ) {
-                    ReviewsScreen(productId, productName, viewModel)
-                    viewModel.loadReviews(productId)
+                    ReviewsScreen(productId, productName, viewModel,queryParams)
+                    viewModel.loadReviews(productId,queryParams)
                 }
             }
         }
@@ -98,13 +100,13 @@ class ReviewScreenViewModel: ViewModel() {
     val liveReviews = MutableLiveData<List<ReviewInfoItem>>()
     private var page = 1
 
-    fun loadReviews(productId: Int) {
+    fun loadReviews(productId: Int,obj: OrderAttributes) {
         MainScope().launch(Dispatchers.Main) {
             try {
                 val reviews: ReviewsInfo
                 withContext(Dispatchers.IO) {
                     // do blocking networking on IO thread
-                    reviews = DataGetter.getReviews(productId,page)
+                    reviews = DataGetter.getReviews(productId,page,obj)
                     page++
                 }
                 liveReviews.value = liveReviews.value?.plus(reviews.reviews) ?: reviews.reviews
@@ -114,23 +116,99 @@ class ReviewScreenViewModel: ViewModel() {
         }
     }
 
+    fun reloadReviews(productId: Int, obj:OrderAttributes) {
+        liveReviews.value = mutableListOf()
+        page = 1
+        loadReviews(productId,obj)
+    }
+
 }
 
 @Composable
-fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewModel) {
+fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewModel, obj:OrderAttributes) {
     val reviews by viewModel.liveReviews.observeAsState(initial = emptyList())
     val context = LocalContext.current
+    val orderState = remember { mutableStateOf(DrawerValue.Closed) }
+
+    if (orderState.value == DrawerValue.Open) {
+        Dialog(onDismissRequest = { orderState.value = DrawerValue.Closed }) {
+
+            Card(
+                border = BorderStroke(1.dp, Color.Black)
+            )
+            {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(context.getString(R.string.order_by), style = MaterialTheme.typography.h5)
+                    Spacer(modifier = Modifier.height(20.dp))
+                    val selectedOrder = remember { mutableStateOf(context.getString(R.string.newest)) }
+                    DropdownList(
+                        items = listOf(
+                            context.getString(R.string.newest),
+                            context.getString(R.string.oldest),
+                            context.getString(R.string.score_asc),
+                            context.getString(R.string.score_desc)
+                        ),
+                        label = context.getString(R.string.order_by),
+                        selected = selectedOrder
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Button(onClick = {
+                        when (selectedOrder.value) {
+                            context.getString(R.string.newest) -> {
+                                obj.order_by = ""
+                                obj.order_type = ""
+                            }
+                            context.getString(R.string.oldest) -> {
+                                obj.order_by = CREATED_AT
+                                obj.order_type = ASCENDING
+                            }
+                            context.getString(R.string.score_asc) -> {
+                                obj.order_by = SCORE
+                                obj.order_type = ASCENDING
+                            }
+                            context.getString(R.string.score_desc) -> {
+                                obj.order_by = SCORE
+                                obj.order_type = DESSCENDING
+                            }
+                        }
+
+                        viewModel.reloadReviews(productId, obj)
+                        orderState.value = DrawerValue.Closed
+                    }) {
+                        Text(context.getString(R.string.save))
+                    }
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
             .padding(20.dp)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            "${context.getString(R.string.reviews_of)} $productName",
-            style = TextStyle(fontSize = 25.sp),
-            textAlign = TextAlign.Center
-        )
+
+        Row {
+            IconButton(
+                onClick = {
+                    orderState.value = DrawerValue.Open
+                }
+            ) {
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    painter = rememberVectorPainter(Icons.Filled.Sort),
+                    contentDescription = null
+                )
+            }
+            Text(
+                "${context.getString(R.string.reviews_of)} $productName",
+                style = TextStyle(fontSize = 25.sp),
+                textAlign = TextAlign.Center
+            )
+        }
         LazyColumn(
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -138,7 +216,7 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
             itemsIndexed(reviews) { index,item ->
                 ReviewBox(reviewInfo = item,canEdit = false)
                 if(index == reviews.lastIndex) {
-                    viewModel.loadReviews(productId)
+                    viewModel.loadReviews(productId,obj)
                 }
             }
         }

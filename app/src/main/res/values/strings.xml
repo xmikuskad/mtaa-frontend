@@ -59,6 +59,7 @@
     <string name="price_desc">Price desc</string>
     <string name="score_asc">Score asc</string>
     <string name="score_desc">Score desc</string>
+    <string name="oldest">Oldest</string>
     <string name="add_review">Add review</string>
     <string name="saved">Saved</string>
     <string name="edit_account">Edit account</string>

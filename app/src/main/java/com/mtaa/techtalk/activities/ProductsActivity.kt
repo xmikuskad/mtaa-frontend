@@ -44,6 +44,10 @@ import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
 const val PRICE_MULTIPLIER = 10000
+const val ASCENDING = "asc"
+const val DESSCENDING = "des"
+const val PRICE = "price"
+const val SCORE = "score"
 
 class ProductsActivity : ComponentActivity() {
 
@@ -321,13 +325,27 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(onClick = {
-                        val values = selectedOrder.value.split(" ")
-                        if (values.size == 2) {
-                            obj.order_by = values[0].toLowerCase(Locale.ROOT)
-                            obj.order_type = values[1]
-                        } else {
-                            obj.order_by = ""
-                            obj.order_type = ""
+                        when (selectedOrder.value) {
+                            context.getString(R.string.newest) -> {
+                                obj.order_by = ""
+                                obj.order_type = ""
+                            }
+                            context.getString(R.string.price_asc) -> {
+                                obj.order_by = PRICE
+                                obj.order_type = ASCENDING
+                            }
+                            context.getString(R.string.price_desc) -> {
+                                obj.order_by = PRICE
+                                obj.order_type = DESSCENDING
+                            }
+                            context.getString(R.string.score_asc) -> {
+                                obj.order_by = SCORE
+                                obj.order_type = ASCENDING
+                            }
+                            context.getString(R.string.score_desc) -> {
+                                obj.order_by = SCORE
+                                obj.order_type = DESSCENDING
+                            }
                         }
 
                         viewModel.reloadProducts(categoryId, obj)

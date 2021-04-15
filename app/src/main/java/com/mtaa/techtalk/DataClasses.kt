@@ -70,3 +70,4 @@ data class ReviewIdInfo(val id:Int)
  */
 
 data class QueryAttributes(var order_by:String, var order_type:String, var brands:String, var min_price :Float, var max_price:Float, var min_score:Float)
+data class OrderAttributes(var order_by:String, var order_type:String)

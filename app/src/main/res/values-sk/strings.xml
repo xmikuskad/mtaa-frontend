@@ -60,6 +60,7 @@
     <string name="price_desc">Ceny nadol</string>
     <string name="score_asc">Hodnotenia nahor</string>
     <string name="score_desc">Hodnotenia nadol</string>
+    <string name="oldest">Najstaršie</string>
     <string name="add_review">Pridať recenziu</string>
     <string name="saved">Uložené</string>
     <string name="edit_account">Upraviť účet</string>

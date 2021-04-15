@@ -50,8 +50,15 @@ object DataGetter {
             }
         }
     }
-    suspend fun getReviews(productID:Int, page:Int): ReviewsInfo {
-        return client.get("$ADDRESS/products/$productID/$page")
+    suspend fun getReviews(productID:Int, page:Int, obj:OrderAttributes): ReviewsInfo {
+        return client.get("$ADDRESS/products/$productID/$page") {
+            if (obj.order_by.isNotEmpty()) {
+                parameter("order_by", obj.order_by)
+            }
+            if (obj.order_type.isNotEmpty()) {
+                parameter("order_type", obj.order_type)
+            }
+        }
     }
     suspend fun login(email: String, password: String): AuthInfo {
         return client.post("$ADDRESS/login") {
@@ -114,9 +121,15 @@ object DataGetter {
     suspend fun getCategoryBrands(categoryID: Int) :BrandsInfo {
         return client.get("$ADDRESS/categories/$categoryID/brands")
     }
-    suspend fun getUserInfo(authKey: String, page: Int): UserInfo {
+    suspend fun getUserInfo(authKey: String, page: Int, obj:OrderAttributes): UserInfo {
         return client.get("$ADDRESS/users/$page") {
             header("auth", authKey)
+            if (obj.order_by.isNotEmpty()) {
+                parameter("order_by", obj.order_by)
+            }
+            if (obj.order_type.isNotEmpty()) {
+                parameter("order_type", obj.order_type)
+            }
         }
     }
     suspend fun search(searchInput: String, page: Int): ProductsInfo {
