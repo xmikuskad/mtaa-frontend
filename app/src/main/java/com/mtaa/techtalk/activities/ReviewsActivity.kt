@@ -189,21 +189,21 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 onClick = {
                     orderState.value = DrawerValue.Open
                 }
             ) {
                 Icon(
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(28.dp),
                     painter = rememberVectorPainter(Icons.Filled.Sort),
                     contentDescription = null
                 )
             }
             Text(
                 "${context.getString(R.string.reviews_of)} $productName",
-                style = TextStyle(fontSize = 25.sp),
+                style = TextStyle(fontSize = 22.sp),
                 textAlign = TextAlign.Center
             )
         }

@@ -160,7 +160,7 @@ fun Drawer(prefs: SharedPreferences) {
             }?.let {
                 Text(
                     text = it,
-                    fontSize = 22.sp
+                    fontSize = 20.sp
                 )
             }
         }
@@ -187,7 +187,7 @@ fun Drawer(prefs: SharedPreferences) {
                 modifier = Modifier.clickable(
                     onClick = { openScreen(context, MainMenuActivity()) }
                 ),
-                fontSize = 28.sp
+                fontSize = 24.sp
             )
         }
         Spacer(Modifier.size(20.dp))
@@ -206,7 +206,7 @@ fun Drawer(prefs: SharedPreferences) {
                         openCategories(context)
                     }
                 ),
-                fontSize = 28.sp
+                fontSize = 24.sp
             )
         }
         Spacer(Modifier.size(20.dp))
@@ -228,7 +228,7 @@ fun Drawer(prefs: SharedPreferences) {
                         context.startActivity(intent)
                     }
                 ),
-                fontSize = 28.sp
+                fontSize = 24.sp
             )
         }
         Spacer(Modifier.size(20.dp))
@@ -245,7 +245,7 @@ fun Drawer(prefs: SharedPreferences) {
                 modifier = Modifier.clickable(
                     onClick = { openScreen(context, AboutAppActivity()) }
                 ),
-                fontSize = 28.sp
+                fontSize = 24.sp
             )
         }
     }
@@ -272,7 +272,7 @@ fun Drawer(prefs: SharedPreferences) {
                     modifier = Modifier.clickable(
                         onClick = { openScreen(context, EditAccountActivity()) }
                     ),
-                    fontSize = 28.sp
+                    fontSize = 24.sp
                 )
             }
             Spacer(Modifier.size(20.dp))
@@ -298,7 +298,7 @@ fun Drawer(prefs: SharedPreferences) {
                             context.startActivity(intent)
                         }
                     ),
-                    fontSize = 28.sp
+                    fontSize = 24.sp
                 )
             }
         } else if (name == "" && authToken == "") {
@@ -321,7 +321,7 @@ fun Drawer(prefs: SharedPreferences) {
                             context.startActivity(intent)
                         }
                     ),
-                    fontSize = 28.sp
+                    fontSize = 24.sp
                 )
             }
             Spacer(Modifier.size(20.dp))
@@ -344,7 +344,7 @@ fun Drawer(prefs: SharedPreferences) {
                             context.startActivity(intent)
                         }
                     ),
-                    fontSize = 28.sp
+                    fontSize = 24.sp
                 )
             }
         }

@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -361,14 +362,14 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             .padding(20.dp)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 onClick = {
                     orderState.value = DrawerValue.Open
                 }
             ) {
                 Icon(
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(28.dp),
                     painter = rememberVectorPainter(Icons.Filled.Sort),
                     contentDescription = null
                 )
@@ -377,7 +378,8 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             Text(
                 text = categoryName,
                 textAlign = TextAlign.Center,
-                style = typography.h4
+                style = typography.h4,
+                fontSize = 26.sp
             )
             Spacer(modifier = Modifier.width(10.dp))
             IconButton(
@@ -386,7 +388,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                 }
             ) {
                 Icon(
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(28.dp),
                     painter = rememberVectorPainter(Icons.Filled.FilterAlt),
                     contentDescription = null
                 )
