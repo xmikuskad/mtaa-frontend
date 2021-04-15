@@ -3,6 +3,7 @@ package com.mtaa.techtalk.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -71,7 +72,13 @@ class ReviewsActivity : ComponentActivity() {
                     drawerContent = { Drawer(prefs) },
                     floatingActionButton = {
                         ExtendedFloatingActionButton(
-                            onClick = { openAddReview(this,productId,productName) },
+                            onClick = {
+                                if ((prefs.getString("token","") ?: "").isNotEmpty()) {
+                                    openAddReview(this, productId, productName)
+                                } else {
+                                    showMessage(this, getString(R.string.not_logged_in), Toast.LENGTH_SHORT)
+                                }
+                            },
                             text = {Text(text=getString(R.string.add_review))},
                             icon = {
                                 Icon(
@@ -224,7 +231,6 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
 fun openAddReview(context: Context, productId: Int, productName: String)
 {
     val intent = Intent(context, AddReviewActivity::class.java)
-    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
     intent.putExtra("productID",productId)
     intent.putExtra("productName",productName)
     context.startActivity(intent)

@@ -1,7 +1,9 @@
 package com.mtaa.techtalk.activities
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -28,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.accompanist.glide.GlideImage
 import com.mtaa.techtalk.*
 import com.mtaa.techtalk.R
+import com.mtaa.techtalk.ui.theme.TechTalkGray
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -113,17 +116,29 @@ fun ReviewInfoScreen(viewModel:ReviewInfoViewModel, reviewID: Int, prefs:SharedP
     val dislikes by viewModel.liveDislikes.observeAsState(initial = 0)
     val scrollState = rememberScrollState()
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize(),
-    ) {
-        item {
-            if(reviewData!=null) {
-                ReviewDetails(viewModel,ReviewVotesInfo(likes,dislikes),reviewData!!,scrollState,reviewID,prefs)
-            }
-            else{
-                //TODO add loading animation or something
-                Text(text="Loading details...")
+    if (reviewData == null) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator(color = TechTalkGray)
+            Text(text = "Loading details...")
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(),
+        ) {
+            item {
+                ReviewDetails(
+                    viewModel,
+                    ReviewVotesInfo(likes, dislikes),
+                    reviewData!!,
+                    scrollState,
+                    reviewID,
+                    prefs
+                )
             }
         }
     }
@@ -141,7 +156,7 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
             ) {
                 IconButton(
                     onClick = {
-                        addVote(viewModel, true, id, prefs)
+                        addVote(context, viewModel, true, id, prefs)
                     }
                 ) {
                     Icon(
@@ -188,7 +203,7 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
             ) {
                 IconButton(
                     onClick = {
-                        addVote(viewModel, false, id, prefs)
+                        addVote(context, viewModel, false, id, prefs)
                     }
                 ) {
                     Icon(
@@ -303,12 +318,18 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
     }
 }
 
-fun addVote(viewModel: ReviewInfoViewModel,shouldLike:Boolean,reviewID: Int,prefs:SharedPreferences) {
+fun addVote(
+    context: Context,
+    viewModel: ReviewInfoViewModel,
+    shouldLike: Boolean,
+    reviewID: Int,
+    prefs: SharedPreferences
+) {
     val auth = prefs.getString("token","")?:""
 
     if(auth.isEmpty())
     {
-        //TODO show not logged in warning
+        showMessage(context, context.getString(R.string.not_logged_in), Toast.LENGTH_SHORT)
         return
     }
     MainScope().launch(Dispatchers.Main) {
