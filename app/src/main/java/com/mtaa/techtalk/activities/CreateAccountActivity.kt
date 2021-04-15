@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -75,7 +77,7 @@ fun CreateAccountScreen() {
         ([a-zA-Z]+)?    // possibility of a second surname
          */
         val usernameRegex = Pattern.compile(
-            "^([a-zA-Z]{2,}\\s[a-zA-Z]+'?-?[a-zA-Z]{2,}\\s?([a-zA-Z]+)?)"
+            "^([\\p{L}]{2,}\\s[\\p{L}]+'?-?[\\p{L}]{2,}\\s?([\\p{L}]+)?)"
         )
         val isValidName = usernameRegex.matcher(nameState.value.text).matches()
         OutlinedTextField(
@@ -171,7 +173,8 @@ fun CreateAccountScreen() {
                         contentDescription = null
                     )
                 }
-            }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
 
         Spacer(modifier = Modifier.size(10.dp))
@@ -197,7 +200,8 @@ fun CreateAccountScreen() {
                     painter = rememberVectorPainter(image = Icons.Filled.Password),
                     contentDescription = null
                 )
-            }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
         Button(
             modifier = Modifier
