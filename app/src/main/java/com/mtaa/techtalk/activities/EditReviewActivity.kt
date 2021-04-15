@@ -54,7 +54,7 @@ class EditReviewActivity : ComponentActivity() {
         setLanguage(prefs.getString("language", "English"), this)
 
         setContent {
-            TechTalkTheme(true) {
+            TechTalkTheme(setColorScheme(prefs)) {
                 val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
                 val scope = rememberCoroutineScope()
                 Scaffold(

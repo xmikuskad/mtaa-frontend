@@ -35,7 +35,7 @@ class SettingsActivity : ComponentActivity() {
         setLanguage(prefs.getString("language", "en"), this)
 
         setContent {
-            TechTalkTheme(true) {
+            TechTalkTheme(setColorScheme(prefs)) {
                 val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
                 val scope = rememberCoroutineScope()
                 Scaffold(
@@ -170,4 +170,10 @@ fun setLanguage(language: String?, context: Context) {
     val config: Configuration = resources.configuration
     config.setLocale(myLocale)
     resources.updateConfiguration(config, dm)
+}
+
+fun setColorScheme(prefs: SharedPreferences): Boolean {
+    if (prefs.getString("color-scheme", "Light Mode") == "Light Mode")
+        return false
+    return true
 }

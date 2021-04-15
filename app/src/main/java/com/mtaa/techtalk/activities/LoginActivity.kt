@@ -46,7 +46,7 @@ class LoginActivity: ComponentActivity() {
         setLanguage(prefs.getString("language", "English"), this)
 
         setContent {
-            TechTalkTheme(true) {
+            TechTalkTheme(setColorScheme(prefs)) {
                 Surface(color = MaterialTheme.colors.background) {
                     LoginScreen(prefs)
                 }

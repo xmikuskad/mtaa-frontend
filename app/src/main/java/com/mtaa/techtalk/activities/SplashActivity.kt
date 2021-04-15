@@ -40,7 +40,7 @@ class SplashActivity : ComponentActivity() {
         if (prefs.getBoolean("firstrun", true)) {
             isFirstRun = true
             prefs.edit().putBoolean("firstrun", false).apply()
-            prefs.edit().putString("color-scheme", "Dark Mode").apply()
+            prefs.edit().putString("color-scheme", "Light Mode").apply()
             prefs.edit().putString("language", "English").apply()
         }
 
@@ -49,7 +49,7 @@ class SplashActivity : ComponentActivity() {
         //isFirstRun = true
 
         setContent {
-            TechTalkTheme(true) {
+            TechTalkTheme(setColorScheme(prefs)) {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
                     SplashScreen()
