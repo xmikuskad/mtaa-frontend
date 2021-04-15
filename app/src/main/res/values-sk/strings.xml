@@ -8,7 +8,7 @@
     <string name="enter_password_fail">Vaše heslo*</string>
     <string name="enter_name">Vaše meno</string>
     <string name="enter_name_fail">Vaše meno*</string>
-    <string name="confirm_password">Potrvdenie hesla</string>
+    <string name="confirm_password">Potvrdenie hesla</string>
     <string name="confirm_password_fail">Potrvdenie hesla*</string>
     <string name="create_account">Vytvoriť účet</string>
     <string name="password_rules">Vaše heslo musí obsahovať:\n\n
@@ -77,10 +77,10 @@
     <string name="password">Heslo</string>
     <string name="confirmation_password">Potvrdenie hesla</string>
     <string name="invalid">Chybné:</string>
-    <string name="new_or_old_email">Nový alebo pôvodný e-mail</string>
-    <string name="new_or_old_email_fail">Nový alebo pôvodný e-mail*</string>
-    <string name="new_or_old_password">Nové alebo pôvodné heslo</string>
-    <string name="new_or_old_password_fail">Nové alebo pôvodné heslo*</string>
+    <string name="new_or_old_email">Nový/pôvodný e-mail</string>
+    <string name="new_or_old_email_fail">Nový/pôvodný e-mail*</string>
+    <string name="new_or_old_password">Nové/pôvodné heslo</string>
+    <string name="new_or_old_password_fail">Nové/pôvodné heslo*</string>
     <string name="new_name">Nové meno</string>
     <string name="new_name_fail">Nové meno*</string>
     <string name="discard_changes">Zrušiť zmeny</string>
