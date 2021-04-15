@@ -38,7 +38,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
-import java.util.*
 
 const val CREATED_AT = "created_at"
 
@@ -60,7 +59,7 @@ class ReviewsActivity : ComponentActivity() {
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
         val queryParams = OrderAttributes("","")
 
-        setLanguage(prefs.getString("language", "en"), this)
+        setLanguage(prefs.getString("language", "English"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -171,7 +170,7 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
                             }
                             context.getString(R.string.score_desc) -> {
                                 obj.order_by = SCORE
-                                obj.order_type = DESSCENDING
+                                obj.order_type = DESCENDING
                             }
                         }
 

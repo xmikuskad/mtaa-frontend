@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
@@ -47,7 +46,7 @@ class ReviewInfoActivity: ComponentActivity() {
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
         viewModel = ViewModelProvider(this).get(ReviewInfoViewModel::class.java)
 
-        setLanguage(prefs.getString("language", "en"), this)
+        setLanguage(prefs.getString("language", "English"), this)
 
         setContent {
             TechTalkTheme(true) {

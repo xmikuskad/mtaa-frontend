@@ -46,7 +46,7 @@ class AccountActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(UserReviewsViewModel::class.java)
         val queryParams = OrderAttributes("","")
 
-        setLanguage(prefs.getString("language", "en"), this)
+        setLanguage(prefs.getString("language", "English"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -146,7 +146,7 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
                             }
                             context.getString(R.string.score_desc) -> {
                                 obj.order_by = SCORE
-                                obj.order_type = DESSCENDING
+                                obj.order_type = DESCENDING
                             }
                         }
 

@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -55,7 +54,7 @@ class AddReviewActivity: ComponentActivity() {
         val productID = intent.getIntExtra("productID",-1)
         val productName = intent.getStringExtra("productName")?:""
 
-        setLanguage(prefs.getString("language", "en"), this)
+        setLanguage(prefs.getString("language", "English"), this)
 
         setContent {
             TechTalkTheme(true) {

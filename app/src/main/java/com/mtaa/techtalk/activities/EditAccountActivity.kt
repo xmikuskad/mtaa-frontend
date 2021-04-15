@@ -48,7 +48,7 @@ class EditAccountActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
-        setLanguage(prefs.getString("language", "en"), this)
+        setLanguage(prefs.getString("language", "English"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -91,11 +91,11 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
         ^               // start of line
         [a-zA-Z]{2,}    // will except a name with at least two characters
         \s              // will look for white space between name and surname
-        [a-zA-Z]{1,}    // needs at least 1 Character
+        [a-zA-Z]+    // needs at least 1 Character
         \'?-?           // possibility of ' or - for double barreled and hyphenated surnames - John D'Largy
         [a-zA-Z]{2,}    // will except a name with at least two characters
         \s?             // possibility of another whitespace
-        ([a-zA-Z]{1,})? // possibility of a second surname
+        ([a-zA-Z]+)? // possibility of a second surname
          */
         val usernameRegex = Pattern.compile(
             "^([\\p{L}]{2,}\\s[\\p{L}]+'?-?[\\p{L}]{2,}\\s?([\\p{L}]+)?)"

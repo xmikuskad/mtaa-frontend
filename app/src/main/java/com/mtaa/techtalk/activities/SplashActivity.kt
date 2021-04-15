@@ -2,10 +2,7 @@ package com.mtaa.techtalk.activities
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
-import android.content.res.Resources
 import android.os.Bundle
-import android.util.DisplayMetrics
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -16,7 +13,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.mtaa.techtalk.CategoriesInfo
 import com.mtaa.techtalk.DataGetter.getCategories
@@ -27,8 +23,6 @@ import io.ktor.network.sockets.*
 import kotlinx.coroutines.*
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkGray
-import java.util.*
-
 
 class SplashActivity : ComponentActivity() {
     companion object InitialData {
@@ -47,10 +41,10 @@ class SplashActivity : ComponentActivity() {
             isFirstRun = true
             prefs.edit().putBoolean("firstrun", false).apply()
             prefs.edit().putString("color-scheme", "Dark Mode").apply()
-            prefs.edit().putString("language", "eng").apply()
+            prefs.edit().putString("language", "English").apply()
         }
 
-        setLanguage(prefs.getString("language", "en"), this)
+        setLanguage(prefs.getString("language", "English"), this)
         // TODO Delete after testing
         //isFirstRun = true
 
@@ -115,17 +109,5 @@ fun SplashScreen() {
             )
         }
         CircularProgressIndicator(color = TechTalkGray)
-    }
-}
-
-fun setLanguage(language: String?, context: Context) {
-    if (language != null) {
-        val myLocale = Locale(language)
-        Locale.setDefault(myLocale)
-        val resources: Resources = context.resources
-        val dm: DisplayMetrics = resources.displayMetrics
-        val config: Configuration = resources.configuration
-        config.setLocale(myLocale)
-        resources.updateConfiguration(config, dm)
     }
 }

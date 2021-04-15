@@ -57,7 +57,7 @@ class MainMenuActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(MainMenuViewModel::class.java)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
-        setLanguage(prefs.getString("language", "en"), this)
+        setLanguage(prefs.getString("language", "English"), this)
 
         setContent {
             TechTalkTheme(true) {

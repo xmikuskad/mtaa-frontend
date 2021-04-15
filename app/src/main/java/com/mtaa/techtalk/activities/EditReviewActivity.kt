@@ -51,7 +51,7 @@ class EditReviewActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(EditReviewViewModel::class.java)
         val reviewID = intent.getIntExtra("reviewID",-1)
 
-        setLanguage(prefs.getString("language", "en"), this)
+        setLanguage(prefs.getString("language", "English"), this)
 
         setContent {
             TechTalkTheme(true) {

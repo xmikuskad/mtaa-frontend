@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -39,13 +38,12 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
-import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
 const val PRICE_MULTIPLIER = 10000
 const val ASCENDING = "asc"
-const val DESSCENDING = "des"
+const val DESCENDING = "des"
 const val PRICE = "price"
 const val SCORE = "score"
 
@@ -65,7 +63,7 @@ class ProductsActivity : ComponentActivity() {
         categoryName = intent.getStringExtra("categoryName") ?: "Unknown name"
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
-        setLanguage(prefs.getString("language", "en"), this)
+        setLanguage(prefs.getString("language", "English"), this)
 
         setContent {
             TechTalkTheme(true) {
@@ -336,7 +334,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                             }
                             context.getString(R.string.price_desc) -> {
                                 obj.order_by = PRICE
-                                obj.order_type = DESSCENDING
+                                obj.order_type = DESCENDING
                             }
                             context.getString(R.string.score_asc) -> {
                                 obj.order_by = SCORE
@@ -344,7 +342,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                             }
                             context.getString(R.string.score_desc) -> {
                                 obj.order_by = SCORE
-                                obj.order_type = DESSCENDING
+                                obj.order_type = DESCENDING
                             }
                         }
 
@@ -363,7 +361,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             .padding(20.dp)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row() {
+        Row {
             IconButton(
                 onClick = {
                     orderState.value = DrawerValue.Open

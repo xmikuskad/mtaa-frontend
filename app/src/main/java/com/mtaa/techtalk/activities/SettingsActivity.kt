@@ -1,8 +1,12 @@
 package com.mtaa.techtalk.activities
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
+import java.util.*
 
 class SettingsActivity : ComponentActivity() {
     @ExperimentalAnimationApi
@@ -80,8 +85,7 @@ fun SettingsScreen(prefs: SharedPreferences) {
         )
         Button(
             onClick = {
-                val language = if (selectedLanguage.value == "English") { "en" } else { "sk" }
-                prefs.edit().putString("language", language).apply()
+                prefs.edit().putString("language", selectedLanguage.value).apply()
                 prefs.edit().putString("color-scheme", selectedScheme.value).apply()
                 showMessage(context, context.getString(R.string.saved), Toast.LENGTH_LONG)
 
@@ -147,4 +151,23 @@ fun DropdownList(items: List<String>, label: String? = null, selected: MutableSt
             }
         }
     }
+}
+
+fun setLanguage(language: String?, context: Context) {
+    if (language == null) {
+        return
+    }
+    val myLocale = Locale(
+        if (language == "English") {
+            "en"
+        } else {
+            "sk"
+        }
+    )
+    Locale.setDefault(myLocale)
+    val resources: Resources = context.resources
+    val dm: DisplayMetrics = resources.displayMetrics
+    val config: Configuration = resources.configuration
+    config.setLocale(myLocale)
+    resources.updateConfiguration(config, dm)
 }
