@@ -77,7 +77,6 @@ class ReviewsActivity : ComponentActivity() {
                                 Icon(
                                 modifier = Modifier.size(40.dp, 40.dp),
                                 painter = rememberVectorPainter(Icons.Filled.Add),
-                                tint = Color.White,
                                 contentDescription = null
                             )},
                             backgroundColor = TechTalkGray

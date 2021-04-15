@@ -158,14 +158,10 @@ fun LoginScreen(prefs: SharedPreferences) {
                         }
                     }
                 }
-            },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            )
+            }
         ) {
             Text(
                 text = context.getString(R.string.log_in),
-                color = Color.Black,
                 fontSize = 16.sp
             )
         }

@@ -61,21 +61,16 @@ fun FirstLaunchScreen() {
                 intent.flags =
                     Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
-            },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            )
+            }
         )
         {
             Icon(
                 modifier = Modifier.size(28.dp, 28.dp),
                 painter = rememberVectorPainter(image = Icons.Filled.Login),
-                contentDescription = null,
-                tint = Color.Black
+                contentDescription = null
             )
             Text(
                 text = context.getString(R.string.log_in),
-                color = Color.Black,
                 fontSize = 16.sp
             )
         }
@@ -89,15 +84,11 @@ fun FirstLaunchScreen() {
                 intent.flags =
                     Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(intent)
-            },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            )
+            }
         )
         {
             Text(
                 text = context.getString(R.string.create_account),
-                color = Color.Black,
                 fontSize = 16.sp
             )
         }
@@ -111,14 +102,10 @@ fun FirstLaunchScreen() {
                 intent.flags =
                     Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 context.startActivity(intent)
-            },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            )
+            }
         ) {
             Text(
                 text = context.getString(R.string.continue_without_account),
-                color = Color.Black,
                 fontSize = 16.sp
             )
         }

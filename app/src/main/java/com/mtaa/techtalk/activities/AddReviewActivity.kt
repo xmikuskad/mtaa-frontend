@@ -392,20 +392,15 @@ fun AddReviewScreen(
         Button(
             onClick = {
                 addReviewActivity.loadImagesFromGallery()
-            },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            )
+            }
         ) {
             Icon(
                 painter = rememberVectorPainter(Icons.Filled.AddPhotoAlternate),
-                tint = Color.Black,
                 contentDescription = null
             )
             Spacer(modifier = Modifier.size(5.dp))
             Text(
                 text = context.getString(R.string.add_photos),
-                color = Color.Black
             )
         }
 
@@ -454,20 +449,15 @@ fun AddReviewScreen(
                         println(e.stackTraceToString())
                     }
                 }
-            },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            )
+            }
         ) {
             Icon(
                 painter = rememberVectorPainter(Icons.Filled.Add),
-                tint = Color.Black,
                 contentDescription = null
             )
             Spacer(modifier = Modifier.size(5.dp))
             Text(
-                text = context.getString(R.string.add_review),
-                color = Color.Black
+                text = context.getString(R.string.add_review)
             )
         }
     }

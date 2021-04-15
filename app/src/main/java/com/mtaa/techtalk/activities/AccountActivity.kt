@@ -174,7 +174,7 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
             )
         }
         Text(
-            text = "${context.getString(R.string.fan_score)}: $trustScore",
+            text = "${context.getString(R.string.fan_score)} $trustScore",
             modifier = Modifier.padding(top = 15.dp, start = 25.dp),
             fontSize = 24.sp
         )

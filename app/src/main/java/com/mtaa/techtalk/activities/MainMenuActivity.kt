@@ -150,8 +150,7 @@ fun Drawer(prefs: SharedPreferences) {
             Icon(
                 modifier = Modifier.size(48.dp, 48.dp),
                 painter = rememberVectorPainter(image = Icons.Filled.AccountCircle),
-                contentDescription = null,
-                tint = Color.White
+                contentDescription = null
             )
             Spacer(Modifier.size(10.dp))
             if (name != "") {
@@ -462,6 +461,7 @@ fun CategoryMainMenu(item:CategoryInfo,context: Context){
             modifier = Modifier.padding(5.dp),
             textAlign = TextAlign.Center,
             style = TextStyle(fontSize = 18.sp),
+            color = Color.White
         )
     }
 }
@@ -494,52 +494,70 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = reviewInfo.text.take(MAX_REVIEW_TEXT) + "...",
-                modifier = Modifier.padding(15.dp)
+                modifier = Modifier.padding(15.dp),
+                color = Color.White
             )
-            //Spacer(Modifier.size(15.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     modifier = Modifier.size(25.dp),
                     painter = rememberVectorPainter(Icons.Filled.AddCircle),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = Color.White
                 )
                 Spacer(Modifier.size(5.dp))
-                Text(text = "$positives ${context.getString(R.string.positives_num)}")
+                Text(
+                    text = "$positives ${context.getString(R.string.positives_num)}",
+                    color = Color.White
+                )
                 Spacer(Modifier.size(20.dp))
                 Icon(
                     modifier = Modifier.size(25.dp),
                     painter = rememberVectorPainter(Icons.Filled.RemoveCircle),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = Color.White
                 )
                 Spacer(Modifier.size(5.dp))
-                Text(text = "$negatives ${context.getString(R.string.negatives_num)}")
+                Text(
+                    text = "$negatives ${context.getString(R.string.negatives_num)}",
+                    color = Color.White
+                )
             }
             Spacer(Modifier.size(25.dp))
             Row {
-                Text(text = "${reviewInfo.likes}")
+                Text(
+                    text = "${reviewInfo.likes}",
+                    color = Color.White
+                )
                 Spacer(Modifier.size(5.dp))
                 Icon(
                     modifier = Modifier.size(20.dp),
                     painter = rememberVectorPainter(Icons.Filled.ThumbUp),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = Color.White
                 )
                 Spacer(Modifier.size(20.dp))
-                Text(text = "${reviewInfo.dislikes}")
+                Text(
+                    text = "${reviewInfo.dislikes}",
+                    color = Color.White
+                )
                 Spacer(Modifier.size(5.dp))
                 Icon(
                     modifier = Modifier.size(20.dp),
                     painter = rememberVectorPainter(Icons.Filled.ThumbDown),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = Color.White
                 )
                 Spacer(Modifier.size(50.dp))
                 Text(
-                    text = "${reviewInfo.score.div(10.0)} / 10"
+                    text = "${reviewInfo.score.div(10.0)} / 10",
+                    color = Color.White
                 )
                 Spacer(Modifier.size(5.dp))
                 Icon(
                     modifier = Modifier.size(20.dp),
                     painter = rememberVectorPainter(Icons.Filled.Star),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = Color.White
                 )
             }
         }

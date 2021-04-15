@@ -421,24 +421,33 @@ fun ProductBox(product: ProductInfo) {
                 text = product.name,
                 modifier = Modifier.padding(top=10.dp),
                 textAlign = TextAlign.Center,
-                style = typography.h6
+                style = typography.h6,
+                color = Color.White
             )
             Spacer(Modifier.size(20.dp))
             Row {
-                Text(text = "${product.price.div(100.0)}")
+                Text(
+                    text = "${product.price.div(100.0)}",
+                    color = Color.White
+                )
                 Spacer(Modifier.size(5.dp))
                 Icon(
                     modifier = Modifier.size(20.dp),
                     painter = rememberVectorPainter(Icons.Filled.Euro),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = Color.White
                 )
                 Spacer(Modifier.size(50.dp))
-                Text(text = "${product.score.div(10.0)} / 10")
+                Text(
+                    text = "${product.score.div(10.0)} / 10",
+                    color = Color.White
+                )
                 Spacer(Modifier.size(5.dp))
                 Icon(
                     modifier = Modifier.size(20.dp),
                     painter = rememberVectorPainter(Icons.Filled.Star),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = Color.White
                 )
             }
         }

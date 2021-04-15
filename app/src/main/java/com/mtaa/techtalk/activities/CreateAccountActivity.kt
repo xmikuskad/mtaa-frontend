@@ -260,15 +260,11 @@ fun CreateAccountScreen() {
                         }
                     }
                 }
-            },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            )
+            }
         )
         {
             Text(
                 text = context.getString(R.string.create_account),
-                color = Color.Black,
                 fontSize = 16.sp
             )
         }

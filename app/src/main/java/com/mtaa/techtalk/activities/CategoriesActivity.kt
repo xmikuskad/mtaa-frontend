@@ -82,7 +82,8 @@ fun CategoryScreen() {
                         text = item.name,
                         modifier = Modifier.padding(15.dp).fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.h6
+                        style = MaterialTheme.typography.h6,
+                        color = Color.White
                     )
                 }
             }

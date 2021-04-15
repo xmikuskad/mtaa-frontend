@@ -82,7 +82,7 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h4
         )
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         val nameState =
             remember { mutableStateOf(TextFieldValue(prefs.getString("username", "") ?: "")) }
@@ -225,7 +225,7 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
         )
         Button(
             modifier = Modifier
-                .padding(30.dp)
+                .padding(top = 30.dp)
                 .size(250.dp, 55.dp),
             onClick = {
                 if (!isValidName || !isValidEmail || !isValidPassword || !isValidSecondPassword) {
@@ -285,30 +285,22 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
                         }
                     }
                 }
-            },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            )
+            }
         )
         {
             Text(
                 text = context.getString(R.string.save_changes),
-                color = Color.Black,
                 fontSize = 16.sp
             )
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(5.dp))
         Button(
             onClick = { activity.finish() },
             modifier = Modifier
                 .size(250.dp, 55.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            )
         ) {
             Text(
                 text = context.getString(R.string.discard_changes),
-                color = Color.Black,
                 fontSize = 16.sp
             )
         }

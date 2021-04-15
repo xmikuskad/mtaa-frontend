@@ -94,14 +94,10 @@ fun SettingsScreen(prefs: SharedPreferences) {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 context.startActivity(intent)
             },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            ),
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
                 text = context.getString(R.string.save_changes),
-                color = Color.Black
             )
         }
     }

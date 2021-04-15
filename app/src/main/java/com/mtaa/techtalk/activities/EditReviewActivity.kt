@@ -527,40 +527,30 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 onClick = {
                     activity.loadImagesFromGallery()
                 },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.Gray
-                ),
                 modifier = Modifier.padding(end=10.dp)
             ) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Filled.AddPhotoAlternate),
-                    tint = Color.Black,
                     contentDescription = null
                 )
                 Text(
-                    text = context.getString(R.string.add_photos),
-                    color = Color.Black
+                    text = context.getString(R.string.add_photos)
                 )
             }
             Button(
                 onClick = {
                     showPhotos = !showPhotos
                 },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.Gray
-                ),
                 modifier = Modifier.padding(start=10.dp)
             ) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Filled.Collections),
-                    tint = Color.Black,
                     contentDescription = null
                 )
                 Text(
                     text = if (showPhotos) {
                         context.getString(R.string.hide_photos)
-                    } else context.getString(R.string.show_photos),
-                    color = Color.Black
+                    } else context.getString(R.string.show_photos)
                 )
             }
         }
@@ -648,19 +638,14 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     }
                 }
             },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            ),
             modifier = Modifier.padding(top=15.dp)
         ) {
             Icon(
                 painter = rememberVectorPainter(Icons.Filled.Save),
-                tint = Color.Black,
                 contentDescription = null
             )
             Text(
-                text = context.getString(R.string.save_changes),
-                color = Color.Black
+                text = context.getString(R.string.save_changes)
             )
         }
 
@@ -670,19 +655,14 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 //Close activity
                 activity.finish()
             },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            ),
             modifier = Modifier.padding(top=15.dp)
         ) {
             Icon(
                 painter = rememberVectorPainter(Icons.Filled.EditOff),
-                tint = Color.Black,
                 contentDescription = null
             )
             Text(
-                text = context.getString(R.string.discard_changes),
-                color = Color.Black
+                text = context.getString(R.string.discard_changes)
             )
         }
         //Spacer(modifier = Modifier.height(10.dp))
@@ -703,19 +683,14 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     }
                 }
             },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Gray
-            ),
             modifier = Modifier.padding(top=15.dp)
         ) {
             Icon(
                 painter = rememberVectorPainter(Icons.Filled.Delete),
-                tint = Color.Black,
                 contentDescription = null
             )
             Text(
-                text = context.getString(R.string.delete_review),
-                color = Color.Black
+                text = context.getString(R.string.delete_review)
             )
         }
     }
