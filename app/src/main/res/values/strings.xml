@@ -99,6 +99,7 @@
     <string name="no_search_input">No search input!</string>
     <string name="loading_user_info">Loading user information...</string>
     <string name="loading_reviews">Loading reviews...</string>
+    <string name="loading_review">Loading review...</string>
     <string name="loading_details">Loading details...</string>
     <string name="loading_products">Loading products...</string>
     <string name="no_reviews_found">No reviews found</string>

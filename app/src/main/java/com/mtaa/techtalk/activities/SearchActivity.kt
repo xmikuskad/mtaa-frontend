@@ -1,6 +1,7 @@
 package com.mtaa.techtalk.activities
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -41,6 +42,7 @@ import com.mtaa.techtalk.DataGetter
 import com.mtaa.techtalk.ProductInfo
 import com.mtaa.techtalk.ProductsInfo
 import com.mtaa.techtalk.R
+import com.mtaa.techtalk.ui.theme.SearchBarDark
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -143,6 +145,20 @@ fun SearchScreen(searchInput: String, viewModel: SearchViewModel) {
 @Composable
 fun SearchBar(open: MutableState<Boolean>) {
     val context = LocalContext.current
+    val prefs = context.getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+
+    val barColor = if (setColorScheme(prefs)) {
+        SearchBarDark
+    } else {
+        Color.White
+    }
+
+    val textColor = if (setColorScheme(prefs)) {
+        Color.White
+    } else {
+        Color.Black
+    }
+
     val searchText = remember { mutableStateOf(TextFieldValue()) }
     TextField(
         modifier = Modifier
@@ -151,7 +167,7 @@ fun SearchBar(open: MutableState<Boolean>) {
             .size(48.dp),
         textStyle = TextStyle(
             fontSize = 12.sp,
-            color = Color.Black
+            color = textColor
         ),
         value = searchText.value,
         onValueChange = {
@@ -167,7 +183,7 @@ fun SearchBar(open: MutableState<Boolean>) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Filled.Close),
                     contentDescription = null,
-                    tint = Color.Black
+                    tint = textColor
                 )
             }
         },
@@ -184,13 +200,14 @@ fun SearchBar(open: MutableState<Boolean>) {
                 Icon(
                     painter = rememberVectorPainter(Icons.Filled.Search),
                     contentDescription = null,
-                    tint = Color.Black
+                    tint = textColor
                 )
             }
         },
         colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color.White,
-            focusedIndicatorColor = Color.White
+            backgroundColor = barColor,
+            focusedIndicatorColor = barColor,
+            unfocusedIndicatorColor = barColor
         ),
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Search
