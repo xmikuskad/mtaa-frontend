@@ -143,46 +143,53 @@ fun SplashScreen(viewModel: SplashScreenViewModel, isFirstRun: Boolean, activity
         CircularProgressIndicator(color = TechTalkGray)
 
         if(result != NO_ERROR) {
-            Dialog(onDismissRequest = {
-                viewModel.changeResult(NO_ERROR)
-                activity.initApplication(context, isFirstRun, viewModel)
-            }) {
-                Card(
-                    border = BorderStroke(1.dp, Color.Black)
-                )
-                {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        when (result) {
-                            SERVER_OFFLINE -> {
-                                Text(
-                                    context.getString(R.string.err_server_offline),
-                                    style = MaterialTheme.typography.h6
-                                )
-                            }
-                            NO_INTERNET -> {
-                                Text(
-                                    context.getString(R.string.err_no_internet),
-                                    style = MaterialTheme.typography.h6
-                                )
-                            }
-                            OTHER_ERROR -> {
-                                Text(
-                                    context.getString(R.string.err_other),
-                                    style = MaterialTheme.typography.h6
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Button(onClick = {
-                            viewModel.changeResult(NO_ERROR)
-                            activity.initApplication(context, isFirstRun, viewModel)
-                        }) {
-                            Text(context.getString(R.string.retry),)
-                        }
+            OfflineDialog(
+                callback = {
+                    viewModel.changeResult(NO_ERROR)
+                    activity.initApplication(context, isFirstRun, viewModel)
+                },
+                result = result
+            )
+        }
+    }
+}
+
+@Composable
+fun OfflineDialog(callback: () -> Unit, result: Int) {
+    val context = LocalContext.current
+
+    Dialog(onDismissRequest = callback) {
+        Card(
+            border = BorderStroke(1.dp, Color.Black)
+        )
+        {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                when (result) {
+                    SERVER_OFFLINE -> {
+                        Text(
+                            context.getString(R.string.err_server_offline),
+                            style = MaterialTheme.typography.h6
+                        )
                     }
+                    NO_INTERNET -> {
+                        Text(
+                            context.getString(R.string.err_no_internet),
+                            style = MaterialTheme.typography.h6
+                        )
+                    }
+                    OTHER_ERROR -> {
+                        Text(
+                            context.getString(R.string.err_other),
+                            style = MaterialTheme.typography.h6
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Button(onClick = callback) {
+                    Text(context.getString(R.string.retry),)
                 }
             }
         }
