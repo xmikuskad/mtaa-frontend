@@ -104,4 +104,8 @@
     <string name="loading_products">Načítavanie produktov...</string>
     <string name="no_reviews_found">Žiadne recenzie</string>
     <string name="no_products_found">Nenašli sa žiadne produkty</string>
+    <string name="retry">Opakovať</string>
+    <string name="err_no_internet">Žiadne internetové pripojenie</string>
+    <string name="err_server_offline">Server je nedostupný, skúste to neskôr prosím</string>
+    <string name="err_other">Vyskytol sa neznámy problém. Prosím reštartujte aplikáciu</string>
 </resources>

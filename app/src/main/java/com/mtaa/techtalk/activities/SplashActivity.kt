@@ -5,16 +5,23 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.mtaa.techtalk.CategoriesInfo
 import com.mtaa.techtalk.DataGetter.getCategories
 import com.mtaa.techtalk.DataGetter.getRecentReviews
@@ -24,12 +31,20 @@ import io.ktor.network.sockets.*
 import kotlinx.coroutines.*
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkGray
+import java.net.ConnectException
+
+const val NO_ERROR = 0
+const val NO_INTERNET = -1
+const val SERVER_OFFLINE = -2
+const val OTHER_ERROR = -3
 
 class SplashActivity : ComponentActivity() {
     companion object InitialData {
         lateinit var categories : CategoriesInfo
         lateinit var reviews : ReviewsInfo
     }
+
+    private lateinit var viewModel: SplashScreenViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,23 +61,23 @@ class SplashActivity : ComponentActivity() {
         }
 
         setLanguage(prefs.getString("language", "English"), this)
-        // TODO Delete after testing
-        //isFirstRun = true
+
+        viewModel = ViewModelProvider(this).get(SplashScreenViewModel::class.java)
 
         setContent {
             TechTalkTheme(setColorScheme(prefs)) {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    SplashScreen()
+                    SplashScreen(viewModel,isFirstRun,this)
 
                     //Download main menu data and load next activity
-                    initApplication(this, isFirstRun)
+                    initApplication(this, isFirstRun,viewModel)
                 }
             }
         }
     }
 
-    private fun initApplication(context:Context, isFirstRun: Boolean) {
+    fun initApplication(context:Context, isFirstRun: Boolean,viewModel: SplashScreenViewModel) {
         val scope = MainScope()
         scope.launch(Dispatchers.Main) {
             try {
@@ -70,7 +85,6 @@ class SplashActivity : ComponentActivity() {
                     // do blocking networking on IO thread
                     reviews = getRecentReviews()
                     categories = getCategories()
-                    //TODO log in user
                 }
 
                 //Load new screen
@@ -86,15 +100,32 @@ class SplashActivity : ComponentActivity() {
             } catch (e: Exception) {
                 println(e.stackTraceToString())
                 when (e) {
-                    is ConnectTimeoutException -> println("server or user offline") //User or server is offline TODO handle - show warning
+                    is ConnectTimeoutException -> {
+                        viewModel.changeResult(SERVER_OFFLINE)
+                    }
+                    is ConnectException -> {
+                        viewModel.changeResult(NO_INTERNET)
+                    }
+                    else -> viewModel.changeResult(OTHER_ERROR)
                 }
             }
         }
     }
 }
 
+class SplashScreenViewModel: ViewModel() {
+    val loadingResult = MutableLiveData<Int>(0)
+
+    fun changeResult(value:Int) {
+        loadingResult.value = value
+    }
+}
+
 @Composable
-fun SplashScreen() {
+fun SplashScreen(viewModel: SplashScreenViewModel, isFirstRun: Boolean, activity: SplashActivity) {
+    val result by viewModel.loadingResult.observeAsState(initial = NO_ERROR)
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -110,6 +141,51 @@ fun SplashScreen() {
             )
         }
         CircularProgressIndicator(color = TechTalkGray)
+
+        if(result != NO_ERROR) {
+            Dialog(onDismissRequest = {
+                viewModel.changeResult(NO_ERROR)
+                activity.initApplication(context, isFirstRun, viewModel)
+            }) {
+                Card(
+                    border = BorderStroke(1.dp, Color.Black)
+                )
+                {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        when (result) {
+                            SERVER_OFFLINE -> {
+                                Text(
+                                    context.getString(R.string.err_server_offline),
+                                    style = MaterialTheme.typography.h6
+                                )
+                            }
+                            NO_INTERNET -> {
+                                Text(
+                                    context.getString(R.string.err_no_internet),
+                                    style = MaterialTheme.typography.h6
+                                )
+                            }
+                            OTHER_ERROR -> {
+                                Text(
+                                    context.getString(R.string.err_other),
+                                    style = MaterialTheme.typography.h6
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Button(onClick = {
+                            viewModel.changeResult(NO_ERROR)
+                            activity.initApplication(context, isFirstRun, viewModel)
+                        }) {
+                            Text(context.getString(R.string.retry),)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

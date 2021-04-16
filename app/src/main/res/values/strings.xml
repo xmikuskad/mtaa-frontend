@@ -103,4 +103,9 @@
     <string name="loading_products">Loading products...</string>
     <string name="no_reviews_found">No reviews found</string>
     <string name="no_products_found">No products found</string>
+    <string name="retry">Retry</string>
+    <string name="err_no_internet">No internet connection</string>
+    <string name="err_server_offline">Server is offline please try again later</string>
+    <string name="err_other">Unknown problem. Please restart the app</string>
+
 </resources>
