@@ -101,5 +101,7 @@
     <string name="loading_user_info">Načítavanie informácií používateľa...</string>
     <string name="loading_reviews">Načítavanie recenzií...</string>
     <string name="loading_details">Načítavanie podrobností...</string>
+    <string name="loading_products">Načítavanie produktov...</string>
     <string name="no_reviews_found">Žiadne recenzie</string>
+    <string name="no_products_found">Nenašli sa žiadne produkty</string>
 </resources>

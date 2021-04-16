@@ -219,7 +219,7 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
             }
 
             if (reviews!!.isEmpty()) {
-                NotFoundScreen(context)
+                NotFoundScreen(context.getString(R.string.no_reviews_found))
             } else {
                 LazyColumn(
                     modifier = Modifier

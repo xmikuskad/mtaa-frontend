@@ -102,7 +102,7 @@ class SearchViewModel: ViewModel() {
 
 @Composable
 fun SearchScreen(searchInput: String, viewModel: SearchViewModel) {
-    val searchResultProducts by viewModel.liveSearchResultProducts.observeAsState(initial = emptyList())
+    val searchResultProducts by viewModel.liveSearchResultProducts.observeAsState(initial = null)
     val context = LocalContext.current
 
     Column(
@@ -116,14 +116,24 @@ fun SearchScreen(searchInput: String, viewModel: SearchViewModel) {
             style = TextStyle(fontSize = 20.sp),
             textAlign = TextAlign.Center
         )
-        LazyColumn(
-            modifier = Modifier
-                .padding(top = 10.dp)
-        ) {
-            itemsIndexed(searchResultProducts) { index, item ->
-                ProductBox(product = item)
-                if(index == searchResultProducts.lastIndex) {
-                    viewModel.loadSearchResultProducts(searchInput)
+        when {
+            searchResultProducts == null -> {
+                LoadingScreen(context.getString(R.string.loading_products))
+            }
+            searchResultProducts!!.isEmpty() -> {
+                NotFoundScreen(context.getString(R.string.no_products_found))
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                ) {
+                    itemsIndexed(searchResultProducts!!) { index, item ->
+                        ProductBox(product = item)
+                        if (index == searchResultProducts!!.lastIndex) {
+                            viewModel.loadSearchResultProducts(searchInput)
+                        }
+                    }
                 }
             }
         }

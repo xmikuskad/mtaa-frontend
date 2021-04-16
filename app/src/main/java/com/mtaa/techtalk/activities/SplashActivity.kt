@@ -126,12 +126,12 @@ fun LoadingScreen(label: String) {
 }
 
 @Composable
-fun NotFoundScreen(context: Context) {
+fun NotFoundScreen(label: String) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = context.getString(R.string.no_reviews_found))
+        Text(text = label)
     }
 }

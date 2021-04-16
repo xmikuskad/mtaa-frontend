@@ -202,7 +202,7 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
             }
 
             if (userReviews!!.isEmpty()) {
-                NotFoundScreen(context)
+                NotFoundScreen(context.getString(R.string.no_reviews_found))
             } else {
                 LazyColumn(
                     modifier = Modifier
