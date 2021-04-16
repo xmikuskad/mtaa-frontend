@@ -100,6 +100,7 @@
     <string name="no_search_input">Prázdne textové pole!</string>
     <string name="loading_user_info">Načítavanie informácií používateľa...</string>
     <string name="loading_reviews">Načítavanie recenzií...</string>
+    <string name="loading_review">Načítavanie recenzie...</string>
     <string name="loading_details">Načítavanie podrobností...</string>
     <string name="loading_products">Načítavanie produktov...</string>
     <string name="no_reviews_found">Žiadne recenzie</string>

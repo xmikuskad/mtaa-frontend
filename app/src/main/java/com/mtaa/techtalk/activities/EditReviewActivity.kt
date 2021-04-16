@@ -210,8 +210,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
 
     //Loading
     if (review == null) {
-        //TODO do better loading anim
-        Text(text = "Loading")
+        LoadingScreen(context.getString(R.string.loading_review))
         return
     }
     var reviewText by remember { mutableStateOf(TextFieldValue(review!!.text)) }
@@ -226,7 +225,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
     ) {
         Text(
             text = context.getString(R.string.edit_review),
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h4
         )
@@ -234,7 +235,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
         //Positive attributes
         Text(
             text = context.getString(R.string.positive_attributes),
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h6
         )
@@ -279,14 +282,18 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 ) {
                     if (!positiveStatus[count]) {
                         Icon(
-                            modifier = Modifier.size(36.dp).padding(start = 10.dp),
+                            modifier = Modifier
+                                .size(36.dp)
+                                .padding(start = 10.dp),
                             painter = rememberVectorPainter(Icons.Filled.Edit),
                             contentDescription = null
                         )
                     }
                     else {
                         Icon(
-                            modifier = Modifier.size(36.dp).padding(start = 10.dp),
+                            modifier = Modifier
+                                .size(36.dp)
+                                .padding(start = 10.dp),
                             painter = rememberVectorPainter(Icons.Filled.Save),
                             contentDescription = null
                         )
@@ -304,7 +311,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     }
                 ) {
                     Icon(
-                        modifier = Modifier.size(36.dp).padding(start=10.dp),
+                        modifier = Modifier
+                            .size(36.dp)
+                            .padding(start = 10.dp),
                         painter = rememberVectorPainter(Icons.Filled.RemoveCircle),
                         contentDescription = null
                     )
@@ -343,7 +352,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
         //Negative attributes
         Text(
             text = context.getString(R.string.negative_attributes),
-            modifier = Modifier.fillMaxWidth().padding(top = 30.dp,bottom = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 30.dp, bottom = 10.dp),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h6
         )
@@ -391,14 +402,18 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 ) {
                     if (!negativeStatus[count]) {
                         Icon(
-                            modifier = Modifier.size(36.dp).padding(start = 10.dp),
+                            modifier = Modifier
+                                .size(36.dp)
+                                .padding(start = 10.dp),
                             painter = rememberVectorPainter(Icons.Filled.Edit),
                             contentDescription = null
                         )
                     }
                     else {
                         Icon(
-                            modifier = Modifier.size(36.dp).padding(start = 10.dp),
+                            modifier = Modifier
+                                .size(36.dp)
+                                .padding(start = 10.dp),
                             painter = rememberVectorPainter(Icons.Filled.Save),
                             contentDescription = null
                         )
@@ -416,7 +431,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     }
                 ) {
                     Icon(
-                        modifier = Modifier.size(36.dp).padding(start = 10.dp),
+                        modifier = Modifier
+                            .size(36.dp)
+                            .padding(start = 10.dp),
                         painter = rememberVectorPainter(Icons.Filled.RemoveCircle),
                         contentDescription = null
                     )
@@ -513,7 +530,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 textAlign = TextAlign.Center
             )
             Icon(
-                modifier = Modifier.size(25.dp).padding(start=5.dp),
+                modifier = Modifier
+                    .size(25.dp)
+                    .padding(start = 5.dp),
                 painter = rememberVectorPainter(Icons.Filled.Star),
                 contentDescription = null
             )
