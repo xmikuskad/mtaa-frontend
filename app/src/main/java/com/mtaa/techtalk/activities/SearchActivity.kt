@@ -44,15 +44,18 @@ import com.mtaa.techtalk.ProductsInfo
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.SearchBarDark
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
+import io.ktor.network.sockets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.net.ConnectException
 
 class SearchActivity : ComponentActivity() {
     private lateinit var viewModel: SearchViewModel
     private lateinit var searchInput: String
+    private lateinit var offlineViewModel: OfflineDialogViewModel
 
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +63,7 @@ class SearchActivity : ComponentActivity() {
 
         viewModel = ViewModelProvider(this).get(SearchViewModel::class.java)
         searchInput = intent.getStringExtra("search-input") ?: ""
+        offlineViewModel = ViewModelProvider(this).get(OfflineDialogViewModel::class.java)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
         setLanguage(prefs.getString("language", "English"), this)
@@ -73,8 +77,8 @@ class SearchActivity : ComponentActivity() {
                     topBar = { TopBar(scaffoldState, scope) },
                     drawerContent = { Drawer(prefs) }
                 ) {
-                    SearchScreen(searchInput, viewModel)
-                    viewModel.loadSearchResultProducts(searchInput)
+                    SearchScreen(searchInput, viewModel,offlineViewModel)
+                    viewModel.loadSearchResultProducts(searchInput,offlineViewModel)
                 }
             }
         }
@@ -85,7 +89,7 @@ class SearchViewModel: ViewModel() {
     val liveSearchResultProducts = MutableLiveData<List<ProductInfo>>()
     private var page = 1
 
-    fun loadSearchResultProducts(searchInput: String) {
+    fun loadSearchResultProducts(searchInput: String,offlineViewModel: OfflineDialogViewModel) {
         MainScope().launch(Dispatchers.Main) {
             try {
                 val foundProducts: ProductsInfo
@@ -94,18 +98,40 @@ class SearchViewModel: ViewModel() {
                     foundProducts = DataGetter.search(searchInput, page)
                     page++
                 }
+                offlineViewModel.changeResult(NO_ERROR)
                 liveSearchResultProducts.value = liveSearchResultProducts.value?.plus(foundProducts.products) ?: foundProducts.products
             } catch (e: Exception) {
                 println(e.stackTraceToString())
+                when (e) {
+                    is ConnectTimeoutException -> {
+                        offlineViewModel.changeResult(SERVER_OFFLINE)
+                    }
+                    is ConnectException -> {
+                        offlineViewModel.changeResult(NO_INTERNET)
+                    }
+                    else -> offlineViewModel.changeResult(OTHER_ERROR)
+                }
             }
         }
     }
 }
 
 @Composable
-fun SearchScreen(searchInput: String, viewModel: SearchViewModel) {
+fun SearchScreen(searchInput: String, viewModel: SearchViewModel,offlineViewModel: OfflineDialogViewModel) {
     val searchResultProducts by viewModel.liveSearchResultProducts.observeAsState(initial = null)
+    val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
     val context = LocalContext.current
+
+    if (result != NO_ERROR && result != WAITING_FOR_CONFIRMATION) {
+        OfflineDialog(
+            callback = {
+                offlineViewModel.changeResult(WAITING_FOR_CONFIRMATION)
+                viewModel.loadSearchResultProducts(searchInput,offlineViewModel)
+            },
+            result = result
+        )
+        return
+    }
 
     Column(
         modifier = Modifier
@@ -132,8 +158,8 @@ fun SearchScreen(searchInput: String, viewModel: SearchViewModel) {
                 ) {
                     itemsIndexed(searchResultProducts!!) { index, item ->
                         ProductBox(product = item)
-                        if (index == searchResultProducts!!.lastIndex) {
-                            viewModel.loadSearchResultProducts(searchInput)
+                        if (index == searchResultProducts!!.lastIndex && result == NO_ERROR) {
+                            viewModel.loadSearchResultProducts(searchInput,offlineViewModel)
                         }
                     }
                 }

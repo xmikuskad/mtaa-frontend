@@ -34,11 +34,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.mtaa.techtalk.*
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
+import io.ktor.client.features.*
+import io.ktor.network.sockets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.net.ConnectException
 import kotlin.collections.HashMap
 import kotlin.math.roundToInt
 
@@ -51,6 +54,7 @@ const val SCORE = "score"
 class ProductsActivity : ComponentActivity() {
 
     private lateinit var viewModel: ProductScreenViewModel
+    private lateinit var offlineViewModel: OfflineDialogViewModel
     private lateinit var categoryName: String
     private var categoryId: Int = 0
     private var queryAttributes = QueryAttributes("","","",0f,1f,0f)
@@ -60,11 +64,13 @@ class ProductsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProvider(this).get(ProductScreenViewModel::class.java)
+        offlineViewModel = ViewModelProvider(this).get(OfflineDialogViewModel::class.java)
         categoryId = intent.getIntExtra("categoryId", 0)
         categoryName = intent.getStringExtra("categoryName") ?: "Unknown name"
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
         setLanguage(prefs.getString("language", "English"), this)
+        viewModel.loadViewModel(offlineViewModel)
 
         setContent {
             TechTalkTheme(setColorScheme(prefs)) {
@@ -76,24 +82,30 @@ class ProductsActivity : ComponentActivity() {
                     topBar = { TopBar(scaffoldState, scope) },
                     drawerContent = { Drawer(prefs) }
                 ) {
-                    ProductsScreen(categoryId, categoryName, viewModel, queryAttributes)
+                    ProductsScreen(categoryId, categoryName, viewModel, queryAttributes,offlineViewModel)
                 }
             }
         }
 
-        viewModel.loadProducts(categoryId,queryAttributes)
-        viewModel.loadBrands(categoryId)
+        //viewModel.loadProducts(categoryId,queryAttributes)
+        //viewModel.loadBrands(categoryId)
+        viewModel.initProductScreen(categoryId,queryAttributes)
     }
 }
 
 
 //This class is responsible for updating list data
-class ProductScreenViewModel: ViewModel() {
+class ProductScreenViewModel(): ViewModel() {
 
     val liveProducts = MutableLiveData<List<ProductInfo>>()
     val liveBrands = MutableLiveData<List<BrandInfo>>()
+    lateinit var offlineViewModel:OfflineDialogViewModel
 
     private var page = 1
+
+    fun loadViewModel(viewModel:OfflineDialogViewModel) {
+        offlineViewModel = viewModel
+    }
 
     fun loadProducts(categoryId: Int, obj:QueryAttributes) {
         MainScope().launch(Dispatchers.Main) {
@@ -104,9 +116,22 @@ class ProductScreenViewModel: ViewModel() {
                     products = DataGetter.getProducts(categoryId,page,obj)
                     page++
                 }
+                offlineViewModel.changeResult(NO_ERROR)
                 liveProducts.value = liveProducts.value?.plus(products.products) ?: products.products
             } catch (e: Exception) {
                 println(e.stackTraceToString())
+                when (e) {
+                    is ConnectTimeoutException -> {
+                        offlineViewModel.changeResult(SERVER_OFFLINE)
+                    }
+                    is ConnectException -> {
+                        offlineViewModel.changeResult(NO_INTERNET)
+                    }
+                    is ClientRequestException -> {
+                        //This is OK, the list it empty
+                    }
+                    else -> offlineViewModel.changeResult(OTHER_ERROR)
+                }
             }
         }
     }
@@ -118,7 +143,8 @@ class ProductScreenViewModel: ViewModel() {
         loadProducts(categoryId,obj)
     }
 
-    fun loadBrands(categoryID: Int) {
+    private fun loadBrands(categoryID: Int) {
+        liveBrands.value = mutableListOf()
         MainScope().launch(Dispatchers.Main) {
             try {
                 val brands: BrandsInfo
@@ -126,22 +152,52 @@ class ProductScreenViewModel: ViewModel() {
                     // do blocking networking on IO thread
                     brands = DataGetter.getCategoryBrands(categoryID)
                 }
+                offlineViewModel.changeResult(NO_ERROR)
                 liveBrands.value = liveBrands.value?.plus(brands.brands) ?: brands.brands
             } catch (e: Exception) {
                 println(e.stackTraceToString())
+                when (e) {
+                    is ConnectTimeoutException -> {
+                        offlineViewModel.changeResult(SERVER_OFFLINE)
+                    }
+                    is ConnectException -> {
+                        offlineViewModel.changeResult(NO_INTERNET)
+                    }
+                    is ClientRequestException -> {
+                        //This is OK, the list it empty
+                    }
+                    else -> offlineViewModel.changeResult(OTHER_ERROR)
+                }
             }
         }
+    }
+
+    fun initProductScreen(categoryID: Int,obj: QueryAttributes) {
+        loadBrands(categoryID)
+        loadProducts(categoryID,obj)
     }
 
 }
 
 @Composable
-fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenViewModel, obj:QueryAttributes) {
+fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenViewModel, obj:QueryAttributes, offlineViewModel: OfflineDialogViewModel) {
     val products by viewModel.liveProducts.observeAsState(initial = emptyList())
     val filterState = remember { mutableStateOf(DrawerValue.Closed) }
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
+    val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
 
     val context = LocalContext.current
+
+    if (result != NO_ERROR && result != WAITING_FOR_CONFIRMATION) {
+        OfflineDialog(
+            callback = {
+                offlineViewModel.changeResult(WAITING_FOR_CONFIRMATION)
+                viewModel.initProductScreen(categoryId, obj)
+            },
+            result = result
+        )
+        return
+    }
 
     if (filterState.value == DrawerValue.Open) {
         val brands by viewModel.liveBrands.observeAsState(initial = emptyList())
@@ -310,7 +366,8 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                 ) {
                     Text(context.getString(R.string.order_by), style = typography.h5)
                     Spacer(modifier = Modifier.height(20.dp))
-                    val selectedOrder = remember { mutableStateOf(context.getString(R.string.newest)) }
+                    val selectedOrder =
+                        remember { mutableStateOf(context.getString(R.string.newest)) }
                     DropdownList(
                         items = listOf(
                             context.getString(R.string.newest),
@@ -365,7 +422,8 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 onClick = {
-                    orderState.value = DrawerValue.Open
+                    if (result == NO_ERROR)
+                        orderState.value = DrawerValue.Open
                 }
             ) {
                 Icon(
@@ -384,7 +442,8 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             Spacer(modifier = Modifier.width(10.dp))
             IconButton(
                 onClick = {
-                    filterState.value = DrawerValue.Open
+                    if (result == NO_ERROR)
+                        filterState.value = DrawerValue.Open
                 }
             ) {
                 Icon(
@@ -400,7 +459,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
         ) {
             itemsIndexed(products) { index, item ->
                 ProductBox(product = item)
-                if (index == products.lastIndex) {
+                if (index == products.lastIndex && result == NO_ERROR) {
                     viewModel.loadProducts(categoryId, obj)
                 }
             }

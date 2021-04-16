@@ -27,14 +27,18 @@ import androidx.lifecycle.ViewModelProvider
 import com.mtaa.techtalk.*
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
+import io.ktor.client.features.*
+import io.ktor.network.sockets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.net.ConnectException
 
 class AccountActivity : ComponentActivity() {
     private lateinit var viewModel: UserReviewsViewModel
+    private lateinit var offlineViewModel: OfflineDialogViewModel
 
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,9 +48,11 @@ class AccountActivity : ComponentActivity() {
         val authKey = prefs.getString("token", "") ?: ""
         val name = prefs.getString("username", "") ?: ""
         viewModel = ViewModelProvider(this).get(UserReviewsViewModel::class.java)
+        offlineViewModel = ViewModelProvider(this).get(OfflineDialogViewModel::class.java)
         val queryParams = OrderAttributes("","")
 
         setLanguage(prefs.getString("language", "English"), this)
+        viewModel.loadViewModel(offlineViewModel)
 
         setContent {
             TechTalkTheme(setColorScheme(prefs)) {
@@ -58,7 +64,7 @@ class AccountActivity : ComponentActivity() {
                     drawerContent = { Drawer(prefs) }
                 ) {
 
-                    AccountScreen(viewModel, authKey, name,queryParams)
+                    AccountScreen(viewModel, authKey, name,queryParams,offlineViewModel)
                     if (authKey.isNotEmpty()) {
                         viewModel.loadUserReviews(authKey,queryParams)
                     }
@@ -71,7 +77,13 @@ class AccountActivity : ComponentActivity() {
 class UserReviewsViewModel: ViewModel() {
     val liveUserReviews = MutableLiveData<List<ReviewInfoItem>>()
     val trustScore = MutableLiveData<Int>()
+    lateinit var offlineViewModel:OfflineDialogViewModel
+
     private var page = 1
+
+    fun loadViewModel(viewModel:OfflineDialogViewModel) {
+        offlineViewModel = viewModel
+    }
 
     fun loadUserReviews(authKey: String,obj:OrderAttributes) {
         MainScope().launch(Dispatchers.Main) {
@@ -82,10 +94,22 @@ class UserReviewsViewModel: ViewModel() {
                     userInfo = DataGetter.getUserInfo(authKey, page,obj)
                     page++
                 }
+                offlineViewModel.changeResult(NO_ERROR)
                 liveUserReviews.value = liveUserReviews.value?.plus(userInfo.reviews) ?: userInfo.reviews
                 trustScore.value = userInfo.trust_score
             } catch (e: Exception) {
-                println(e.stackTraceToString())
+                when (e) {
+                    is ConnectTimeoutException -> {
+                        offlineViewModel.changeResult(SERVER_OFFLINE)
+                    }
+                    is ConnectException -> {
+                        offlineViewModel.changeResult(NO_INTERNET)
+                    }
+                    is ClientRequestException -> {
+                        //This is OK, the list it empty
+                    }
+                    else -> offlineViewModel.changeResult(OTHER_ERROR)
+                }
             }
         }
     }
@@ -98,10 +122,23 @@ class UserReviewsViewModel: ViewModel() {
 }
 
 @Composable
-fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: String?, obj: OrderAttributes) {
+fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: String?, obj: OrderAttributes, offlineViewModel: OfflineDialogViewModel) {
     val userReviews by viewModel.liveUserReviews.observeAsState(initial = null)
     val trustScore by viewModel.trustScore.observeAsState(initial = 0)
     val context = LocalContext.current
+    val result = offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
+
+    if (result.value != NO_ERROR && result.value != WAITING_FOR_CONFIRMATION) {
+        OfflineDialog(
+            callback = {
+                offlineViewModel.changeResult(WAITING_FOR_CONFIRMATION)
+                if (authKey != null) {
+                    viewModel.loadUserReviews(authKey, obj)
+                }
+            },
+            result = result.value
+        )
+    }
 
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
 
@@ -118,7 +155,8 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
                 ) {
                     Text(context.getString(R.string.order_by), style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.height(20.dp))
-                    val selectedOrder = remember { mutableStateOf(context.getString(R.string.newest)) }
+                    val selectedOrder =
+                        remember { mutableStateOf(context.getString(R.string.newest)) }
                     DropdownList(
                         items = listOf(
                             context.getString(R.string.newest),
@@ -150,7 +188,7 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
                             }
                         }
 
-                        viewModel.reloadUserReviews(authKey?:"", obj)
+                        viewModel.reloadUserReviews(authKey ?: "", obj)
                         orderState.value = DrawerValue.Closed
                     }) {
                         Text(context.getString(R.string.save))
@@ -186,7 +224,8 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
             ) {
                 IconButton(
                     onClick = {
-                        orderState.value = DrawerValue.Open
+                        if (result.value == NO_ERROR)
+                            orderState.value = DrawerValue.Open
                     }
                 ) {
                     Icon(
@@ -210,7 +249,7 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
                 ) {
                     itemsIndexed(userReviews!!) { index, item ->
                         ReviewBox(reviewInfo = item, canEdit = true)
-                        if (index == userReviews!!.lastIndex) {
+                        if (index == userReviews!!.lastIndex && result.value == NO_ERROR) {
                             if (authKey != null) {
                                 viewModel.loadUserReviews(authKey, obj)
                             }

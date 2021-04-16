@@ -34,6 +34,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.net.ConnectException
 import java.util.regex.Pattern
 
 class CreateAccountActivity : ComponentActivity() {
@@ -64,6 +65,7 @@ fun CreateAccountScreen() {
     ) {
 
         val nameState = remember { mutableStateOf(TextFieldValue()) }
+
         /**
         ^               // start of line
         [a-zA-Z]{2,}    // will accept a name with at least two characters
@@ -247,14 +249,25 @@ fun CreateAccountScreen() {
                         } catch (e: Exception) {
                             println(e.stackTraceToString())
                             when (e) {
-                                //User or server is offline TODO handle - show warning
-                                is ConnectTimeoutException -> println("server or user offline")
-                                // TODO
+                                is ConnectTimeoutException -> {
+                                    showMessage(
+                                        context,
+                                        context.getString(R.string.err_server_offline),
+                                        Toast.LENGTH_LONG
+                                    )
+                                }
+                                is ConnectException -> {
+                                    showMessage(
+                                        context,
+                                        context.getString(R.string.err_no_internet),
+                                        Toast.LENGTH_LONG
+                                    )
+                                }
                                 is ClientRequestException ->
                                     showMessage(
                                         context,
                                         context.getString(R.string.duplicate_account),
-                                        Toast.LENGTH_SHORT
+                                        Toast.LENGTH_LONG
                                     )
                             }
                         }

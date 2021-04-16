@@ -37,6 +37,7 @@ const val NO_ERROR = 0
 const val NO_INTERNET = -1
 const val SERVER_OFFLINE = -2
 const val OTHER_ERROR = -3
+const val WAITING_FOR_CONFIRMATION = -4
 
 class SplashActivity : ComponentActivity() {
     companion object InitialData {
@@ -44,7 +45,7 @@ class SplashActivity : ComponentActivity() {
         lateinit var reviews : ReviewsInfo
     }
 
-    private lateinit var viewModel: SplashScreenViewModel
+    private lateinit var viewModel: OfflineDialogViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +63,7 @@ class SplashActivity : ComponentActivity() {
 
         setLanguage(prefs.getString("language", "English"), this)
 
-        viewModel = ViewModelProvider(this).get(SplashScreenViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(OfflineDialogViewModel::class.java)
 
         setContent {
             TechTalkTheme(setColorScheme(prefs)) {
@@ -77,7 +78,7 @@ class SplashActivity : ComponentActivity() {
         }
     }
 
-    fun initApplication(context:Context, isFirstRun: Boolean,viewModel: SplashScreenViewModel) {
+    fun initApplication(context:Context, isFirstRun: Boolean,viewModel: OfflineDialogViewModel) {
         val scope = MainScope()
         scope.launch(Dispatchers.Main) {
             try {
@@ -113,7 +114,7 @@ class SplashActivity : ComponentActivity() {
     }
 }
 
-class SplashScreenViewModel: ViewModel() {
+class OfflineDialogViewModel: ViewModel() {
     val loadingResult = MutableLiveData<Int>(0)
 
     fun changeResult(value:Int) {
@@ -122,7 +123,7 @@ class SplashScreenViewModel: ViewModel() {
 }
 
 @Composable
-fun SplashScreen(viewModel: SplashScreenViewModel, isFirstRun: Boolean, activity: SplashActivity) {
+fun SplashScreen(viewModel: OfflineDialogViewModel, isFirstRun: Boolean, activity: SplashActivity) {
     val result by viewModel.loadingResult.observeAsState(initial = NO_ERROR)
     val context = LocalContext.current
 

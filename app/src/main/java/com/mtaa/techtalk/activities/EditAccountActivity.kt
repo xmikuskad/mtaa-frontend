@@ -40,6 +40,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.net.ConnectException
 import java.util.regex.Pattern
 
 class EditAccountActivity : ComponentActivity() {
@@ -229,7 +230,7 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
                 .size(250.dp, 55.dp),
             onClick = {
                 if (!isValidName || !isValidEmail || !isValidPassword || !isValidSecondPassword) {
-                    var message =  context.getString(R.string.invalid)
+                    var message = context.getString(R.string.invalid)
                     var num = 1
                     if (!isValidName) {
                         message += "\n $num. ${context.getString(R.string.name)}"
@@ -272,14 +273,25 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
                         } catch (e: Exception) {
                             println(e.stackTraceToString())
                             when (e) {
-                                //User or server is offline TODO handle - show warning
-                                is ConnectTimeoutException -> println("server or user offline")
-                                // TODO
+                                is ConnectTimeoutException -> {
+                                    showMessage(
+                                        context,
+                                        context.getString(R.string.err_server_offline),
+                                        Toast.LENGTH_LONG
+                                    )
+                                }
+                                is ConnectException -> {
+                                    showMessage(
+                                        context,
+                                        context.getString(R.string.err_no_internet),
+                                        Toast.LENGTH_LONG
+                                    )
+                                }
                                 is ClientRequestException ->
                                     showMessage(
                                         context,
                                         context.getString(R.string.duplicate_account),
-                                        Toast.LENGTH_SHORT
+                                        Toast.LENGTH_LONG
                                     )
                             }
                         }

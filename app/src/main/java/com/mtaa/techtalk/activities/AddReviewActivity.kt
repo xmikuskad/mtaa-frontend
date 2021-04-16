@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -33,11 +34,13 @@ import com.google.accompanist.glide.GlideImage
 import com.mtaa.techtalk.*
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
+import io.ktor.network.sockets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.net.ConnectException
 import kotlin.math.roundToInt
 
 const val PICK_IMAGES_CODE = 0
@@ -447,6 +450,22 @@ fun AddReviewScreen(
                         openScreen(context, MainMenuActivity())
                     } catch (e: Exception) {
                         println(e.stackTraceToString())
+                        when (e) {
+                            is ConnectTimeoutException -> {
+                                showMessage(
+                                    context,
+                                    context.getString(R.string.err_server_offline),
+                                    Toast.LENGTH_LONG
+                                )
+                            }
+                            is ConnectException -> {
+                                showMessage(
+                                    context,
+                                    context.getString(R.string.err_no_internet),
+                                    Toast.LENGTH_LONG
+                                )
+                            }
+                        }
                     }
                 }
             }

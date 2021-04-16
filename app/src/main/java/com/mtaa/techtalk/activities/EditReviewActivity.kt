@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -39,6 +40,9 @@ import java.lang.Exception
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.painterResource
 import com.mtaa.techtalk.R
+import io.ktor.client.features.*
+import io.ktor.network.sockets.*
+import java.net.ConnectException
 
 class EditReviewActivity : ComponentActivity() {
 
@@ -654,6 +658,22 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                         openScreen(context, AccountActivity())
                     } catch (e: Exception) {
                         println(e.stackTraceToString())
+                        when (e) {
+                            is ConnectTimeoutException -> {
+                                showMessage(
+                                    context,
+                                    context.getString(R.string.err_server_offline),
+                                    Toast.LENGTH_LONG
+                                )
+                            }
+                            is ConnectException -> {
+                                showMessage(
+                                    context,
+                                    context.getString(R.string.err_no_internet),
+                                    Toast.LENGTH_LONG
+                                )
+                            }
+                        }
                     }
                 }
             },
@@ -699,6 +719,22 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                         openScreen(context, AccountActivity())
                     } catch (e: Exception) {
                         println(e.stackTraceToString())
+                        when (e) {
+                            is ConnectTimeoutException -> {
+                                showMessage(
+                                    context,
+                                    context.getString(R.string.err_server_offline),
+                                    Toast.LENGTH_LONG
+                                )
+                            }
+                            is ConnectException -> {
+                                showMessage(
+                                    context,
+                                    context.getString(R.string.err_no_internet),
+                                    Toast.LENGTH_LONG
+                                )
+                            }
+                        }
                     }
                 }
             },

@@ -41,20 +41,24 @@ import com.mtaa.techtalk.ReviewInfoItem
 import com.mtaa.techtalk.ReviewsInfo
 import com.mtaa.techtalk.ui.theme.TechTalkGray
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
+import io.ktor.network.sockets.*
 import kotlinx.coroutines.*
 import java.lang.Exception
+import java.net.ConnectException
 
 const val MAX_CATEGORIES_COUNT = 6
 const val MAX_REVIEW_TEXT = 80
 
 class MainMenuActivity : ComponentActivity() {
     private lateinit var viewModel: MainMenuViewModel
+    private lateinit var offlineViewModel: OfflineDialogViewModel
 
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProvider(this).get(MainMenuViewModel::class.java)
+        offlineViewModel = ViewModelProvider(this).get(OfflineDialogViewModel::class.java)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
 
         setLanguage(prefs.getString("language", "English"), this)
@@ -70,19 +74,20 @@ class MainMenuActivity : ComponentActivity() {
                 ) {
                     MenuScreen(
                         liveCategories = viewModel.liveCategories,
-                        liveRecentReviews = viewModel.liveRecentReviews
+                        liveRecentReviews = viewModel.liveRecentReviews,
+                        offlineViewModel = offlineViewModel,
+                        activity= this
                     )
-                    initMainMenu()
+                    initMainMenu(intent.getStringExtra("activity")?:"")
                 }
             }
         }
     }
 
 
-    private fun initMainMenu() {
+    fun initMainMenu(prevScreen:String) {
         viewModel.loadCategoriesMenu() //They are the same, no need to reload
 
-        val prevScreen = intent.getStringExtra("activity")
         //If we came from splash screen load preloaded data
         if (prevScreen.equals("splash") || prevScreen.equals("first-launch")) {
             viewModel.loadRecentReviews(SplashActivity.reviews.reviews)
@@ -98,6 +103,15 @@ class MainMenuActivity : ComponentActivity() {
                     viewModel.loadRecentReviews(recentReviews.reviews)
                 } catch (e: Exception) {
                     println(e.stackTraceToString())
+                    when (e) {
+                        is ConnectTimeoutException -> {
+                            offlineViewModel.changeResult(SERVER_OFFLINE)
+                        }
+                        is ConnectException -> {
+                            offlineViewModel.changeResult(NO_INTERNET)
+                        }
+                        else -> offlineViewModel.changeResult(OTHER_ERROR)
+                    }
                 }
             }
         }
@@ -400,9 +414,10 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
 }
 
 @Composable
-fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:LiveData<List<ReviewInfoItem>>) {
+fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:LiveData<List<ReviewInfoItem>>, offlineViewModel: OfflineDialogViewModel, activity:MainMenuActivity) {
     val categories by liveCategories.observeAsState(initial = emptyList())
     val reviews by liveRecentReviews.observeAsState(initial = emptyList())
+    val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
     val context = LocalContext.current
 
     Column(
@@ -434,6 +449,17 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
 
             }
         }
+
+        if(result != NO_ERROR) {
+            OfflineDialog(
+                callback = {
+                    offlineViewModel.changeResult(NO_ERROR)
+                    activity.initMainMenu("")
+                },
+                result = result
+            )
+        }
+
         Text(
             text = context.getString(R.string.recent_reviews),
             style = TextStyle(fontSize = 25.sp),

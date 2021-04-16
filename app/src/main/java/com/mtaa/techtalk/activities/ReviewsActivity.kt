@@ -34,17 +34,20 @@ import com.mtaa.techtalk.*
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkGray
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
+import io.ktor.network.sockets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.net.ConnectException
 
 const val CREATED_AT = "created_at"
 
 class ReviewsActivity : ComponentActivity() {
 
     private lateinit var viewModel: ReviewScreenViewModel
+    private lateinit var offlineViewModel: OfflineDialogViewModel
     private lateinit var productName: String
     private var productId: Int = 0
 
@@ -55,12 +58,14 @@ class ReviewsActivity : ComponentActivity() {
         window.exitTransition = null
 
         viewModel = ViewModelProvider(this).get(ReviewScreenViewModel::class.java)
+        offlineViewModel = ViewModelProvider(this).get(OfflineDialogViewModel::class.java)
         productId = intent.getIntExtra("productId", 0)
         productName = intent.getStringExtra("productName") ?: "Unknown name"
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
         val queryParams = OrderAttributes("","")
 
         setLanguage(prefs.getString("language", "English"), this)
+        viewModel.loadViewModel(offlineViewModel)
 
         setContent {
             TechTalkTheme(setColorScheme(prefs)) {
@@ -90,7 +95,7 @@ class ReviewsActivity : ComponentActivity() {
                         )
                     }
                 ) {
-                    ReviewsScreen(productId, productName, viewModel,queryParams)
+                    ReviewsScreen(productId, productName, viewModel,queryParams,offlineViewModel)
                     viewModel.loadReviews(productId,queryParams)
                 }
             }
@@ -103,7 +108,13 @@ class ReviewsActivity : ComponentActivity() {
 class ReviewScreenViewModel: ViewModel() {
 
     val liveReviews = MutableLiveData<List<ReviewInfoItem>>()
+    lateinit var offlineViewModel:OfflineDialogViewModel
+
     private var page = 1
+
+    fun loadViewModel(viewModel:OfflineDialogViewModel) {
+        offlineViewModel = viewModel
+    }
 
     fun loadReviews(productId: Int,obj: OrderAttributes) {
         MainScope().launch(Dispatchers.Main) {
@@ -114,9 +125,19 @@ class ReviewScreenViewModel: ViewModel() {
                     reviews = DataGetter.getReviews(productId,page,obj)
                     page++
                 }
+                offlineViewModel.changeResult(NO_ERROR)
                 liveReviews.value = liveReviews.value?.plus(reviews.reviews) ?: reviews.reviews
             } catch (e: Exception) {
                 println(e.stackTraceToString())
+                when (e) {
+                    is ConnectTimeoutException -> {
+                        offlineViewModel.changeResult(SERVER_OFFLINE)
+                    }
+                    is ConnectException -> {
+                        offlineViewModel.changeResult(NO_INTERNET)
+                    }
+                    else -> offlineViewModel.changeResult(OTHER_ERROR)
+                }
             }
         }
     }
@@ -130,10 +151,22 @@ class ReviewScreenViewModel: ViewModel() {
 }
 
 @Composable
-fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewModel, obj:OrderAttributes) {
+fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewModel, obj:OrderAttributes,offlineViewModel: OfflineDialogViewModel) {
     val reviews by viewModel.liveReviews.observeAsState(initial = null)
     val context = LocalContext.current
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
+    val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
+
+    if (result != NO_ERROR && result != WAITING_FOR_CONFIRMATION) {
+        OfflineDialog(
+            callback = {
+                offlineViewModel.changeResult(WAITING_FOR_CONFIRMATION)
+                viewModel.loadReviews(productId, obj)
+            },
+            result = result
+        )
+        return
+    }
 
     if (orderState.value == DrawerValue.Open) {
         Dialog(onDismissRequest = { orderState.value = DrawerValue.Closed }) {
@@ -148,7 +181,8 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
                 ) {
                     Text(context.getString(R.string.order_by), style = MaterialTheme.typography.h5)
                     Spacer(modifier = Modifier.height(20.dp))
-                    val selectedOrder = remember { mutableStateOf(context.getString(R.string.newest)) }
+                    val selectedOrder =
+                        remember { mutableStateOf(context.getString(R.string.newest)) }
                     DropdownList(
                         items = listOf(
                             context.getString(R.string.newest),
@@ -202,7 +236,8 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
                     onClick = {
-                        orderState.value = DrawerValue.Open
+                        if (result == NO_ERROR)
+                            orderState.value = DrawerValue.Open
                     }
                 ) {
                     Icon(
@@ -227,7 +262,7 @@ fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewMo
                 ) {
                     itemsIndexed(reviews!!) { index, item ->
                         ReviewBox(reviewInfo = item, canEdit = false)
-                        if (index == reviews!!.lastIndex) {
+                        if (index == reviews!!.lastIndex && result == NO_ERROR) {
                             viewModel.loadReviews(productId, obj)
                         }
                     }

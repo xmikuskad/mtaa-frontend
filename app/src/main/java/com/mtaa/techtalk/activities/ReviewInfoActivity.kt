@@ -32,14 +32,17 @@ import com.mtaa.techtalk.*
 import com.mtaa.techtalk.R
 import com.mtaa.techtalk.ui.theme.TechTalkGray
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
+import io.ktor.network.sockets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.net.ConnectException
 
 class ReviewInfoActivity: ComponentActivity() {
     lateinit var viewModel: ReviewInfoViewModel
+    private lateinit var offlineViewModel: OfflineDialogViewModel
 
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +51,7 @@ class ReviewInfoActivity: ComponentActivity() {
         val reviewID = intent.getIntExtra("reviewID",-1)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
         viewModel = ViewModelProvider(this).get(ReviewInfoViewModel::class.java)
+        offlineViewModel = ViewModelProvider(this).get(OfflineDialogViewModel::class.java)
 
         setLanguage(prefs.getString("language", "English"), this)
 
@@ -61,7 +65,7 @@ class ReviewInfoActivity: ComponentActivity() {
                     drawerContent = { Drawer(prefs) }
                 ){
                     if (reviewID > 0) {
-                        ReviewInfoScreen(viewModel, reviewID,prefs)
+                        ReviewInfoScreen(viewModel, reviewID,prefs,offlineViewModel,this)
                     }
                     else {
                         //TODO better error handling
@@ -74,7 +78,7 @@ class ReviewInfoActivity: ComponentActivity() {
         loadReviewData(reviewID)
     }
 
-    private fun loadReviewData(reviewID:Int){
+    fun loadReviewData(reviewID:Int){
         MainScope().launch(Dispatchers.Main) {
             try {
                 val review: ReviewInfo
@@ -87,6 +91,15 @@ class ReviewInfoActivity: ComponentActivity() {
             } catch (e: Exception) {
                 //Review wasnt found
                 println(e.stackTraceToString())
+                when (e) {
+                    is ConnectTimeoutException -> {
+                        offlineViewModel.changeResult(SERVER_OFFLINE)
+                    }
+                    is ConnectException -> {
+                        offlineViewModel.changeResult(NO_INTERNET)
+                    }
+                    else -> offlineViewModel.changeResult(OTHER_ERROR)
+                }
             }
         }
     }
@@ -110,11 +123,24 @@ class ReviewInfoViewModel: ViewModel() {
 }
 
 @Composable
-fun ReviewInfoScreen(viewModel:ReviewInfoViewModel, reviewID: Int, prefs:SharedPreferences) {
+fun ReviewInfoScreen(viewModel:ReviewInfoViewModel, reviewID: Int, prefs:SharedPreferences,offlineViewModel: OfflineDialogViewModel,activity:ReviewInfoActivity) {
     val reviewData by viewModel.liveReview.observeAsState(initial = null)
     val likes by viewModel.liveLikes.observeAsState(initial = 0)
     val dislikes by viewModel.liveDislikes.observeAsState(initial = 0)
     val scrollState = rememberScrollState()
+    val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
+
+
+    if (result != NO_ERROR) {
+        OfflineDialog(
+            callback = {
+                offlineViewModel.changeResult(NO_ERROR)
+                activity.loadReviewData(reviewID)
+            },
+            result = result
+        )
+        return
+    }
 
     if (reviewData == null) {
         LoadingScreen(LocalContext.current.getString(R.string.loading_details))

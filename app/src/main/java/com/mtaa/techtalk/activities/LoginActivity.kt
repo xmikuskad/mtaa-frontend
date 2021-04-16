@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import com.mtaa.techtalk.AuthInfo
 import com.mtaa.techtalk.DataGetter.login
 import com.mtaa.techtalk.R
@@ -37,6 +38,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
+import java.net.ConnectException
 
 class LoginActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,21 +121,31 @@ fun LoginScreen(prefs: SharedPreferences) {
                 .size(250.dp, 55.dp),
             onClick = {
                 if (!isValidEmail && !isValidPassword) {
-                    showMessage(context, context.getString(R.string.invalid_pass_mail), Toast.LENGTH_SHORT)
-                }
-                else if (!isValidEmail) {
-                    showMessage(context, context.getString(R.string.invalid_mail), Toast.LENGTH_SHORT)
-                }
-                else if (!isValidPassword) {
-                    showMessage(context, context.getString(R.string.invalid_pass), Toast.LENGTH_SHORT)
-                }
-                else {
+                    showMessage(
+                        context,
+                        context.getString(R.string.invalid_pass_mail),
+                        Toast.LENGTH_SHORT
+                    )
+                } else if (!isValidEmail) {
+                    showMessage(
+                        context,
+                        context.getString(R.string.invalid_mail),
+                        Toast.LENGTH_SHORT
+                    )
+                } else if (!isValidPassword) {
+                    showMessage(
+                        context,
+                        context.getString(R.string.invalid_pass),
+                        Toast.LENGTH_SHORT
+                    )
+                } else {
                     MainScope().launch(Dispatchers.Main) {
                         try {
                             val loginResponse: AuthInfo
                             withContext(Dispatchers.IO) {
                                 // do blocking networking on IO thread
-                                loginResponse = login(emailState.value.text, passwordState.value.text)
+                                loginResponse =
+                                    login(emailState.value.text, passwordState.value.text)
                             }
                             //Need to be called here to prevent blocking UI
 
@@ -149,11 +161,26 @@ fun LoginScreen(prefs: SharedPreferences) {
                         } catch (e: Exception) {
                             println(e.stackTraceToString())
                             when (e) {
-                                //User or server is offline TODO handle - show warning
-                                is ConnectTimeoutException -> println("server or user offline")
-                                // TODO
+                                is ConnectTimeoutException -> {
+                                    showMessage(
+                                        context,
+                                        context.getString(R.string.err_server_offline),
+                                        Toast.LENGTH_LONG
+                                    )
+                                }
+                                is ConnectException -> {
+                                    showMessage(
+                                        context,
+                                        context.getString(R.string.err_no_internet),
+                                        Toast.LENGTH_LONG
+                                    )
+                                }
                                 is ClientRequestException ->
-                                    showMessage(context, context.getString(R.string.account_not_found), Toast.LENGTH_SHORT)
+                                    showMessage(
+                                        context,
+                                        context.getString(R.string.account_not_found),
+                                        Toast.LENGTH_LONG
+                                    )
                             }
                         }
                     }
