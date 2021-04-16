@@ -57,7 +57,7 @@ class SplashActivity : ComponentActivity() {
         if (prefs.getBoolean("firstrun", true)) {
             isFirstRun = true
             prefs.edit().putBoolean("firstrun", false).apply()
-            prefs.edit().putString("color-scheme", "Light Mode").apply()
+            prefs.edit().putString("color-scheme", "Dark Mode").apply()
             prefs.edit().putString("language", "English").apply()
         }
 

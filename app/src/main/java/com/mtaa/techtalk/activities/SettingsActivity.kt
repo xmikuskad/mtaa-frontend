@@ -52,7 +52,6 @@ class SettingsActivity : ComponentActivity() {
 
 @Composable
 fun SettingsScreen(prefs: SharedPreferences) {
-    // TODO *Actually* change settings
     val context = LocalContext.current
     Column(
         modifier = Modifier
@@ -169,7 +168,7 @@ fun setLanguage(language: String?, context: Context) {
 }
 
 fun setColorScheme(prefs: SharedPreferences): Boolean {
-    if (prefs.getString("color-scheme", "Light Mode") == "Light Mode")
+    if (prefs.getString("color-scheme", "Dark Mode") == "Light Mode")
         return false
     return true
 }
