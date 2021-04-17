@@ -14,6 +14,8 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -119,10 +121,19 @@ fun DropdownList(items: List<String>, label: String? = null, selected: MutableSt
             enabled = false,
             trailingIcon = {
                 IconButton(onClick = { expanded.value = true }) {
-                    Icon(
-                        Icons.Filled.MoreVert,
-                        contentDescription = null
-                    )
+                    if (expanded.value) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropUp,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
             }
         )
