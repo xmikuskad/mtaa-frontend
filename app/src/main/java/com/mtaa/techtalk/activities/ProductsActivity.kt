@@ -181,7 +181,7 @@ class ProductScreenViewModel(): ViewModel() {
 
 @Composable
 fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenViewModel, obj:QueryAttributes, offlineViewModel: OfflineDialogViewModel) {
-    val products by viewModel.liveProducts.observeAsState(initial = emptyList())
+    val products by viewModel.liveProducts.observeAsState(initial = null)
     val filterState = remember { mutableStateOf(DrawerValue.Closed) }
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
     val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
@@ -453,14 +453,25 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                 )
             }
         }
-        LazyColumn(
-            modifier = Modifier
-                .padding(top = 10.dp)
-        ) {
-            itemsIndexed(products) { index, item ->
-                ProductBox(product = item)
-                if (index == products.lastIndex && result == NO_ERROR) {
-                    viewModel.loadProducts(categoryId, obj)
+
+        when {
+            products == null -> {
+                LoadingScreen(context.getString(R.string.loading_products))
+            }
+            products!!.isEmpty() -> {
+                NotFoundScreen(context.getString(R.string.no_products_found))
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                ) {
+                    itemsIndexed(products!!) { index, item ->
+                        ProductBox(product = item)
+                        if (index == products!!.lastIndex && result == NO_ERROR) {
+                            viewModel.loadProducts(categoryId, obj)
+                        }
+                    }
                 }
             }
         }
