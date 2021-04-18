@@ -110,4 +110,6 @@
     <string name="err_server_offline">Server je nedostupný, skúste to neskôr prosím</string>
     <string name="err_other">Vyskytol sa neznámy problém. Prosím reštartujte aplikáciu</string>
     <string name="uploading_photo">Nahrávanie fotky</string>
+    <string name="one_positive_negative">Musíte pridať aspoň jedno pozitívum a negatívum!</string>
+    <string name="review_text_empty">Musíte pridať text recenzie!</string>
 </resources>

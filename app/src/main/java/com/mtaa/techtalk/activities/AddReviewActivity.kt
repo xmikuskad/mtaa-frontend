@@ -431,7 +431,7 @@ fun AddReviewScreen(
         }
 
         var isUploading by remember { mutableStateOf(false) }
-        var progress by remember { mutableStateOf(0.1f) }
+        var progress by remember { mutableStateOf(0f) }
         var photoNum by remember { mutableStateOf(1) }
 
         if (isUploading) {
@@ -464,9 +464,27 @@ fun AddReviewScreen(
         //Add review
         Button(
             onClick = {
+                if (reviewText.text.isEmpty()) {
+                    showMessage(
+                        context,
+                        context.getString(R.string.review_text_empty),
+                        Toast.LENGTH_SHORT
+                    )
+                    return@Button
+                }
+
+                if (negativesCount == 1 || positivesCount == 1) {
+                    showMessage(
+                        context,
+                        context.getString(R.string.one_positive_negative),
+                        Toast.LENGTH_SHORT
+                    )
+                    return@Button
+                }
+
                 MainScope().launch(Dispatchers.Main) {
                     try {
-                        val auth = prefs.getString("token","") ?: ""
+                        val auth = prefs.getString("token", "") ?: ""
                         withContext(Dispatchers.IO) {
                             // do blocking networking on IO thread
                             val info = DataGetter.createReview(
@@ -474,13 +492,13 @@ fun AddReviewScreen(
                                     reviewText.text,
                                     (positives + negatives) as MutableList<ReviewAttributePostPutInfo>,
                                     productID, (sliderPosition * 100).roundToInt()
-                                ),auth
+                                ), auth
                             )
                             isUploading = true
-                            for((i, image) in images.withIndex()) {
+                            for ((i, image) in images.withIndex()) {
                                 photoNum = i + 1
                                 progress = (i + 1).toFloat() / images.size
-                                DataGetter.uploadPhoto(info.id,image,auth,context)
+                                DataGetter.uploadPhoto(info.id, image, auth, context)
                             }
                         }
                         //Need to be called here to prevent blocking UI

@@ -109,4 +109,6 @@
     <string name="err_server_offline">Server is offline please try again later</string>
     <string name="err_other">Unknown problem. Please restart the app</string>
     <string name="uploading_photo">Uploading photo</string>
+    <string name="one_positive_negative">You have to add at least one positive and negative!</string>
+    <string name="review_text_empty">You have to add review text!</string>
 </resources>
