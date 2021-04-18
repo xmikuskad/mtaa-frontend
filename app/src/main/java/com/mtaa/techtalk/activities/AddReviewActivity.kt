@@ -324,7 +324,6 @@ fun AddReviewScreen(
             }
         }
 
-
         //---------------
         Spacer(Modifier.size(30.dp))
         Row(
@@ -391,7 +390,6 @@ fun AddReviewScreen(
                 contentDescription = null
             )
         }
-
 
         //Load images
         Spacer(Modifier.size(20.dp))

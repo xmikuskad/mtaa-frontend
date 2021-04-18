@@ -117,7 +117,7 @@ class SearchViewModel: ViewModel() {
 }
 
 @Composable
-fun SearchScreen(searchInput: String, viewModel: SearchViewModel,offlineViewModel: OfflineDialogViewModel) {
+fun SearchScreen(searchInput: String, viewModel: SearchViewModel, offlineViewModel: OfflineDialogViewModel) {
     val searchResultProducts by viewModel.liveSearchResultProducts.observeAsState(initial = null)
     val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
     val context = LocalContext.current

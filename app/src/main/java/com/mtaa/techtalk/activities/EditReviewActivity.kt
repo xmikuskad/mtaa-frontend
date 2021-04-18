@@ -38,7 +38,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 import kotlin.math.roundToInt
-import androidx.compose.ui.res.painterResource
 import com.mtaa.techtalk.R
 import io.ktor.client.features.*
 import io.ktor.network.sockets.*
@@ -84,7 +83,7 @@ class EditReviewActivity : ComponentActivity() {
                 //Need to be called here to prevent blocking UI
                 viewModel.loadReviewData(review)
             } catch (e: Exception) {
-                //Review wasnt found
+                //Review wasn't found
                 println(e.stackTraceToString())
             }
         }

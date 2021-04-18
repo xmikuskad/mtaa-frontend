@@ -86,16 +86,13 @@ class ProductsActivity : ComponentActivity() {
                 }
             }
         }
-
-        //viewModel.loadProducts(categoryId,queryAttributes)
-        //viewModel.loadBrands(categoryId)
         viewModel.initProductScreen(categoryId,queryAttributes)
     }
 }
 
 
 //This class is responsible for updating list data
-class ProductScreenViewModel(): ViewModel() {
+class ProductScreenViewModel : ViewModel() {
 
     val liveProducts = MutableLiveData<List<ProductInfo>>()
     val liveBrands = MutableLiveData<List<BrandInfo>>()
@@ -128,7 +125,7 @@ class ProductScreenViewModel(): ViewModel() {
                         offlineViewModel.changeResult(NO_INTERNET)
                     }
                     is ClientRequestException -> {
-                        //This is OK, the list it empty
+                        //This is OK, the list is empty
                     }
                     else -> offlineViewModel.changeResult(OTHER_ERROR)
                 }
@@ -136,8 +133,7 @@ class ProductScreenViewModel(): ViewModel() {
         }
     }
 
-    fun reloadProducts(categoryId: Int, obj:QueryAttributes)
-    {
+    fun reloadProducts(categoryId: Int, obj:QueryAttributes) {
         liveProducts.value = mutableListOf()
         page = 1
         loadProducts(categoryId,obj)
@@ -176,7 +172,6 @@ class ProductScreenViewModel(): ViewModel() {
         loadBrands(categoryID)
         loadProducts(categoryID,obj)
     }
-
 }
 
 @Composable
@@ -348,7 +343,6 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             }) {
                 Text(context.getString(R.string.close))
             }
-
         }
         return
     }

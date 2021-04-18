@@ -84,7 +84,6 @@ class MainMenuActivity : ComponentActivity() {
         }
     }
 
-
     fun initMainMenu(prevScreen:String) {
         viewModel.loadCategoriesMenu() //They are the same, no need to reload
 
@@ -136,7 +135,6 @@ class MainMenuViewModel: ViewModel() {
 
 @Composable
 fun Drawer(prefs: SharedPreferences) {
-    // TODO Smaller Width
     val context = LocalContext.current
 
     val authToken = prefs.getString("token", "")
@@ -414,7 +412,12 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
 }
 
 @Composable
-fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:LiveData<List<ReviewInfoItem>>, offlineViewModel: OfflineDialogViewModel, activity:MainMenuActivity) {
+fun MenuScreen(
+    liveCategories: LiveData<List<CategoryInfo>>,
+    liveRecentReviews: LiveData<List<ReviewInfoItem>>,
+    offlineViewModel: OfflineDialogViewModel,
+    activity: MainMenuActivity
+) {
     val categories by liveCategories.observeAsState(initial = emptyList())
     val reviews by liveRecentReviews.observeAsState(initial = emptyList())
     val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
@@ -437,7 +440,6 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
                         CategoryMainMenu(item = item, context = context)
                     }
                 }
-
             }
             Spacer(Modifier.size(10.dp))
             LazyColumn(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
@@ -446,7 +448,6 @@ fun MenuScreen(liveCategories: LiveData<List<CategoryInfo>>, liveRecentReviews:L
                         CategoryMainMenu(item = item, context = context)
                     }
                 }
-
             }
         }
 
@@ -590,7 +591,6 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
     }
 }
 
-//TODO remake into navigation drawer
 fun openCategories(context:Context){
     val intent = Intent(context, CategoriesActivity::class.java)
     context.startActivity(intent)

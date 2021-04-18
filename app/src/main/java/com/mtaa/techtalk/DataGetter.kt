@@ -10,7 +10,6 @@ import io.ktor.http.content.*
 import com.mtaa.techtalk.activities.PRICE_MULTIPLIER
 import kotlin.math.roundToInt
 
-
 const val ADDRESS = "http://10.0.2.2:8080"
 
 object DataGetter {

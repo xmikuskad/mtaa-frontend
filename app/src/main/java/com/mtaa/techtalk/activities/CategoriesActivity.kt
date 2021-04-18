@@ -46,7 +46,6 @@ class CategoriesActivity : ComponentActivity() {
             }
         }
     }
-
 }
 
 @Composable

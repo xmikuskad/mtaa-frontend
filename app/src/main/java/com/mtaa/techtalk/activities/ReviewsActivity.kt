@@ -147,11 +147,16 @@ class ReviewScreenViewModel: ViewModel() {
         page = 1
         loadReviews(productId,obj)
     }
-
 }
 
 @Composable
-fun ReviewsScreen(productId:Int,productName:String,viewModel: ReviewScreenViewModel, obj:OrderAttributes,offlineViewModel: OfflineDialogViewModel) {
+fun ReviewsScreen(
+    productId: Int,
+    productName: String,
+    viewModel: ReviewScreenViewModel,
+    obj: OrderAttributes,
+    offlineViewModel: OfflineDialogViewModel
+) {
     val reviews by viewModel.liveReviews.observeAsState(initial = null)
     val context = LocalContext.current
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }

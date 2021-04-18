@@ -16,11 +16,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,7 +67,9 @@ fun SettingsScreen(prefs: SharedPreferences) {
             modifier = Modifier.size(20.dp)
         )
 
-        val selectedLanguage = remember { mutableStateOf(prefs.getString("language", "English")?:"English") }
+        val selectedLanguage = remember {
+            mutableStateOf(prefs.getString("language", "English") ?: "English")
+        }
         DropdownList(
             items = listOf("English", "Slovenčina"),
             label = context.getString(R.string.select_language),
@@ -78,7 +78,9 @@ fun SettingsScreen(prefs: SharedPreferences) {
         Spacer(
             modifier = Modifier.size(10.dp)
         )
-        val selectedScheme = remember { mutableStateOf(prefs.getString("color-scheme", "Dark Mode")?:"Dark Mode") }
+        val selectedScheme = remember {
+            mutableStateOf(prefs.getString("color-scheme", "Dark Mode") ?: "Dark Mode")
+        }
         DropdownList(
             items = listOf("Dark Mode", "Light Mode"),
             label = context.getString(R.string.select_color),

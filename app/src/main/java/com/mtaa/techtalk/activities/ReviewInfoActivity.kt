@@ -30,7 +30,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.accompanist.glide.GlideImage
 import com.mtaa.techtalk.*
 import com.mtaa.techtalk.R
-import com.mtaa.techtalk.ui.theme.TechTalkGray
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.Dispatchers
@@ -123,7 +122,13 @@ class ReviewInfoViewModel: ViewModel() {
 }
 
 @Composable
-fun ReviewInfoScreen(viewModel:ReviewInfoViewModel, reviewID: Int, prefs:SharedPreferences,offlineViewModel: OfflineDialogViewModel,activity:ReviewInfoActivity) {
+fun ReviewInfoScreen(
+    viewModel: ReviewInfoViewModel,
+    reviewID: Int,
+    prefs: SharedPreferences,
+    offlineViewModel: OfflineDialogViewModel,
+    activity: ReviewInfoActivity
+) {
     val reviewData by viewModel.liveReview.observeAsState(initial = null)
     val likes by viewModel.liveLikes.observeAsState(initial = 0)
     val dislikes by viewModel.liveDislikes.observeAsState(initial = 0)
@@ -164,7 +169,14 @@ fun ReviewInfoScreen(viewModel:ReviewInfoViewModel, reviewID: Int, prefs:SharedP
 }
 
 @Composable
-fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: ReviewInfo, scrollState:ScrollState, id:Int, prefs:SharedPreferences){
+fun ReviewDetails(
+    viewModel: ReviewInfoViewModel,
+    votes: ReviewVotesInfo,
+    review: ReviewInfo,
+    scrollState: ScrollState,
+    id: Int,
+    prefs: SharedPreferences)
+{
     val context = LocalContext.current
     //First line with name, likes, dislikes
     Column(modifier = Modifier.fillMaxWidth(),
@@ -257,9 +269,13 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
         }
     }
 
-    //Positive attributs
+    //Positive attributes
     Row(
-        modifier = Modifier.padding(start=20.dp,top=10.dp,end = 10.dp),
+        modifier = Modifier.padding(
+            start = 20.dp,
+            top = 10.dp,
+            end = 10.dp
+        ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -279,15 +295,26 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
     {
         for (item in review.attributes) {
             if (item.is_positive) {
-                Text(text = "- "+item.text,modifier = Modifier.padding(start=30.dp,top=5.dp,end=15.dp))
+                Text(
+                    text = "- " + item.text,
+                    modifier = Modifier.padding(
+                        start = 30.dp,
+                        top = 5.dp,
+                        end = 15.dp
+                    )
+                )
             }
         }
     }
 
     Spacer(Modifier.size(20.dp))
-    //Negative attributs
+    //Negative attributes
     Row(
-        modifier = Modifier.padding(start=20.dp,top=10.dp,end = 10.dp),
+        modifier = Modifier.padding(
+            start = 20.dp,
+            top = 10.dp,
+            end = 10.dp
+        ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -307,7 +334,14 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
     {
         for (item in review.attributes) {
             if (!item.is_positive) {
-                Text(text = "- "+item.text,modifier = Modifier.padding(start=30.dp,top=5.dp,end=15.dp))
+                Text(
+                    text = "- " + item.text,
+                    modifier = Modifier.padding(
+                        start = 30.dp,
+                        top = 5.dp,
+                        end = 15.dp
+                    )
+                )
             }
         }
     }
@@ -315,7 +349,12 @@ fun ReviewDetails(viewModel:ReviewInfoViewModel,votes:ReviewVotesInfo,review: Re
     Spacer(Modifier.size(20.dp))
     //Text of review
     Column(
-        modifier = Modifier.padding(start=20.dp,top=10.dp,end = 10.dp,bottom = 20.dp),
+        modifier = Modifier.padding(
+            start=20.dp,
+            top=10.dp,
+            end = 10.dp,
+            bottom = 20.dp
+        ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -361,7 +400,7 @@ fun addVote(
             //Need to be called here to prevent blocking UI
             viewModel.loadVotes(votes)
         } catch (e: Exception) {
-            //Review wasnt found
+            //Review wasn't found
             println(e.stackTraceToString())
         }
     }
