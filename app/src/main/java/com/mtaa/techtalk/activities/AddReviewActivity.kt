@@ -450,7 +450,7 @@ fun AddReviewScreen(
                         ),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Uploading photo ${photoNum}...")
+                        Text("${context.getString(R.string.uploading_photo)} ${photoNum}...")
                         Spacer(modifier = Modifier.size(20.dp))
                         LinearProgressIndicator(
                             color = TechTalkGray,

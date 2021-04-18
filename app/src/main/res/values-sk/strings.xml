@@ -109,4 +109,5 @@
     <string name="err_no_internet">Žiadne internetové pripojenie</string>
     <string name="err_server_offline">Server je nedostupný, skúste to neskôr prosím</string>
     <string name="err_other">Vyskytol sa neznámy problém. Prosím reštartujte aplikáciu</string>
+    <string name="uploading_photo">Nahrávanie fotky</string>
 </resources>
