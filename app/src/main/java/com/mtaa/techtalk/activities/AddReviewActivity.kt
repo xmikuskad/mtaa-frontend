@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -26,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,6 +35,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.accompanist.glide.GlideImage
 import com.mtaa.techtalk.*
 import com.mtaa.techtalk.R
+import com.mtaa.techtalk.ui.theme.TechTalkGray
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.Dispatchers
@@ -427,6 +430,37 @@ fun AddReviewScreen(
             Spacer(Modifier.size(10.dp))
         }
 
+        var isUploading by remember { mutableStateOf(false) }
+        var progress by remember { mutableStateOf(0.1f) }
+        var photoNum by remember { mutableStateOf(1) }
+
+        if (isUploading) {
+            Dialog(
+                onDismissRequest = { }
+            ) {
+                Card(
+                    border = BorderStroke(1.dp, Color.Black)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(
+                            top = 50.dp,
+                            bottom = 50.dp,
+                            start = 20.dp,
+                            end = 20.dp
+                        ),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Uploading photo ${photoNum}...")
+                        Spacer(modifier = Modifier.size(20.dp))
+                        LinearProgressIndicator(
+                            color = TechTalkGray,
+                            progress = progress
+                        )
+                    }
+                }
+            }
+        }
+
         //Add review
         Button(
             onClick = {
@@ -442,11 +476,15 @@ fun AddReviewScreen(
                                     productID, (sliderPosition * 100).roundToInt()
                                 ),auth
                             )
-                            for(image in images) {
+                            isUploading = true
+                            for((i, image) in images.withIndex()) {
+                                photoNum = i + 1
+                                progress = (i + 1).toFloat() / images.size
                                 DataGetter.uploadPhoto(info.id,image,auth,context)
                             }
                         }
                         //Need to be called here to prevent blocking UI
+                        isUploading = false
                         openScreen(context, MainMenuActivity())
                     } catch (e: Exception) {
                         println(e.stackTraceToString())
@@ -480,7 +518,6 @@ fun AddReviewScreen(
             )
         }
     }
-
 }
 
 
