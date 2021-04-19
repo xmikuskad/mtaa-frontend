@@ -180,6 +180,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
     val filterState = remember { mutableStateOf(DrawerValue.Closed) }
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
     val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
+    val isFirst = remember { mutableStateOf(true) }
 
     val context = LocalContext.current
 
@@ -452,10 +453,14 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             products == null -> {
                 LoadingScreen(context.getString(R.string.loading_products))
             }
-            products!!.isEmpty() -> {
+            products!!.isEmpty() && isFirst.value -> {
                 NotFoundScreen(context.getString(R.string.no_products_found))
             }
+            products!!.isEmpty() && !isFirst.value -> {
+                LoadingScreen(context.getString(R.string.loading_products))
+            }
             else -> {
+                isFirst.value = false
                 LazyColumn(
                     modifier = Modifier
                         .padding(top = 10.dp)

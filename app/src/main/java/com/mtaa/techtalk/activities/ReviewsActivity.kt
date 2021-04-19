@@ -161,6 +161,7 @@ fun ReviewsScreen(
     val context = LocalContext.current
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
     val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
+    val isFirst = remember { mutableStateOf(true) }
 
     if (result != NO_ERROR && result != WAITING_FOR_CONFIRMATION) {
         OfflineDialog(
@@ -258,9 +259,12 @@ fun ReviewsScreen(
                 )
             }
 
-            if (reviews!!.isEmpty()) {
+            if (reviews!!.isEmpty() && isFirst.value) {
                 NotFoundScreen(context.getString(R.string.no_reviews_found))
+            } else if (reviews!!.isEmpty() && !isFirst.value) {
+                LoadingScreen(context.getString(R.string.loading_reviews))
             } else {
+                isFirst.value = false
                 LazyColumn(
                     modifier = Modifier
                         .padding(top = 10.dp)

@@ -127,6 +127,7 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
     val trustScore by viewModel.trustScore.observeAsState(initial = 0)
     val context = LocalContext.current
     val result = offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
+    val isFirst = remember { mutableStateOf(true) }
 
     if (result.value != NO_ERROR && result.value != WAITING_FOR_CONFIRMATION) {
         OfflineDialog(
@@ -240,9 +241,12 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
                 )
             }
 
-            if (userReviews!!.isEmpty()) {
+            if (userReviews!!.isEmpty() && isFirst.value) {
                 NotFoundScreen(context.getString(R.string.no_reviews_found))
+            } else if (userReviews!!.isEmpty() && !isFirst.value) {
+                LoadingScreen(context.getString(R.string.loading_reviews))
             } else {
+                isFirst.value = false
                 LazyColumn(
                     modifier = Modifier
                         .padding(top = 10.dp)
