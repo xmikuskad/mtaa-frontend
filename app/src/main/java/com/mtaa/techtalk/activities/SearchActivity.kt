@@ -99,7 +99,8 @@ class SearchViewModel: ViewModel() {
                     page++
                 }
                 offlineViewModel.changeResult(NO_ERROR)
-                liveSearchResultProducts.value = liveSearchResultProducts.value?.plus(foundProducts.products) ?: foundProducts.products
+                liveSearchResultProducts.value = liveSearchResultProducts.value
+                    ?.plus(foundProducts.products) ?: foundProducts.products
             } catch (e: Exception) {
                 println(e.stackTraceToString())
                 when (e) {
@@ -117,7 +118,11 @@ class SearchViewModel: ViewModel() {
 }
 
 @Composable
-fun SearchScreen(searchInput: String, viewModel: SearchViewModel, offlineViewModel: OfflineDialogViewModel) {
+fun SearchScreen(
+    searchInput: String,
+    viewModel: SearchViewModel,
+    offlineViewModel: OfflineDialogViewModel
+) {
     val searchResultProducts by viewModel.liveSearchResultProducts.observeAsState(initial = null)
     val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
     val context = LocalContext.current

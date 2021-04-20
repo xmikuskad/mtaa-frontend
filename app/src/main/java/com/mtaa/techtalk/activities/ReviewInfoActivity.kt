@@ -216,7 +216,10 @@ fun ReviewDetails(
                     text = context.getString(R.string.review_details),
                     textAlign = TextAlign.Center,
                     style = typography.h5,
-                    modifier = Modifier.padding(top=10.dp,bottom = 5.dp)
+                    modifier = Modifier.padding(
+                        top=10.dp,
+                        bottom = 5.dp
+                    )
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -265,12 +268,16 @@ fun ReviewDetails(
         Row(
             modifier = Modifier
                 .height(300.dp)
-                .horizontalScroll(enabled = true, state = scrollState)
+                .horizontalScroll(
+                    enabled = true,
+                    state = scrollState
+                )
         ) {
             for(item in review.images) {
                 GlideImage(
                     data = "$ADDRESS/reviews/" + id + "/photo/" + item.image_id,
-                    contentDescription = "My content description", fadeIn = true
+                    contentDescription = "My content description",
+                    fadeIn = true
                 )
                 Spacer(modifier = Modifier.width(20.dp))
             }

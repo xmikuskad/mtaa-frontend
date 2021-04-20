@@ -179,7 +179,6 @@ fun ReviewsScreen(
     //Order screen
     if (orderState.value == DrawerValue.Open) {
         Dialog(onDismissRequest = { orderState.value = DrawerValue.Closed }) {
-
             Card(
                 border = BorderStroke(1.dp, Color.Black)
             )
@@ -239,7 +238,8 @@ fun ReviewsScreen(
         Column(
             modifier = Modifier
                 .padding(20.dp)
-                .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {

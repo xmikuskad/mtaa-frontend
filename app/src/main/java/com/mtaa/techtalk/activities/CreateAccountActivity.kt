@@ -131,8 +131,12 @@ fun CreateAccountScreen() {
         //Password field
         Spacer(modifier = Modifier.size(10.dp))
         val passwordState = remember { mutableStateOf(TextFieldValue()) }
-        // Password rules:
-        // Minimum eight characters, at least one uppercase letter, one lowercase letter, one digit and one special character
+        /** Password rules:
+         * Minimum eight characters,
+         * at least one uppercase letter,
+         * one lowercase letter,
+         * one digit and one special character
+         */
         val passwordRegex = Pattern.compile(
             "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@\$%^&*-]).{8,}\$"
         )

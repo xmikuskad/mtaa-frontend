@@ -82,7 +82,13 @@ class ProductsActivity : ComponentActivity() {
                     topBar = { TopBar(scaffoldState, scope) },
                     drawerContent = { Drawer(prefs) }
                 ) {
-                    ProductsScreen(categoryId, categoryName, viewModel, queryAttributes,offlineViewModel)
+                    ProductsScreen(
+                        categoryId,
+                        categoryName,
+                        viewModel,
+                        queryAttributes,
+                        offlineViewModel
+                    )
                 }
             }
         }
@@ -177,7 +183,13 @@ class ProductScreenViewModel : ViewModel() {
 }
 
 @Composable
-fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenViewModel, obj:QueryAttributes, offlineViewModel: OfflineDialogViewModel) {
+fun ProductsScreen(
+    categoryId: Int,
+    categoryName: String,
+    viewModel: ProductScreenViewModel,
+    obj: QueryAttributes,
+    offlineViewModel: OfflineDialogViewModel
+) {
     val products by viewModel.liveProducts.observeAsState(initial = null)
     val filterState = remember { mutableStateOf(DrawerValue.Closed) }
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
@@ -209,7 +221,9 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
         val map by remember { mutableStateOf(HashMap<Int, Boolean>()) }
 
         val brandsLoaded =
-            if (obj.brands.isNotEmpty()) obj.brands.split(',').map { it.toInt() } else emptyList()
+            if (obj.brands.isNotEmpty())
+                obj.brands.split(',').map { it.toInt() }
+            else emptyList()
 
         if (map.size <= 0 && brands.isNotEmpty()) {
             for (brand in brands) {

@@ -125,7 +125,12 @@ class UserReviewsViewModel: ViewModel() {
 }
 
 @Composable
-fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: String?, obj: OrderAttributes, offlineViewModel: OfflineDialogViewModel) {
+fun AccountScreen(
+    viewModel: UserReviewsViewModel,
+    authKey: String?, name: String?,
+    obj: OrderAttributes,
+    offlineViewModel: OfflineDialogViewModel
+) {
     val userReviews by viewModel.liveUserReviews.observeAsState(initial = null)
     val trustScore by viewModel.trustScore.observeAsState(initial = 0)
     val context = LocalContext.current

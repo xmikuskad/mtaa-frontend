@@ -122,7 +122,11 @@ class OfflineDialogViewModel: ViewModel() {
 }
 
 @Composable
-fun SplashScreen(viewModel: OfflineDialogViewModel, isFirstRun: Boolean, activity: SplashActivity) {
+fun SplashScreen(
+    viewModel: OfflineDialogViewModel,
+    isFirstRun: Boolean,
+    activity: SplashActivity
+) {
     val result by viewModel.loadingResult.observeAsState(initial = NO_ERROR)
     val context = LocalContext.current
 

@@ -89,7 +89,7 @@ class MainMenuActivity : ComponentActivity() {
         viewModel.loadCategoriesMenu() //They are the same, no need to reload
 
         //If we came from splash screen load preloaded data
-        if (prevScreen.equals("splash") || prevScreen.equals("first-launch")) {
+        if (prevScreen == "splash" || prevScreen == "first-launch") {
             viewModel.loadRecentReviews(SplashActivity.reviews.reviews)
         } else { //Update data and download again
             MainScope().launch(Dispatchers.Main) {
@@ -457,7 +457,10 @@ fun MenuScreen(
 
         //Show few categories
         Row {
-            LazyColumn(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.Start) {
+            LazyColumn(
+                modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
                 itemsIndexed(categories) { index, item ->
                     if (index % 2 == 0 && index < MAX_CATEGORIES_COUNT) {
                         CategoryMainMenu(item = item, context = context)
@@ -465,7 +468,10 @@ fun MenuScreen(
                 }
             }
             Spacer(Modifier.size(10.dp))
-            LazyColumn(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.End) {
+            LazyColumn(
+                modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.End
+            ) {
                 itemsIndexed(categories) { index, item ->
                     if (index % 2 == 1 && index < MAX_CATEGORIES_COUNT) {
                         CategoryMainMenu(item = item, context = context)
@@ -503,7 +509,9 @@ fun MenuScreen(
             style = TextStyle(fontSize = 25.sp),
             textAlign = TextAlign.Center
         )
-        LazyColumn(modifier = Modifier.padding(top = 5.dp)) {
+        LazyColumn(
+            modifier = Modifier.padding(top = 5.dp)
+        ) {
             items(reviews) { item ->
                 ReviewBox(item,false)
             }

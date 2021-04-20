@@ -196,7 +196,12 @@ class EditReviewViewModel: ViewModel() {
 
 //For some reason spacers cant be used in this screen. It crashes the app.
 @Composable
-fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivity, prefs: SharedPreferences, reviewID: Int) {
+fun EditReviewScreen(
+    viewModel: EditReviewViewModel,
+    activity: EditReviewActivity,
+    prefs: SharedPreferences,
+    reviewID: Int
+) {
     val positives by viewModel.livePositive.observeAsState(initial = mutableListOf())
     val negatives by viewModel.liveNegative.observeAsState(initial = mutableListOf())
     val images by viewModel.liveImage.observeAsState(initial = mutableListOf())

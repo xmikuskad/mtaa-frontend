@@ -123,7 +123,9 @@ object DataGetter {
     suspend fun uploadPhoto(reviewID: Int, photoURI: Uri,auth:String,context: Context) {
         return client.post("$ADDRESS/reviews/$reviewID/photo") {
             header("auth",auth)
-            body = context.contentResolver.openInputStream(photoURI)?.let { ByteArrayContent(it.readBytes(), ContentType.Image.Any) }!!
+            body = context.contentResolver.openInputStream(photoURI)?.let {
+                ByteArrayContent(it.readBytes(), ContentType.Image.Any)
+            }!!
         }
     }
 
