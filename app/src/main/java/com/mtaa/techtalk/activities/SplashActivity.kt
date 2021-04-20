@@ -49,8 +49,6 @@ class SplashActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.enterTransition = null
-        window.exitTransition = null
 
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
         var isFirstRun = false

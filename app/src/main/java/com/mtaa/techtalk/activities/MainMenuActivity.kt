@@ -456,7 +456,7 @@ fun MenuScreen(
         )
 
         //Show few categories
-        Row(modifier = Modifier.padding(bottom = 10.dp)) {
+        Row {
             LazyColumn(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.Start) {
                 itemsIndexed(categories) { index, item ->
                     if (index % 2 == 0 && index < MAX_CATEGORIES_COUNT) {
@@ -482,6 +482,18 @@ fun MenuScreen(
                     activity.initMainMenu("")
                 },
                 result = result
+            )
+        }
+
+        IconButton(onClick = {
+            openCategories(context)
+        }) {
+            Icon(
+                painter = rememberVectorPainter(
+                image = Icons.Filled.ArrowDropDown
+                ),
+                contentDescription = null,
+                modifier = Modifier.size(36.dp)
             )
         }
 
