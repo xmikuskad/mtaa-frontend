@@ -57,6 +57,7 @@ fun AboutAppScreen() {
         horizontalAlignment = Alignment.Start
     )
     {
+        //Title
         Spacer(modifier = Modifier.height(15.dp))
         Text(
             text = context.getString(R.string.about),
@@ -64,6 +65,8 @@ fun AboutAppScreen() {
             textAlign = TextAlign.Center,
             style = typography.h4
         )
+
+        //App version
         Spacer(modifier = Modifier.height(40.dp))
         Row {
             Text(text = context.getString(R.string.app_version))
@@ -71,6 +74,7 @@ fun AboutAppScreen() {
             Text(text = "v1.0")
         }
 
+        //Authors
         Spacer(modifier = Modifier.height(30.dp))
         Row {
             Text(text = context.getString(R.string.authors))
@@ -82,6 +86,7 @@ fun AboutAppScreen() {
             }
         }
 
+        //Bug reports with link
         Spacer(modifier = Modifier.height(30.dp))
         Text(text = context.getString(R.string.bugs))
         Spacer(modifier = Modifier.height(10.dp))
@@ -93,6 +98,8 @@ fun AboutAppScreen() {
                 context.startActivity(intent)
             })
         )
+
+        //App logo
         Image(
             modifier = Modifier.fillMaxWidth(),
             alignment = Alignment.Center,

@@ -133,6 +133,7 @@ class ProductScreenViewModel : ViewModel() {
         }
     }
 
+    //Delete all products and load them again
     fun reloadProducts(categoryId: Int, obj:QueryAttributes) {
         liveProducts.value = mutableListOf()
         page = 1
@@ -168,6 +169,7 @@ class ProductScreenViewModel : ViewModel() {
         }
     }
 
+    //Load brands and products
     fun initProductScreen(categoryID: Int,obj: QueryAttributes) {
         loadBrands(categoryID)
         loadProducts(categoryID,obj)
@@ -184,6 +186,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
 
     val context = LocalContext.current
 
+    //IF we have a connection problem
     if (result != NO_ERROR && result != WAITING_FOR_CONFIRMATION) {
         OfflineDialog(
             callback = {
@@ -195,6 +198,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
         return
     }
 
+    //Filter screen
     if (filterState.value == DrawerValue.Open) {
         val brands by viewModel.liveBrands.observeAsState(initial = emptyList())
         var minPrice by remember { mutableStateOf(obj.min_price) }
@@ -348,6 +352,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
         return
     }
 
+    //Order screen
     if (orderState.value == DrawerValue.Open) {
         Dialog(onDismissRequest = { orderState.value = DrawerValue.Closed }) {
 
@@ -414,6 +419,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
             .padding(20.dp)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        //Sort btn
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 onClick = {
@@ -427,6 +433,8 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                     contentDescription = null
                 )
             }
+
+            //Title
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = categoryName,
@@ -434,6 +442,8 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
                 style = typography.h4,
                 fontSize = 26.sp
             )
+
+            //Filter btn
             Spacer(modifier = Modifier.width(10.dp))
             IconButton(
                 onClick = {
@@ -477,6 +487,7 @@ fun ProductsScreen(categoryId:Int,categoryName:String,viewModel: ProductScreenVi
     }
 }
 
+//This is design for one product
 @Composable
 fun ProductBox(product: ProductInfo) {
     val context = LocalContext.current
@@ -488,6 +499,8 @@ fun ProductBox(product: ProductInfo) {
         backgroundColor = Color.DarkGray
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+            //Name of the product
             Text(
                 text = product.name,
                 modifier = Modifier.padding(top=10.dp),
@@ -495,8 +508,10 @@ fun ProductBox(product: ProductInfo) {
                 style = typography.h6,
                 color = Color.White
             )
+
             Spacer(Modifier.size(20.dp))
             Row {
+                //Product price
                 Text(
                     text = "${product.price.div(100.0)}",
                     color = Color.White
@@ -508,6 +523,8 @@ fun ProductBox(product: ProductInfo) {
                     contentDescription = null,
                     tint = Color.White
                 )
+
+                //Product score
                 Spacer(Modifier.size(50.dp))
                 Text(
                     text = "${product.score.div(10.0)} / 10",
@@ -525,6 +542,7 @@ fun ProductBox(product: ProductInfo) {
     }
 }
 
+//This opens reviews activity
 fun openReviewsMenu(product : ProductInfo, context: Context){
     val intent = Intent(context, ReviewsActivity::class.java)
     intent.putExtra("productId",product.product_id)

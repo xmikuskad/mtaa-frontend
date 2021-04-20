@@ -104,7 +104,6 @@ class ReviewsActivity : ComponentActivity() {
 }
 
 //This class is responsible for updating list data
-//NOTE: we cant actually download data in this class because downloading is blocking and UI will lag !!
 class ReviewScreenViewModel: ViewModel() {
 
     val liveReviews = MutableLiveData<List<ReviewInfoItem>>()
@@ -142,6 +141,7 @@ class ReviewScreenViewModel: ViewModel() {
         }
     }
 
+    //Delete all reviews and load them again
     fun reloadReviews(productId: Int, obj:OrderAttributes) {
         liveReviews.value = mutableListOf()
         page = 1
@@ -157,12 +157,14 @@ fun ReviewsScreen(
     obj: OrderAttributes,
     offlineViewModel: OfflineDialogViewModel
 ) {
+
     val reviews by viewModel.liveReviews.observeAsState(initial = null)
     val context = LocalContext.current
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
     val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
     val isFirst = remember { mutableStateOf(true) }
 
+    //If we have connection problem
     if (result != NO_ERROR && result != WAITING_FOR_CONFIRMATION) {
         OfflineDialog(
             callback = {
@@ -174,6 +176,7 @@ fun ReviewsScreen(
         return
     }
 
+    //Order screen
     if (orderState.value == DrawerValue.Open) {
         Dialog(onDismissRequest = { orderState.value = DrawerValue.Closed }) {
 
@@ -240,6 +243,7 @@ fun ReviewsScreen(
         ) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
+                //Order btn
                 IconButton(
                     onClick = {
                         if (result == NO_ERROR)
@@ -252,6 +256,8 @@ fun ReviewsScreen(
                         contentDescription = null
                     )
                 }
+
+                //Title
                 Text(
                     "${context.getString(R.string.reviews_of)} $productName",
                     style = TextStyle(fontSize = 22.sp),
@@ -281,8 +287,8 @@ fun ReviewsScreen(
     }
 }
 
-fun openAddReview(context: Context, productId: Int, productName: String)
-{
+//Open add screen activity
+fun openAddReview(context: Context, productId: Int, productName: String) {
     val intent = Intent(context, AddReviewActivity::class.java)
     intent.putExtra("productID",productId)
     intent.putExtra("productName",productName)

@@ -59,6 +59,8 @@ fun SettingsScreen(prefs: SharedPreferences) {
             .padding(top = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        //Title
         Text(
             text = context.getString(R.string.settings),
             fontSize = 28.sp
@@ -67,6 +69,7 @@ fun SettingsScreen(prefs: SharedPreferences) {
             modifier = Modifier.size(20.dp)
         )
 
+        //Language options
         val selectedLanguage = remember {
             mutableStateOf(prefs.getString("language", "English") ?: "English")
         }
@@ -81,11 +84,15 @@ fun SettingsScreen(prefs: SharedPreferences) {
         val selectedScheme = remember {
             mutableStateOf(prefs.getString("color-scheme", "Dark Mode") ?: "Dark Mode")
         }
+
+        //Theme options
         DropdownList(
             items = listOf("Dark Mode", "Light Mode"),
             label = context.getString(R.string.select_color),
             selected = selectedScheme
         )
+
+        //Save changes btn
         Button(
             onClick = {
                 prefs.edit().putString("language", selectedLanguage.value).apply()
@@ -106,6 +113,7 @@ fun SettingsScreen(prefs: SharedPreferences) {
     }
 }
 
+//Dropdown with fixed item positioning
 @Composable
 fun DropdownList(items: List<String>, label: String? = null, selected: MutableState<String>) {
     val expanded = remember { mutableStateOf(false) }
@@ -161,6 +169,7 @@ fun DropdownList(items: List<String>, label: String? = null, selected: MutableSt
     }
 }
 
+//Sets system language
 fun setLanguage(language: String?, context: Context) {
     if (language == null) {
         return
@@ -180,6 +189,7 @@ fun setLanguage(language: String?, context: Context) {
     resources.updateConfiguration(config, dm)
 }
 
+//Sets color scheme of the app
 fun setColorScheme(prefs: SharedPreferences): Boolean {
     if (prefs.getString("color-scheme", "Dark Mode") == "Light Mode")
         return false

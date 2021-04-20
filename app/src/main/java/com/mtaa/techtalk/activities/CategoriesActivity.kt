@@ -58,6 +58,8 @@ fun CategoryScreen() {
             .padding(20.dp)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        //Title
         Text(
             text = context.getString(R.string.categories),
             modifier = Modifier.fillMaxWidth(),
@@ -65,6 +67,8 @@ fun CategoryScreen() {
             style = MaterialTheme.typography.h4
         )
         Spacer(modifier=Modifier.height(10.dp))
+
+        //List of categories
         LazyColumn(
             modifier = Modifier
                 .padding(top = 10.dp)

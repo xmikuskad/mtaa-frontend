@@ -76,6 +76,7 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        //Title
         Text(
             text = context.getString(R.string.edit_account_info),
             modifier = Modifier.fillMaxWidth(),
@@ -84,10 +85,11 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
         )
         Spacer(modifier = Modifier.height(40.dp))
 
+        //Name field
         val nameState =
             remember { mutableStateOf(TextFieldValue(prefs.getString("username", "") ?: "")) }
 
-        /**
+        /** Regex info - replaced a-zA-Z with \\p{L} to add diactritics
         ^               // start of line
         [a-zA-Z]{2,}    // will except a name with at least two characters
         \s              // will look for white space between name and surname
@@ -123,6 +125,7 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
             }
         )
 
+        //Email field
         Spacer(modifier = Modifier.size(10.dp))
         val emailState = remember { mutableStateOf(TextFieldValue()) }
         val isValidEmail = Patterns.EMAIL_ADDRESS.matcher(emailState.value.text).matches()
@@ -148,6 +151,7 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
             }
         )
 
+        //Password field
         Spacer(modifier = Modifier.size(10.dp))
         val passwordState = remember { mutableStateOf(TextFieldValue()) }
         // Minimum eight characters, at least one uppercase letter, one lowercase letter, one digit and one special character
@@ -197,6 +201,7 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
 
+        //Password again field
         Spacer(modifier = Modifier.size(10.dp))
         val secondPasswordState = remember { mutableStateOf(TextFieldValue()) }
         val isValidSecondPassword = secondPasswordState.value.text == passwordState.value.text
@@ -223,11 +228,15 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
+
+        //Edit button
         Button(
             modifier = Modifier
                 .padding(top = 30.dp)
                 .size(250.dp, 55.dp),
             onClick = {
+
+                //Check input validity
                 if (!isValidName || !isValidEmail || !isValidPassword || !isValidSecondPassword) {
                     var message = context.getString(R.string.invalid)
                     var num = 1
@@ -304,6 +313,8 @@ fun EditAccountScreen(activity: EditAccountActivity, prefs: SharedPreferences) {
                 fontSize = 16.sp
             )
         }
+
+        //Discard changes btn
         Spacer(modifier = Modifier.height(5.dp))
         Button(
             onClick = { activity.finish() },

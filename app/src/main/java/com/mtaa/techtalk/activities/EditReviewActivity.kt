@@ -72,6 +72,7 @@ class EditReviewActivity : ComponentActivity() {
         loadReviewData(reviewID)
     }
 
+    //Load review data
     private fun loadReviewData(reviewID:Int){
         MainScope().launch(Dispatchers.Main) {
             try {
@@ -89,6 +90,7 @@ class EditReviewActivity : ComponentActivity() {
         }
     }
 
+    //Open android gallery
     fun loadImagesFromGallery(){
         val intent = Intent()
         intent.type = "image/*"
@@ -97,6 +99,7 @@ class EditReviewActivity : ComponentActivity() {
         startActivityForResult(Intent.createChooser(intent,"Select images"), PICK_IMAGES_CODE)
     }
 
+    //Called after the gallery is closed
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -130,6 +133,7 @@ class EditReviewViewModel: ViewModel() {
 
     val liveReview= MutableLiveData<ReviewInfo>()
 
+    //Get review data from server
     fun loadReviewData(review:ReviewInfo) {
         liveReview.value = review
 
@@ -143,51 +147,54 @@ class EditReviewViewModel: ViewModel() {
         }
     }
 
+    //Add positive attribute
     fun addPositive(text:String){
         positives.add(ReviewAttributePostPutInfo(text,true))
         livePositive.value = positives
     }
 
+    //Edit positive attribute
     fun editPositive(text:String, position:Int) {
         positives[position] = ReviewAttributePostPutInfo(text,true)
         livePositive.value = positives
     }
 
+    //Delete positive attribute
     fun deletePositive(text: String){
         positives.remove(ReviewAttributePostPutInfo(text,true))
         livePositive.value = positives
     }
 
+    //Add negative attribute
     fun addNegative(text:String){
         negatives.add(ReviewAttributePostPutInfo(text,false))
         liveNegative.value = negatives
     }
 
+    //Edit negative attribute
     fun editNegative(text:String, position:Int) {
         negatives[position] = ReviewAttributePostPutInfo(text,false)
         liveNegative.value = negatives
     }
 
+    //Delete negative attribute
     fun deleteNegative(text:String){
         negatives.remove(ReviewAttributePostPutInfo(text,false))
         liveNegative.value = negatives
     }
 
+    //Add photo uri to list
     fun addPhoto(uri: Uri?){
         liveImage.value = (liveImage.value?.plus(uri) ?: mutableListOf(uri)) as List<Uri>?
     }
 
+    //Delete photo uri
     fun deletePhoto(uri: Uri?){
         liveImage.value = (liveImage.value?.minus(uri) ?: mutableListOf(uri)) as List<Uri>?
     }
 }
 
-// TODO find out why Spacers cause bugs
-// How to replicate:
-// 1. When deleting all positive attributes and then adding one
-// or 2. Adding negative reviews
-// There need to be at least 1 positive and 1 negative review
-// Probably just fix with padding
+//For some reason spacers cant be used in this screen. It crashes the app.
 @Composable
 fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivity, prefs: SharedPreferences, reviewID: Int) {
     val positives by viewModel.livePositive.observeAsState(initial = mutableListOf())
@@ -211,7 +218,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
     var showPhotos by remember { mutableStateOf(false) }
     val deletePhotos by remember { mutableStateOf(mutableListOf<Int>()) }
 
-    //Loading
+    //Loading review
     if (review == null) {
         LoadingScreen(context.getString(R.string.loading_review))
         return
@@ -226,6 +233,8 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        //Title
         Text(
             text = context.getString(R.string.edit_review),
             modifier = Modifier
@@ -235,7 +244,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             style = MaterialTheme.typography.h4
         )
 
-        //Positive attributes
+        //Positive attributes section
         Text(
             text = context.getString(R.string.positive_attributes),
             modifier = Modifier
@@ -245,6 +254,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             style = MaterialTheme.typography.h6
         )
 
+        //Show added attributes
         for ((count, item) in positives.withIndex()) {
             while (positiveStatus.size <= count) {
                 positiveStatus.add(false) //Set default to text not textField
@@ -324,6 +334,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             }
         }
 
+        //Here we can add new positive attribute
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -352,7 +363,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             }
         }
 
-        //Negative attributes
+        //Negative attributes section
         Text(
             text = context.getString(R.string.negative_attributes),
             modifier = Modifier
@@ -362,6 +373,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             style = MaterialTheme.typography.h6
         )
 
+        //Show already added negative attributes
         for ((count, item) in negatives.withIndex()) {
 
             while (negativeStatus.size <= count) {
@@ -442,9 +454,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                     )
                 }
             }
-            //Spacer(modifier = Modifier.height(10.dp))
         }
 
+        //Here we can add new negative attributes
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -492,7 +504,6 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             )
         }
 
-        //Spacer(modifier = Modifier.height(10.dp))
         OutlinedTextField(
             label = {
                 Text(context.getString(R.string.review_text))
@@ -541,7 +552,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             )
         }
 
-        //Load images
+        //Photo buttons
         Row(
             modifier = Modifier.padding(top=20.dp,bottom = 20.dp)
         ) {
@@ -577,8 +588,9 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             }
         }
 
+        //Show images
         if (showPhotos) {
-            //Spacer(modifier = Modifier.height(20.dp))
+            //Images from gallery
             for (image in images) {
                 Box(
                     modifier = Modifier.padding(top=20.dp)
@@ -600,6 +612,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 }
             }
 
+            //Already added images
             for (image in review!!.images) {
                 if (image.image_id !in deletePhotos) {
                     Box(
@@ -687,7 +700,7 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
             )
         }
 
-        //Spacer(modifier = Modifier.height(10.dp))
+        //Discard changes
         Button(
             onClick = {
                 //Close activity
@@ -703,7 +716,8 @@ fun EditReviewScreen(viewModel: EditReviewViewModel, activity: EditReviewActivit
                 text = context.getString(R.string.discard_changes)
             )
         }
-        //Spacer(modifier = Modifier.height(10.dp))
+
+        //Delete review
         Button(
             onClick = {
                 //Delete review

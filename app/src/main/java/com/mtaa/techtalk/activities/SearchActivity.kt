@@ -250,6 +250,7 @@ fun SearchBar(open: MutableState<Boolean>) {
     )
 }
 
+//Opens search screen activity
 fun openSearchScreen(context: Context, searchInput: String) {
     val intent = Intent(context, SearchActivity::class.java)
     intent.putExtra("search-input", searchInput)

@@ -85,6 +85,7 @@ class AddReviewActivity: ComponentActivity() {
         }
     }
 
+    //Open android gallery
     fun loadImagesFromGallery(){
         val intent = Intent()
         intent.type = "image/*"
@@ -93,6 +94,7 @@ class AddReviewActivity: ComponentActivity() {
         startActivityForResult(Intent.createChooser(intent,"Select images"), PICK_IMAGES_CODE)
     }
 
+    //This is called after closing the gallery
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -122,34 +124,40 @@ class AddReviewViewModel: ViewModel() {
     val liveNegative= MutableLiveData<List<ReviewAttributePostPutInfo>>()
     val liveImage= MutableLiveData<List<Uri>>()
 
+    //Add positive attribute to list
     fun addPositive(text:String){
         livePositive.value = livePositive.value?.plus(
             ReviewAttributePostPutInfo(text,true)
         ) ?: mutableListOf(ReviewAttributePostPutInfo(text,true))
     }
 
+    //Delete positive attribute from list
     fun deletePositive(text: String){
         livePositive.value = livePositive.value?.minus(
             ReviewAttributePostPutInfo(text,true)
         )
     }
 
+    //Add negative attribute to list
     fun addNegative(text:String){
         liveNegative.value = liveNegative.value?.plus(
             ReviewAttributePostPutInfo(text,false)
         ) ?: mutableListOf(ReviewAttributePostPutInfo(text,false))
     }
 
+    //Delete negative attribute from list
     fun deleteNegative(text:String){
         liveNegative.value = liveNegative.value?.minus(
             ReviewAttributePostPutInfo(text,false)
         )
     }
 
+    //Add photo uri to list
     fun addPhoto(uri:Uri?){
         liveImage.value = (liveImage.value?.plus(uri) ?: mutableListOf(uri)) as List<Uri>?
     }
 
+    //Remove photo uri from list
     fun deletePhoto(uri: Uri?){
         liveImage.value = (liveImage.value?.minus(uri) ?: mutableListOf(uri)) as List<Uri>?
     }
@@ -165,6 +173,7 @@ fun AddReviewScreen(
     prefs:SharedPreferences,
     productName:String
 ) {
+
     val positives by livePositives.observeAsState(initial = mutableListOf())
     val negatives by liveNegatives.observeAsState(initial = mutableListOf())
     val images by viewModel.liveImage.observeAsState(initial = mutableListOf())
@@ -186,6 +195,8 @@ fun AddReviewScreen(
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        //Title
         Text(
             text = "${context.getString(R.string.add_review_to)} $productName",
             modifier = Modifier.fillMaxWidth(),
@@ -194,7 +205,7 @@ fun AddReviewScreen(
         )
         Spacer(Modifier.size(20.dp))
 
-        //Positive attributes
+        //Positive attributes section
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -208,6 +219,7 @@ fun AddReviewScreen(
 
         Spacer(Modifier.size(10.dp))
 
+        //Show added positives attributes
         for (item in positives) {
             Spacer(Modifier.size(5.dp))
             Row(
@@ -230,6 +242,7 @@ fun AddReviewScreen(
             }
         }
 
+        //Here we can add positive attribute
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -259,7 +272,9 @@ fun AddReviewScreen(
             }
         }
         Spacer(Modifier.size(20.dp))
-        //Negative attributes
+
+
+        //Negative attributes section
         Row(
             modifier = Modifier.padding(start=20.dp,top=10.dp,end = 10.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -273,6 +288,7 @@ fun AddReviewScreen(
         }
         Spacer(Modifier.size(10.dp))
 
+        //Show added negative attributes
         for (item in negatives) {
             Spacer(Modifier.size(5.dp))
             Row(
@@ -295,6 +311,7 @@ fun AddReviewScreen(
             }
         }
 
+        //Here we can add negative attribute
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -324,7 +341,7 @@ fun AddReviewScreen(
             }
         }
 
-        //---------------
+        //Review text
         Spacer(Modifier.size(30.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -408,6 +425,7 @@ fun AddReviewScreen(
             )
         }
 
+        //Show all added images
         Spacer(Modifier.size(20.dp))
         for (image in images) {
             Box {
@@ -432,6 +450,7 @@ fun AddReviewScreen(
         var progress by remember { mutableStateOf(0f) }
         var photoNum by remember { mutableStateOf(1) }
 
+        //Upload progress indicator
         if (isUploading) {
             Dialog(
                 onDismissRequest = { }

@@ -81,6 +81,7 @@ class UserReviewsViewModel: ViewModel() {
 
     private var page = 1
 
+    //Set offline model
     fun loadViewModel(viewModel:OfflineDialogViewModel) {
         offlineViewModel = viewModel
     }
@@ -98,6 +99,7 @@ class UserReviewsViewModel: ViewModel() {
                 liveUserReviews.value = liveUserReviews.value?.plus(userInfo.reviews) ?: userInfo.reviews
                 trustScore.value = userInfo.trust_score
             } catch (e: Exception) {
+                println(e.stackTraceToString())
                 when (e) {
                     is ConnectTimeoutException -> {
                         offlineViewModel.changeResult(SERVER_OFFLINE)
@@ -114,6 +116,7 @@ class UserReviewsViewModel: ViewModel() {
         }
     }
 
+    //Delete all reviews and load them again
     fun reloadUserReviews(authKey: String,obj: OrderAttributes) {
         liveUserReviews.value = mutableListOf()
         page = 1
@@ -129,6 +132,7 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
     val result = offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
     val isFirst = remember { mutableStateOf(true) }
 
+    //Show warning that we are offline
     if (result.value != NO_ERROR && result.value != WAITING_FOR_CONFIRMATION) {
         OfflineDialog(
             callback = {
@@ -143,6 +147,7 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
 
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
 
+    //Open order window
     if (orderState.value == DrawerValue.Open) {
         Dialog(onDismissRequest = { orderState.value = DrawerValue.Closed }) {
 
@@ -199,6 +204,7 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
         }
     }
 
+    //Account screen
     if (userReviews == null) {
         LoadingScreen(context.getString(R.string.loading_user_info))
     } else {
@@ -214,11 +220,15 @@ fun AccountScreen(viewModel: UserReviewsViewModel, authKey: String?, name: Strin
                     fontSize = 24.sp
                 )
             }
+
+            //User score
             Text(
                 text = "${context.getString(R.string.fan_score)} $trustScore",
                 modifier = Modifier.padding(top = 15.dp, start = 25.dp),
                 fontSize = 24.sp
             )
+
+            //Reviews + ordering
             Row(
                 modifier = Modifier.padding(top = 15.dp, start = 20.dp),
                 verticalAlignment = Alignment.CenterVertically

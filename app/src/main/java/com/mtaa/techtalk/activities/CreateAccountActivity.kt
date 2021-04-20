@@ -63,9 +63,10 @@ fun CreateAccountScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        //Name field
         val nameState = remember { mutableStateOf(TextFieldValue()) }
 
-        /**
+        /** Regex info - replaced a-zA-Z with \\p{L} to add diactritics
         ^               // start of line
         [a-zA-Z]{2,}    // will accept a name with at least two characters
         \s              // will look for white space between name and surname
@@ -101,6 +102,7 @@ fun CreateAccountScreen() {
             }
         )
 
+        //Email field
         Spacer(modifier = Modifier.size(10.dp))
         val emailState = remember { mutableStateOf(TextFieldValue()) }
         val isValidEmail = EMAIL_ADDRESS.matcher(emailState.value.text).matches()
@@ -126,8 +128,10 @@ fun CreateAccountScreen() {
             }
         )
 
+        //Password field
         Spacer(modifier = Modifier.size(10.dp))
         val passwordState = remember { mutableStateOf(TextFieldValue()) }
+        // Password rules:
         // Minimum eight characters, at least one uppercase letter, one lowercase letter, one digit and one special character
         val passwordRegex = Pattern.compile(
             "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@\$%^&*-]).{8,}\$"
@@ -176,6 +180,7 @@ fun CreateAccountScreen() {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
 
+        //Password repeat field
         Spacer(modifier = Modifier.size(10.dp))
         val secondPasswordState = remember { mutableStateOf(TextFieldValue()) }
         val isValidSecondPassword = secondPasswordState.value.text == passwordState.value.text
@@ -202,11 +207,15 @@ fun CreateAccountScreen() {
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
+
+        //Create account button
         Button(
             modifier = Modifier
                 .padding(30.dp)
                 .size(250.dp, 55.dp),
             onClick = {
+
+                //Check input validity
                 if (!isValidName || !isValidEmail || !isValidPassword || !isValidSecondPassword) {
                     var message = context.getString(R.string.invalid)
                     var num = 1
@@ -238,7 +247,6 @@ fun CreateAccountScreen() {
                                 )
                             }
                             //Need to be called here to prevent blocking UI
-
                             val intent = Intent(context, RegisterSuccessActivity::class.java)
                             intent.putExtra("activity", "create-account")
                             intent.flags =

@@ -45,10 +45,14 @@ fun RegisterSuccessScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        //App logo
         Image(
             painter = painterResource(R.drawable.success_logo_transparent),
             contentDescription = null
         )
+
+        //Continue without login
         Button(
             modifier = Modifier
                 .padding(10.dp)
@@ -66,6 +70,8 @@ fun RegisterSuccessScreen() {
                 fontSize = 16.sp
             )
         }
+
+        //Login btn
         Button(
             modifier = Modifier
                 .padding(10.dp)

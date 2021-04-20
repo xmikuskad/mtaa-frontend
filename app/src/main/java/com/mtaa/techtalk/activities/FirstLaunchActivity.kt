@@ -45,11 +45,15 @@ fun FirstLaunchScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        //App logo
         Image(
             modifier = Modifier.padding(top = 10.dp, bottom = 165.dp),
             painter = painterResource(R.drawable.logo_transparent_banner_text),
             contentDescription = null
         )
+
+        //Log in btn
         Button(
             modifier = Modifier
                 .padding(10.dp)
@@ -73,6 +77,8 @@ fun FirstLaunchScreen() {
                 fontSize = 16.sp
             )
         }
+
+        //Create account btn
         Button(
             modifier = Modifier
                 .padding(10.dp)
@@ -91,6 +97,8 @@ fun FirstLaunchScreen() {
                 fontSize = 16.sp
             )
         }
+
+        //Continue without account btn
         Button(
             modifier = Modifier
                 .padding(10.dp)

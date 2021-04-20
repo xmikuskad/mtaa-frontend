@@ -115,6 +115,7 @@ class ReviewInfoViewModel: ViewModel() {
         liveDislikes.value = review.dislikes
     }
 
+    //Called after liking/disliking
     fun loadVotes(info:ReviewVotesInfo) {
         liveLikes.value = info.likes
         liveDislikes.value = info.dislikes
@@ -129,13 +130,14 @@ fun ReviewInfoScreen(
     offlineViewModel: OfflineDialogViewModel,
     activity: ReviewInfoActivity
 ) {
+
     val reviewData by viewModel.liveReview.observeAsState(initial = null)
     val likes by viewModel.liveLikes.observeAsState(initial = 0)
     val dislikes by viewModel.liveDislikes.observeAsState(initial = 0)
     val scrollState = rememberScrollState()
     val result by offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
 
-
+    //If we have a connection problem
     if (result != NO_ERROR) {
         OfflineDialog(
             callback = {
@@ -168,6 +170,7 @@ fun ReviewInfoScreen(
     }
 }
 
+//This is design for one review detail
 @Composable
 fun ReviewDetails(
     viewModel: ReviewInfoViewModel,
@@ -177,11 +180,13 @@ fun ReviewDetails(
     id: Int,
     prefs: SharedPreferences)
 {
+
     val context = LocalContext.current
-    //First line with name, likes, dislikes
     Column(modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Row {
+
+            //Likes
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -202,6 +207,7 @@ fun ReviewDetails(
                 )
             }
 
+            //Title
             Spacer(Modifier.width(40.dp))
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -228,6 +234,8 @@ fun ReviewDetails(
                     )
                 }
             }
+
+            //Dislikes
             Spacer(Modifier.width(40.dp))
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -376,6 +384,7 @@ fun ReviewDetails(
     }
 }
 
+//Add vote to review
 fun addVote(
     context: Context,
     viewModel: ReviewInfoViewModel,

@@ -63,8 +63,11 @@ fun LoginScreen(prefs: SharedPreferences) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         val emailState = remember { mutableStateOf(TextFieldValue()) }
         val isValidEmail = EMAIL_ADDRESS.matcher(emailState.value.text).matches()
+
+        //Email field
         OutlinedTextField(
             label = {
                 val label = if (isValidEmail) {
@@ -87,6 +90,7 @@ fun LoginScreen(prefs: SharedPreferences) {
             }
         )
 
+        //Password field
         Spacer(modifier = Modifier.size(10.dp))
         val passwordState = remember { mutableStateOf(TextFieldValue()) }
         val isValidPassword = passwordState.value.text != ""
@@ -113,11 +117,15 @@ fun LoginScreen(prefs: SharedPreferences) {
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
+
+        //Login button
         Button(
             modifier = Modifier
                 .padding(30.dp)
                 .size(250.dp, 55.dp),
             onClick = {
+
+                //Input validation
                 if (!isValidEmail && !isValidPassword) {
                     showMessage(
                         context,

@@ -78,6 +78,7 @@ class SplashActivity : ComponentActivity() {
         }
     }
 
+    //Load initial data
     fun initApplication(context:Context, isFirstRun: Boolean,viewModel: OfflineDialogViewModel) {
         val scope = MainScope()
         scope.launch(Dispatchers.Main) {
@@ -133,6 +134,8 @@ fun SplashScreen(viewModel: OfflineDialogViewModel, isFirstRun: Boolean, activit
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
+
+        //App logo
         Box(
             contentAlignment = Alignment.Center
         ) {
@@ -143,6 +146,7 @@ fun SplashScreen(viewModel: OfflineDialogViewModel, isFirstRun: Boolean, activit
         }
         CircularProgressIndicator(color = TechTalkGray)
 
+        //If we have connection problem
         if(result != NO_ERROR) {
             OfflineDialog(
                 callback = {
@@ -155,6 +159,7 @@ fun SplashScreen(viewModel: OfflineDialogViewModel, isFirstRun: Boolean, activit
     }
 }
 
+//Dialog which is shown when network error happens
 @Composable
 fun OfflineDialog(callback: () -> Unit, result: Int) {
     val context = LocalContext.current
@@ -197,6 +202,7 @@ fun OfflineDialog(callback: () -> Unit, result: Int) {
     }
 }
 
+//This is basic loading animation
 @Composable
 fun LoadingScreen(label: String) {
     Column(
@@ -209,6 +215,7 @@ fun LoadingScreen(label: String) {
     }
 }
 
+//This is shown when there are no results
 @Composable
 fun NotFoundScreen(label: String) {
     Column(

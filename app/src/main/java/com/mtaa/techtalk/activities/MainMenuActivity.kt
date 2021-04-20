@@ -84,6 +84,7 @@ class MainMenuActivity : ComponentActivity() {
         }
     }
 
+    //Get data from splash screen or load new data
     fun initMainMenu(prevScreen:String) {
         viewModel.loadCategoriesMenu() //They are the same, no need to reload
 
@@ -118,7 +119,6 @@ class MainMenuActivity : ComponentActivity() {
 }
 
 //This class is responsible for updating list data
-//NOTE: we cant actually download data in this class because downloading is blocking and UI will lag !!
 class MainMenuViewModel: ViewModel() {
 
     val liveCategories = MutableLiveData<List<CategoryInfo>>()
@@ -133,6 +133,7 @@ class MainMenuViewModel: ViewModel() {
     }
 }
 
+//This is code for left navigation drawer in all screens
 @Composable
 fun Drawer(prefs: SharedPreferences) {
     val context = LocalContext.current
@@ -145,6 +146,7 @@ fun Drawer(prefs: SharedPreferences) {
             .padding(top = 30.dp, start = 30.dp, bottom = 30.dp)
             .fillMaxWidth()
     ) {
+        //Account section
         Row(
             modifier = Modifier
             .clickable(
@@ -186,6 +188,7 @@ fun Drawer(prefs: SharedPreferences) {
             .padding(top = 30.dp, start = 30.dp, bottom = 30.dp)
             .fillMaxWidth()
     ) {
+        //Main menu button
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -202,6 +205,8 @@ fun Drawer(prefs: SharedPreferences) {
                 fontSize = 24.sp
             )
         }
+
+        //Categories button
         Spacer(Modifier.size(20.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -221,8 +226,9 @@ fun Drawer(prefs: SharedPreferences) {
                 fontSize = 24.sp
             )
         }
-        Spacer(Modifier.size(20.dp))
 
+        //Setting button
+        Spacer(Modifier.size(20.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -243,6 +249,8 @@ fun Drawer(prefs: SharedPreferences) {
                 fontSize = 24.sp
             )
         }
+
+        //About app button
         Spacer(Modifier.size(20.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -270,7 +278,9 @@ fun Drawer(prefs: SharedPreferences) {
             .padding(top = 30.dp, start = 30.dp, bottom = 30.dp)
             .fillMaxWidth()
     ) {
+        //Check if we are logged in
         if (name != "" && authToken != "") {
+            //Edit account btn
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -287,6 +297,8 @@ fun Drawer(prefs: SharedPreferences) {
                     fontSize = 24.sp
                 )
             }
+
+            //Logout btn
             Spacer(Modifier.size(20.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -313,7 +325,9 @@ fun Drawer(prefs: SharedPreferences) {
                     fontSize = 24.sp
                 )
             }
+            //if we are not logged in
         } else if (name == "" && authToken == "") {
+            //Login btn
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -336,6 +350,8 @@ fun Drawer(prefs: SharedPreferences) {
                     fontSize = 24.sp
                 )
             }
+
+            //Create account btn
             Spacer(Modifier.size(20.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -363,6 +379,8 @@ fun Drawer(prefs: SharedPreferences) {
     }
 }
 
+//This top bar is used in every screen
+//Experimental animation is used for better search effect
 @ExperimentalAnimationApi
 @Composable
 fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
@@ -375,6 +393,7 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
             )
         },
         navigationIcon = {
+            //Drawer image
             IconButton(
                 onClick = { scope.launch { scaffoldState.drawerState.open() } },
                 modifier = Modifier
@@ -428,11 +447,15 @@ fun MenuScreen(
             .padding(top = 10.dp)
             .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        //Categories section
         Text(
             text = context.getString(R.string.popular_categories),
             style = TextStyle(fontSize = 25.sp),
             textAlign = TextAlign.Center
         )
+
+        //Show few categories
         Row(modifier = Modifier.padding(bottom = 10.dp)) {
             LazyColumn(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.Start) {
                 itemsIndexed(categories) { index, item ->
@@ -451,6 +474,7 @@ fun MenuScreen(
             }
         }
 
+        //If we have some connection problem
         if(result != NO_ERROR) {
             OfflineDialog(
                 callback = {
@@ -461,6 +485,7 @@ fun MenuScreen(
             )
         }
 
+        //Recent reviews
         Text(
             text = context.getString(R.string.recent_reviews),
             style = TextStyle(fontSize = 25.sp),
@@ -474,6 +499,7 @@ fun MenuScreen(
     }
 }
 
+//This is style for one category item on main menu screen
 @Composable
 fun CategoryMainMenu(item:CategoryInfo,context: Context){
     Card(
@@ -493,6 +519,7 @@ fun CategoryMainMenu(item:CategoryInfo,context: Context){
     }
 }
 
+//This is design for one review
 @Composable
 fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
     val context = LocalContext.current
@@ -519,12 +546,16 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
         backgroundColor = Color.DarkGray
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+            //First few characters of review text
             Text(
                 text = reviewInfo.text.take(MAX_REVIEW_TEXT) + "...",
                 modifier = Modifier.padding(15.dp),
                 color = Color.White
             )
+
             Row(verticalAlignment = Alignment.CenterVertically) {
+                //Positive attributes count
                 Icon(
                     modifier = Modifier.size(25.dp),
                     painter = rememberVectorPainter(Icons.Filled.AddCircle),
@@ -536,6 +567,8 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
                     text = "$positives ${context.getString(R.string.positives_num)}",
                     color = Color.White
                 )
+
+                //Negative attributes count
                 Spacer(Modifier.size(20.dp))
                 Icon(
                     modifier = Modifier.size(25.dp),
@@ -549,7 +582,9 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
                     color = Color.White
                 )
             }
+
             Spacer(Modifier.size(25.dp))
+            //Review likes and dislikes
             Row {
                 Text(
                     text = "${reviewInfo.likes}",
@@ -591,29 +626,33 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
     }
 }
 
+//Opens category screen
 fun openCategories(context:Context){
     val intent = Intent(context, CategoriesActivity::class.java)
     context.startActivity(intent)
 }
 
+//Opens review details
 fun openReviewInfo(context: Context,reviewID: Int) {
     val intent = Intent(context, ReviewInfoActivity::class.java)
     intent.putExtra("reviewID",reviewID)
     context.startActivity(intent)
 }
 
+//Open review edit (called from account screen only!)
 fun openReviewEdit(context: Context,reviewID: Int) {
     val intent = Intent(context, EditReviewActivity::class.java)
     intent.putExtra("reviewID",reviewID)
     context.startActivity(intent)
 }
 
-//General openScreen function TODO refactor to use this!
+//General openScreen function - used a few times
 fun openScreen(context: Context, activityClass:ComponentActivity){
     val intent = Intent(context, activityClass::class.java)
     context.startActivity(intent)
 }
 
+//Show basic toast message
 fun showMessage(context: Context, message:String, length: Int){
     Toast.makeText(context, message, length).show()
 }
