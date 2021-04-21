@@ -75,6 +75,7 @@ class ReviewInfoActivity: ComponentActivity() {
         }
 
         loadReviewData(reviewID)
+        setUpWebsocket(reviewID,viewModel)
     }
 
     fun loadReviewData(reviewID:Int){
@@ -84,6 +85,7 @@ class ReviewInfoActivity: ComponentActivity() {
                 withContext(Dispatchers.IO) {
                     // do blocking networking on IO thread
                     review = DataGetter.getReviewInfo(reviewID)
+                    //DataGetter.makeWebsocketConnection()
                 }
                 //Need to be called here to prevent blocking UI
                 viewModel.loadReviewData(review)
@@ -102,6 +104,21 @@ class ReviewInfoActivity: ComponentActivity() {
             }
         }
     }
+
+    private fun setUpWebsocket(reviewID: Int, viewModel: ReviewInfoViewModel) {
+        MainScope().launch(Dispatchers.Main) {
+            try {
+                withContext(Dispatchers.IO) {
+                    // do blocking networking on IO thread
+                    DataGetter.makeWebsocketConnection(reviewID,callback = { viewModel.loadVotesSocket(it)})
+                }
+            } catch (e: Exception) {
+                //Review wasnt found
+                println(e.stackTraceToString())
+            }
+        }
+    }
+
 }
 
 class ReviewInfoViewModel: ViewModel() {
@@ -119,6 +136,12 @@ class ReviewInfoViewModel: ViewModel() {
     fun loadVotes(info:ReviewVotesInfo) {
         liveLikes.value = info.likes
         liveDislikes.value = info.dislikes
+    }
+
+    fun loadVotesSocket(info: ReviewVotesInfo) {
+        //Needs to be called like this because of background threat
+        liveLikes.postValue(info.likes)
+        liveDislikes.postValue(info.dislikes)
     }
 }
 
@@ -180,7 +203,6 @@ fun ReviewDetails(
     id: Int,
     prefs: SharedPreferences)
 {
-
     val context = LocalContext.current
     Column(modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally) {
