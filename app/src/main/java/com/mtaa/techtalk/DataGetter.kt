@@ -19,13 +19,18 @@ import kotlin.math.roundToInt
 const val ADDRESS = "http://10.0.2.2:8080"
 const val WEBSOCKET = "10.0.2.2:8080"
 
+//Websocket commands
+const val VOTES_COMMAND = "votes"
+const val MENU_COMMAND = "menu"
+const val LOAD_COMMAND = "load"
+
 object DataGetter {
     private val client = HttpClient {
         install(JsonFeature) {
             serializer = GsonSerializer()
         }
     }
-    var ws: WebSocket? = null
+    private var ws: WebSocket? = null
 
     suspend fun getRecentReviews(): ReviewsInfo {
         return client.get("$ADDRESS/reviews/recent")
@@ -175,7 +180,7 @@ object DataGetter {
         }
     }
 
-    fun makeWebsocketConnection(id:Int,callback: (info:ReviewVotesInfo) -> Unit) {
+    fun votesUpdateListener(id:Int, callback: (info:ReviewVotesInfo) -> Unit) {
         //Disconnect previous connection
         if (ws != null && ws!!.isOpen) {
             ws!!.disconnect()
@@ -202,9 +207,34 @@ object DataGetter {
         })
 
         ws!!.connect()
-        ws!!.sendText("id $id")
+        ws!!.sendText("$VOTES_COMMAND $id")
     }
 
+    fun recentReviewsUpdateListener(callback: () -> Unit) {
+        //Disconnect previous connection
+        if (ws != null && ws!!.isOpen) {
+            ws!!.disconnect()
+            ws = null
+        }
+        // Create a WebSocket with a socket connection
+        ws = WebSocketFactory().setVerifyHostname(false).createSocket("ws://$WEBSOCKET/reviews")
+
+        // Register a listener to receive WebSocket events.
+        ws!!.addListener(object : WebSocketAdapter() {
+            override fun onTextMessage(websocket: WebSocket?, text: String?) {
+                super.onTextMessage(websocket, text)
+                if(text == LOAD_COMMAND)
+                    callback()
+            }
+
+            override fun onCloseFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
+                super.onCloseFrame(websocket, frame)
+            }
+        })
+
+        ws!!.connect()
+        ws!!.sendText(MENU_COMMAND)
+    }
 
 }
 

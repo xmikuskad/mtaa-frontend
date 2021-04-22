@@ -84,6 +84,12 @@ class MainMenuActivity : ComponentActivity() {
         }
     }
 
+    //This is called on activity creation
+    override fun onResume() {
+        super.onResume()
+        setUpWebsocket()
+    }
+
     //Get data from splash screen or load new data
     fun initMainMenu(prevScreen:String) {
         viewModel.loadCategoriesMenu() //They are the same, no need to reload
@@ -92,27 +98,49 @@ class MainMenuActivity : ComponentActivity() {
         if (prevScreen == "splash" || prevScreen == "first-launch") {
             viewModel.loadRecentReviews(SplashActivity.reviews.reviews)
         } else { //Update data and download again
-            MainScope().launch(Dispatchers.Main) {
-                try {
-                    val recentReviews: ReviewsInfo
-                    withContext(Dispatchers.IO) {
-                        // do blocking networking on IO thread
-                        recentReviews = DataGetter.getRecentReviews()
-                    }
-                    //Need to be called here to prevent blocking UI
-                    viewModel.loadRecentReviews(recentReviews.reviews)
-                } catch (e: Exception) {
-                    println(e.stackTraceToString())
-                    when (e) {
-                        is ConnectTimeoutException -> {
-                            offlineViewModel.changeResult(SERVER_OFFLINE)
-                        }
-                        is ConnectException -> {
-                            offlineViewModel.changeResult(NO_INTERNET)
-                        }
-                        else -> offlineViewModel.changeResult(OTHER_ERROR)
-                    }
+            loadReview()
+        }
+    }
+
+    private fun loadReview(){
+        MainScope().launch(Dispatchers.Main) {
+            try {
+                val recentReviews: ReviewsInfo
+                withContext(Dispatchers.IO) {
+                    // do blocking networking on IO thread
+                    recentReviews = DataGetter.getRecentReviews()
                 }
+                //Need to be called here to prevent blocking UI
+                viewModel.loadRecentReviews(recentReviews.reviews)
+            } catch (e: Exception) {
+                println(e.stackTraceToString())
+                when (e) {
+                    is ConnectTimeoutException -> {
+                        offlineViewModel.changeResult(SERVER_OFFLINE)
+                    }
+                    is ConnectException -> {
+                        offlineViewModel.changeResult(NO_INTERNET)
+                    }
+                    else -> offlineViewModel.changeResult(OTHER_ERROR)
+                }
+            }
+        }
+    }
+
+    private fun setUpWebsocket() {
+        MainScope().launch(Dispatchers.Main) {
+            try {
+                withContext(Dispatchers.IO) {
+                    // do blocking networking on IO thread
+                    //DataGetter.votesUpdateListener(reviewID,callback = { loadReview()})
+                    DataGetter.recentReviewsUpdateListener(callback = {
+                        println("HIIIIIRRR !!!!!!!!!!!!!!!")
+                        loadReview()
+                    })
+                }
+            } catch (e: Exception) {
+                //Review wasnt found
+                println(e.stackTraceToString())
             }
         }
     }
@@ -129,6 +157,7 @@ class MainMenuViewModel: ViewModel() {
     }
 
     fun loadRecentReviews(reviews: List<ReviewInfoItem>) {
+        println("LOADING !!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         liveRecentReviews.value = reviews
     }
 }

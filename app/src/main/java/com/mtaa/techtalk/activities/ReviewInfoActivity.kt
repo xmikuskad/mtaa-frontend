@@ -42,12 +42,13 @@ import java.net.ConnectException
 class ReviewInfoActivity: ComponentActivity() {
     lateinit var viewModel: ReviewInfoViewModel
     private lateinit var offlineViewModel: OfflineDialogViewModel
+    private var reviewID: Int = 0
 
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val reviewID = intent.getIntExtra("reviewID",-1)
+        reviewID = intent.getIntExtra("reviewID",-1)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
         viewModel = ViewModelProvider(this).get(ReviewInfoViewModel::class.java)
         offlineViewModel = ViewModelProvider(this).get(OfflineDialogViewModel::class.java)
@@ -67,7 +68,6 @@ class ReviewInfoActivity: ComponentActivity() {
                         ReviewInfoScreen(viewModel, reviewID,prefs,offlineViewModel,this)
                     }
                     else {
-                        //TODO better error handling
                         Text(text="Review not found!")
                     }
                 }
@@ -75,7 +75,13 @@ class ReviewInfoActivity: ComponentActivity() {
         }
 
         loadReviewData(reviewID)
-        setUpWebsocket(reviewID,viewModel)
+    }
+
+    //This is called on activity creation
+    override fun onResume() {
+        super.onResume()
+        if(reviewID > 0)
+            setUpWebsocket(reviewID,viewModel)
     }
 
     fun loadReviewData(reviewID:Int){
@@ -110,7 +116,7 @@ class ReviewInfoActivity: ComponentActivity() {
             try {
                 withContext(Dispatchers.IO) {
                     // do blocking networking on IO thread
-                    DataGetter.makeWebsocketConnection(reviewID,callback = { viewModel.loadVotesSocket(it)})
+                    DataGetter.votesUpdateListener(reviewID,callback = { viewModel.loadVotesSocket(it)})
                 }
             } catch (e: Exception) {
                 //Review wasnt found
