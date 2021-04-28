@@ -40,6 +40,8 @@ class AccountActivity : ComponentActivity() {
     private lateinit var viewModel: UserReviewsViewModel
     private lateinit var offlineViewModel: OfflineDialogViewModel
 
+    private lateinit var liteHandler : SqliteHandler
+
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +54,9 @@ class AccountActivity : ComponentActivity() {
         val queryParams = OrderAttributes("","")
 
         setLanguage(prefs.getString("language", "English"), this)
-        viewModel.loadViewModel(offlineViewModel)
+
+        liteHandler = SqliteHandler(this,null)
+        viewModel.loadViewModel(offlineViewModel,liteHandler)
 
         setContent {
             TechTalkTheme(setColorScheme(prefs)) {
@@ -65,11 +69,12 @@ class AccountActivity : ComponentActivity() {
                 ) {
 
                     AccountScreen(viewModel, authKey, name,queryParams,offlineViewModel)
-                    if (authKey.isNotEmpty()) {
-                        viewModel.loadUserReviews(authKey,queryParams)
-                    }
                 }
             }
+        }
+
+        if (authKey.isNotEmpty()) {
+            viewModel.loadUserReviews(authKey,queryParams)
         }
     }
 }
@@ -81,9 +86,12 @@ class UserReviewsViewModel: ViewModel() {
 
     private var page = 1
 
+    lateinit var liteDB:SqliteHandler
+
     //Set offline model
-    fun loadViewModel(viewModel:OfflineDialogViewModel) {
+    fun loadViewModel(viewModel:OfflineDialogViewModel, lite:SqliteHandler) {
         offlineViewModel = viewModel
+        liteDB = lite
     }
 
     fun loadUserReviews(authKey: String,obj:OrderAttributes) {
@@ -98,6 +106,25 @@ class UserReviewsViewModel: ViewModel() {
                 offlineViewModel.changeResult(NO_ERROR)
                 liveUserReviews.value = liveUserReviews.value?.plus(userInfo.reviews) ?: userInfo.reviews
                 trustScore.value = userInfo.trust_score
+
+                //DELETE PREVIOUS
+                println("DELETING")
+                liteDB.deleteReviews()
+
+                //ADDED
+                println("ADDING")
+                for(review in userInfo.reviews)
+                    liteDB.addReview(review)
+
+                //READ
+                println("READING")
+                var counter = 0
+                val rev = liteDB.getAllReviews()
+                for(re in rev) {
+                    counter+=1
+                    println("NUM $counter ${re.review_id} ${re.likes} ${re.dislikes} ${re.text}")
+                }
+
             } catch (e: Exception) {
                 println(e.stackTraceToString())
                 when (e) {

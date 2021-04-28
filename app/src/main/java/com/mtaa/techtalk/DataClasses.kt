@@ -155,3 +155,22 @@ data class OrderAttributes(
     var order_by:String,
     var order_type:String
     )
+
+
+/**
+ * Offline updates classes
+ */
+
+data class LiteReviews(
+    val review_id: Int,
+    val attributes: MutableList<ReviewAttributeInfo>,
+    val text: String,
+    val score: Int,
+    val likes: Int,
+    val dislikes:Int
+)
+
+data class LitePhotos(
+    val review_id: Int,
+    val path: String
+)
