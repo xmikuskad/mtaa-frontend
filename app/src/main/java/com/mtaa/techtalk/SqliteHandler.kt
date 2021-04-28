@@ -7,6 +7,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import android.net.Uri
 import com.mtaa.techtalk.activities.CREATED_AT
 
 const val DATABASE_NAME = "account.db"
@@ -26,6 +27,7 @@ const val COLUMN_SCORE = "score"
 const val COLUMN_LIKES = "likes"
 const val COLUMN_DISLIKES = "dislikes"
 const val COLUMN_CREATED_AT = "created_at"
+const val COLUMN_UPDATE_STATUS = "update_status"   //Tracking updates
 const val COLUMN_VOTE_STATUS = "vote_status"   //Tracking likes, dislikes changes
 
 //Attributes columns
@@ -33,35 +35,51 @@ const val COLUMN_IS_POSITIVE = "is_positive"
 
 //Photos columns
 const val COLUMN_PATH = "path"
+const val COLUMN_PHOTO_ID = "photo_id"
+
+//Commands
+const val NONE = 0
+const val ADDED_LIKE = 1
+const val ADDED_DISLIKE = 2
+
+const val DELETE_ITEM = 3
+const val UPDATE_ITEM = 2
+const val ADD_ITEM = 1
+
+const val PHOTO_ON_SERVER = "photo on server"
 
 class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : SQLiteOpenHelper(context, DATABASE_NAME,factory, DATABASE_VERSION) {
     override fun onCreate(db: SQLiteDatabase) {
         val CREATE_REVIEW_TABLE =
             ("CREATE TABLE " + REVIEW_TABLE + "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                COLUMN_REVIEW_ID + " INTEGER," +
-                COLUMN_USER_ID + " INTEGER," +
-                COLUMN_PRODUCT_ID + " INTEGER," +
-                COLUMN_TEXT + " TEXT," +
-                COLUMN_SCORE + " INTEGER," +
-                COLUMN_LIKES + " INTEGER," +
-                COLUMN_DISLIKES + " INTEGER," +
-                CREATED_AT + " TEXT," +
-                COLUMN_VOTE_STATUS + " TEXT" + ")")
+                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    COLUMN_REVIEW_ID + " INTEGER," +
+                    COLUMN_USER_ID + " INTEGER," +
+                    COLUMN_PRODUCT_ID + " INTEGER," +
+                    COLUMN_TEXT + " TEXT," +
+                    COLUMN_SCORE + " INTEGER," +
+                    COLUMN_LIKES + " INTEGER," +
+                    COLUMN_DISLIKES + " INTEGER," +
+                    CREATED_AT + " TEXT," +
+                    COLUMN_UPDATE_STATUS + " INTEGER," +
+                    COLUMN_VOTE_STATUS + " INTEGER" + ")")
 
         val CREATE_PHOTO_TABLE =
-            ("CREATE TABLE " + PHOTO_TABLE  + "(" +
+            ("CREATE TABLE " + PHOTO_TABLE + "(" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    COLUMN_REVIEW_ID + " INTEGER,"+
-                    COLUMN_VOTE_STATUS + " TEXT,"+
-                    " FOREIGN KEY ($COLUMN_REVIEW_ID) REFERENCES $REVIEW_TABLE($COLUMN_ID));")
+                    COLUMN_REVIEW_ID + " INTEGER," +
+                    COLUMN_PHOTO_ID + " INTEGER," +
+                    COLUMN_UPDATE_STATUS + " INTEGER," +
+                    COLUMN_PATH + " TEXT," +
+                    " FOREIGN KEY ($COLUMN_REVIEW_ID) REFERENCES $REVIEW_TABLE($COLUMN_REVIEW_ID));")
 
         val CREATE_ATTRIBUTES_TABLE =
             ("CREATE TABLE " + ATTRIBUTES_TABLE + "(" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     COLUMN_REVIEW_ID + " INTEGER," +
-                    COLUMN_PATH + " TEXT," +
-                    " FOREIGN KEY ($COLUMN_REVIEW_ID) REFERENCES $REVIEW_TABLE($COLUMN_ID));")
+                    COLUMN_IS_POSITIVE + " INTEGER," +
+                    COLUMN_TEXT + " TEXT," +
+                    " FOREIGN KEY ($COLUMN_REVIEW_ID) REFERENCES $REVIEW_TABLE($COLUMN_REVIEW_ID));")
 
 
         db.execSQL(CREATE_REVIEW_TABLE)
@@ -89,19 +107,58 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
         values.put(COLUMN_LIKES,reviewInfo.likes)
         values.put(COLUMN_DISLIKES,reviewInfo.dislikes)
         values.put(CREATED_AT,reviewInfo.created_at)
-        values.put(COLUMN_VOTE_STATUS,"none")
+        values.put(COLUMN_UPDATE_STATUS, NONE)
+        values.put(COLUMN_VOTE_STATUS,NONE)
 
         db.insert(REVIEW_TABLE,null,values)
+
+        for(image in reviewInfo.images) {
+            addPhoto(reviewInfo.review_id, PHOTO_ON_SERVER, image.image_id)
+        }
+
+        for(attr in reviewInfo.attributes) {
+            addAttribute(reviewInfo.review_id,attr)
+        }
+
+    }
+
+    fun addAttribute(reviewID: Int,attr: ReviewAttributeInfo) {
+
+        val db = writableDatabase
+
+        val isPositive = if(attr.is_positive) 1 else 0
+
+        val values = ContentValues()
+        values.put(COLUMN_REVIEW_ID,reviewID)
+        values.put(COLUMN_TEXT,attr.text)
+        values.put(COLUMN_IS_POSITIVE,isPositive)
+
+        db.insert(ATTRIBUTES_TABLE,null,values)
+    }
+
+    fun addPhoto(reviewID:Int, path:String, photoId:Int) {
+        val db = writableDatabase
+
+        val values = ContentValues()
+        values.put(COLUMN_REVIEW_ID,reviewID)
+        values.put(COLUMN_UPDATE_STATUS,NONE)
+        values.put(COLUMN_PHOTO_ID,photoId)
+        values.put(COLUMN_PATH,path)
+
+        db.insert(PHOTO_TABLE,null,values)
     }
 
     @SuppressLint("Recycle")
-    fun getAllReviews(): MutableList<ReviewInfoItem> {
+    fun getAllReviews(canBeDeleted: Boolean): MutableList<ReviewInfoItem> {
 
         val reviews = mutableListOf<ReviewInfoItem>()
         val db = writableDatabase
-        var reviewsCursor : Cursor?
+        val reviewsCursor : Cursor?
         try {
-            reviewsCursor = db.rawQuery("select * from $REVIEW_TABLE", null)
+            if(canBeDeleted)
+                reviewsCursor = db.rawQuery("select * from $REVIEW_TABLE", null)
+            else
+                reviewsCursor = db.rawQuery("select * from $REVIEW_TABLE where $COLUMN_UPDATE_STATUS<$DELETE_ITEM", null)
         } catch (e: SQLiteException) {
             onCreate(db)
             return mutableListOf()
@@ -110,73 +167,169 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
         //Check all data
         if (reviewsCursor!!.moveToFirst()) {
             while (!reviewsCursor.isAfterLast) {
-                val reviewId = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_REVIEW_ID))
-                val userId = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_USER_ID))
-                val productId = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_PRODUCT_ID))
-                val text = reviewsCursor.getString(reviewsCursor.getColumnIndex(COLUMN_TEXT))
-                val score = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_SCORE))
-                val likes = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_LIKES))
-                val dislikes = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_DISLIKES))
-                val createdAt = reviewsCursor.getString(reviewsCursor.getColumnIndex(COLUMN_CREATED_AT))
-                val status = reviewsCursor.getString(reviewsCursor.getColumnIndex(COLUMN_VOTE_STATUS))
-
-                reviews.add(ReviewInfoItem(text, mutableListOf(),mutableListOf(),likes,dislikes,productId,score,userId,reviewId,createdAt))
-                /*userid = reviewsCursor.getString(reviewsCursor.getColumnIndex(DBContract.UserEntry.COLUMN_USER_ID))
-                name = reviewsCursor.getString(reviewsCursor.getColumnIndex(DBContract.UserEntry.COLUMN_NAME))
-                age = reviewsCursor.getString(reviewsCursor.getColumnIndex(DBContract.UserEntry.COLUMN_AGE))
-
-                users.add(UserModel(userid, name, age))*/
+                reviews.add(parseReview(reviewsCursor))
                 reviewsCursor.moveToNext()
             }
         }
         return reviews
     }
 
-    fun deleteReviews() {
-        val db = writableDatabase
-        db.execSQL("delete from $REVIEW_TABLE")
+    fun parseReview(reviewsCursor:Cursor):ReviewInfoItem {
+        val reviewId = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_REVIEW_ID))
+        val userId = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_USER_ID))
+        val productId = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_PRODUCT_ID))
+        val text = reviewsCursor.getString(reviewsCursor.getColumnIndex(COLUMN_TEXT))
+        val score = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_SCORE))
+        val likes = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_LIKES))
+        val dislikes = reviewsCursor.getInt(reviewsCursor.getColumnIndex(COLUMN_DISLIKES))
+        val createdAt = reviewsCursor.getString(reviewsCursor.getColumnIndex(COLUMN_CREATED_AT))
+        val attributes = parseAttributes(reviewId)
+        val photos = parseServerPhotos(reviewId)
+
+        return ReviewInfoItem(text, attributes,photos,likes,dislikes,productId,score,userId,reviewId,createdAt)
     }
 
-    /*fun readAllUsers(): ArrayList<UserModel> {
-        val users = ArrayList<UserModel>()
+    fun parseServerPhotos(reviewID: Int):MutableList<ImageInfo> {
+        val photos = mutableListOf<ImageInfo>()
         val db = writableDatabase
-        var cursor: Cursor? = null
+        val photoCursor : Cursor?
         try {
-            cursor = db.rawQuery("select * from " + DBContract.UserEntry.TABLE_NAME, null)
+            photoCursor = db.rawQuery("select * from $PHOTO_TABLE where $COLUMN_REVIEW_ID=$reviewID and $COLUMN_PHOTO_ID > 0", null)
         } catch (e: SQLiteException) {
-            db.execSQL(SQL_CREATE_ENTRIES)
-            return ArrayList()
+            onCreate(db)
+            return mutableListOf()
         }
 
-        var userid: String
-        var name: String
-        var age: String
-        if (cursor!!.moveToFirst()) {
-            while (cursor.isAfterLast == false) {
-                userid = cursor.getString(cursor.getColumnIndex(DBContract.UserEntry.COLUMN_USER_ID))
-                name = cursor.getString(cursor.getColumnIndex(DBContract.UserEntry.COLUMN_NAME))
-                age = cursor.getString(cursor.getColumnIndex(DBContract.UserEntry.COLUMN_AGE))
+        //Check all data
+        if (photoCursor!!.moveToFirst()) {
+            while (!photoCursor.isAfterLast) {
+                val photoId= photoCursor.getInt(photoCursor.getColumnIndex(COLUMN_PHOTO_ID))
 
-                users.add(UserModel(userid, name, age))
-                cursor.moveToNext()
+                photos.add(ImageInfo(photoId))
+                photoCursor.moveToNext()
             }
         }
-        return users
-    }*/
+        return photos
+    }
 
-    /*fun insertUser(user: UserModel): Boolean {
-        // Gets the data repository in write mode
+    fun parseLocalPhotos(reviewID: Int):MutableList<Uri> {
+        val photos = mutableListOf<Uri>()
+        val db = writableDatabase
+        val photoCursor : Cursor?
+        try {
+            photoCursor = db.rawQuery("select * from $PHOTO_TABLE where $COLUMN_REVIEW_ID=$reviewID and $COLUMN_PHOTO_ID <0", null)
+        } catch (e: SQLiteException) {
+            onCreate(db)
+            return mutableListOf()
+        }
+
+        //Check all data
+        if (photoCursor!!.moveToFirst()) {
+            while (!photoCursor.isAfterLast) {
+                val path= photoCursor.getString(photoCursor.getColumnIndex(COLUMN_PATH))
+
+                photos.add(Uri.parse(path))
+                photoCursor.moveToNext()
+            }
+        }
+        return photos
+    }
+
+    fun parseAttributes(reviewID: Int): MutableList<ReviewAttributeInfo> {
+        val attributes = mutableListOf<ReviewAttributeInfo>()
+        val db = writableDatabase
+        val attributeCursor : Cursor?
+        try {
+            attributeCursor = db.rawQuery("select * from $ATTRIBUTES_TABLE where $COLUMN_REVIEW_ID=$reviewID", null)
+        } catch (e: SQLiteException) {
+            onCreate(db)
+            return mutableListOf()
+        }
+
+        //Check all data
+        if (attributeCursor!!.moveToFirst()) {
+            while (!attributeCursor.isAfterLast) {
+                val text = attributeCursor.getString(attributeCursor.getColumnIndex(COLUMN_TEXT))
+                val positiveRaw = attributeCursor.getInt(attributeCursor.getColumnIndex(
+                    COLUMN_IS_POSITIVE))
+
+                val isPositive = positiveRaw != 0
+                println("ADDING $text $positiveRaw")
+
+                attributes.add(ReviewAttributeInfo(text,isPositive))
+                attributeCursor.moveToNext()
+            }
+        }
+        return attributes
+    }
+
+    fun getReview(id:Int):ReviewInfoItem? {
+        val db = writableDatabase
+        val reviewsCursor : Cursor?
+        try {
+            reviewsCursor = db.rawQuery("select * from $REVIEW_TABLE where $COLUMN_REVIEW_ID=$id", null)
+        } catch (e: SQLiteException) {
+            onCreate(db)
+            return null
+        }
+
+        //Check all data
+        if (reviewsCursor!!.moveToFirst() && !reviewsCursor.isAfterLast) {
+            return parseReview(reviewsCursor)
+        }
+
+        return null
+    }
+
+    fun updateReview(reviewData:ReviewPutInfo,reviewID: Int, deletePhotosServer: MutableList<Int>, photoUri:List<Uri>) {
         val db = writableDatabase
 
-        // Create a new map of values, where column names are the keys
         val values = ContentValues()
-        values.put(DBContract.UserEntry.COLUMN_USER_ID, user.userid)
-        values.put(DBContract.UserEntry.COLUMN_NAME, user.name)
-        values.put(DBContract.UserEntry.COLUMN_AGE, user.age)
+        values.put(COLUMN_UPDATE_STATUS, UPDATE_ITEM)
+        values.put(COLUMN_TEXT, reviewData.text)
+        values.put(COLUMN_SCORE, reviewData.score)
 
-        // Insert the new row, returning the primary key value of the new row
-        val newRowId = db.insert(DBContract.UserEntry.TABLE_NAME, null, values)
+        //Delete old attributes
+        db.execSQL("DELETE FROM $ATTRIBUTES_TABLE WHERE $COLUMN_REVIEW_ID = $reviewID")
 
-        return true
-    }*/
+        //Add new attributes
+        for(attr in reviewData.attributes) {
+            addAttribute(reviewID, ReviewAttributeInfo(attr.text,attr.is_positive))
+        }
+
+        //Server photo update status to delete
+        for(photo in deletePhotosServer) {
+            val photoValues = ContentValues()
+            values.put(COLUMN_UPDATE_STATUS, DELETE_ITEM)
+            db.update(PHOTO_TABLE,photoValues,"$COLUMN_REVIEW_ID=$reviewID",null)
+        }
+
+        //Local photos can be deleted right now
+        db.execSQL("DELETE FROM $PHOTO_TABLE WHERE $COLUMN_REVIEW_ID = $reviewID and $COLUMN_PHOTO_ID < 0")
+
+        //Add new local photos
+        for(photo in photoUri) {
+            addPhoto(reviewID,photo.toString(),-1)
+        }
+
+        db.update(REVIEW_TABLE,values,"$COLUMN_REVIEW_ID=$reviewID",null)
+    }
+
+    fun deleteReview(id:Int) {
+        val db = writableDatabase
+
+        val values = ContentValues()
+        values.put(COLUMN_UPDATE_STATUS, DELETE_ITEM)
+
+        db.update(REVIEW_TABLE,values,"$COLUMN_REVIEW_ID=$id",null)
+    }
+
+    fun reloadTables() {
+        val db = writableDatabase
+
+        db.execSQL("DROP TABLE $ATTRIBUTES_TABLE")
+        db.execSQL("DROP TABLE $PHOTO_TABLE")
+        db.execSQL("DROP TABLE $REVIEW_TABLE")
+        onCreate(db)
+    }
 }

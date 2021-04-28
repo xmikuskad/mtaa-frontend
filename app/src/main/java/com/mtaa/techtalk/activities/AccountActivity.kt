@@ -107,23 +107,14 @@ class UserReviewsViewModel: ViewModel() {
                 liveUserReviews.value = liveUserReviews.value?.plus(userInfo.reviews) ?: userInfo.reviews
                 trustScore.value = userInfo.trust_score
 
-                //DELETE PREVIOUS
-                println("DELETING")
-                liteDB.deleteReviews()
+                if(page == 2) {
+                    liteDB.reloadTables()
+                }
 
                 //ADDED
                 println("ADDING")
                 for(review in userInfo.reviews)
                     liteDB.addReview(review)
-
-                //READ
-                println("READING")
-                var counter = 0
-                val rev = liteDB.getAllReviews()
-                for(re in rev) {
-                    counter+=1
-                    println("NUM $counter ${re.review_id} ${re.likes} ${re.dislikes} ${re.text}")
-                }
 
             } catch (e: Exception) {
                 println(e.stackTraceToString())
@@ -141,6 +132,13 @@ class UserReviewsViewModel: ViewModel() {
                 }
             }
         }
+    }
+
+    fun loadOfflineReviews() {
+        val reviews = liteDB.getAllReviews(false)
+
+        liveUserReviews.value = liveUserReviews.value?.plus(reviews) ?: reviews
+        trustScore.value = -1
     }
 
     //Delete all reviews and load them again
@@ -163,10 +161,11 @@ fun AccountScreen(
     val context = LocalContext.current
     val result = offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
     val isFirst = remember { mutableStateOf(true) }
+    val isOffline = remember { mutableStateOf(false)}
 
     //Show warning that we are offline
     if (result.value != NO_ERROR && result.value != WAITING_FOR_CONFIRMATION) {
-        OfflineDialog(
+        /*OfflineDialog(
             callback = {
                 offlineViewModel.changeResult(WAITING_FOR_CONFIRMATION)
                 if (authKey != null) {
@@ -174,7 +173,11 @@ fun AccountScreen(
                 }
             },
             result = result.value
-        )
+        )*/
+        if (!isOffline.value) {
+            viewModel.loadOfflineReviews()
+        }
+        isOffline.value = true
     }
 
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
@@ -294,7 +297,7 @@ fun AccountScreen(
                         .padding(top = 10.dp)
                 ) {
                     itemsIndexed(userReviews!!) { index, item ->
-                        ReviewBox(reviewInfo = item, canEdit = true)
+                        ReviewBox(reviewInfo = item, canEdit = true,isOffline.value)
                         if (index == userReviews!!.lastIndex && result.value == NO_ERROR) {
                             if (authKey != null) {
                                 viewModel.loadUserReviews(authKey, obj)

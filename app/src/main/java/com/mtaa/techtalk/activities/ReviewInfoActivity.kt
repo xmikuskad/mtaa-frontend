@@ -157,7 +157,7 @@ fun ReviewInfoScreen(
     reviewID: Int,
     prefs: SharedPreferences,
     offlineViewModel: OfflineDialogViewModel,
-    activity: ReviewInfoActivity
+    activity: ReviewInfoActivity,
 ) {
 
     val reviewData by viewModel.liveReview.observeAsState(initial = null)

@@ -162,15 +162,10 @@ data class OrderAttributes(
  */
 
 data class LiteReviews(
-    val review_id: Int,
-    val attributes: MutableList<ReviewAttributeInfo>,
-    val text: String,
-    val score: Int,
-    val likes: Int,
-    val dislikes:Int
+    val reviews: MutableList<ReviewInfoItem>,
+    val bonus_photos: LitePhotos
 )
 
 data class LitePhotos(
-    val review_id: Int,
     val path: String
 )

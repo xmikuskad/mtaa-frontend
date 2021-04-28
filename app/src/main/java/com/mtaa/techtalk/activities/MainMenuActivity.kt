@@ -157,7 +157,6 @@ class MainMenuViewModel: ViewModel() {
     }
 
     fun loadRecentReviews(reviews: List<ReviewInfoItem>) {
-        println("LOADING !!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         liveRecentReviews.value = reviews
     }
 }
@@ -542,7 +541,7 @@ fun MenuScreen(
             modifier = Modifier.padding(top = 5.dp)
         ) {
             items(reviews) { item ->
-                ReviewBox(item,false)
+                ReviewBox(item,false,false)
             }
         }
     }
@@ -570,7 +569,7 @@ fun CategoryMainMenu(item:CategoryInfo,context: Context){
 
 //This is design for one review
 @Composable
-fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
+fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean, isOffline:Boolean) {
     val context = LocalContext.current
 
     //Calculate before showing
@@ -588,7 +587,9 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
             .padding(20.dp)
             .fillMaxWidth()
             .clickable(onClick = {
-                if (canEdit) openReviewEdit(context, reviewInfo.review_id) else {
+                if (canEdit) {
+                    openReviewEdit(context, reviewInfo.review_id, isOffline)
+                } else {
                     openReviewInfo(context, reviewInfo.review_id)
                 }
             }),
@@ -689,9 +690,10 @@ fun openReviewInfo(context: Context,reviewID: Int) {
 }
 
 //Open review edit (called from account screen only!)
-fun openReviewEdit(context: Context,reviewID: Int) {
+fun openReviewEdit(context: Context,reviewID: Int, isOffline:Boolean) {
     val intent = Intent(context, EditReviewActivity::class.java)
     intent.putExtra("reviewID",reviewID)
+    intent.putExtra("isOffline",isOffline)
     context.startActivity(intent)
 }
 

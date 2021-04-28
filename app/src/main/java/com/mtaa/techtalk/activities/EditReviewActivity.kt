@@ -46,13 +46,18 @@ import java.net.ConnectException
 class EditReviewActivity : ComponentActivity() {
 
     private lateinit var viewModel: EditReviewViewModel
+    private lateinit var liteDB: SqliteHandler
 
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
+        liteDB = SqliteHandler(this,null)
         viewModel = ViewModelProvider(this).get(EditReviewViewModel::class.java)
+        viewModel.setLiteDb(liteDB)
         val reviewID = intent.getIntExtra("reviewID",-1)
+        val isOffline = intent.getBooleanExtra("isOffline",false)
+
 
         setLanguage(prefs.getString("language", "English"), this)
 
@@ -65,7 +70,7 @@ class EditReviewActivity : ComponentActivity() {
                     topBar = { TopBar(scaffoldState, scope) },
                     drawerContent = { Drawer(prefs) }
                 ) {
-                    EditReviewScreen(viewModel,this,prefs,reviewID)
+                    EditReviewScreen(viewModel,this,prefs,reviewID,isOffline)
                 }
             }
         }
@@ -132,6 +137,7 @@ class EditReviewViewModel: ViewModel() {
     var negatives = mutableListOf<ReviewAttributePostPutInfo>()
 
     val liveReview= MutableLiveData<ReviewInfo>()
+    var liteDB :SqliteHandler? = null
 
     //Get review data from server
     fun loadReviewData(review:ReviewInfo) {
@@ -143,6 +149,42 @@ class EditReviewViewModel: ViewModel() {
 
             } else {
                 addNegative(item.text)
+            }
+        }
+    }
+
+    fun setLiteDb(lite:SqliteHandler){
+        liteDB=lite
+    }
+
+
+    fun loadOfflineReview(id:Int) {
+        val review = liteDB?.getReview(id)
+        if(review!=null) {
+            liveReview.value = ReviewInfo(
+                review.text,
+                review.attributes,
+                review.images,
+                review.likes,
+                review.dislikes,
+                review.product_id,
+                review.score,
+                review.user_id,
+                review.created_at
+            )
+            for (item in review.attributes) {
+                if (item.is_positive) {
+                    addPositive(item.text)
+
+                } else {
+                    addNegative(item.text)
+                }
+            }
+        }
+        val localPhotos = liteDB?.parseLocalPhotos(id)
+        if (localPhotos != null) {
+            for(photo in localPhotos) {
+                addPhoto(photo)
             }
         }
     }
@@ -200,7 +242,8 @@ fun EditReviewScreen(
     viewModel: EditReviewViewModel,
     activity: EditReviewActivity,
     prefs: SharedPreferences,
-    reviewID: Int
+    reviewID: Int,
+    isOffline: Boolean
 ) {
     val positives by viewModel.livePositive.observeAsState(initial = mutableListOf())
     val negatives by viewModel.liveNegative.observeAsState(initial = mutableListOf())
@@ -225,7 +268,12 @@ fun EditReviewScreen(
 
     //Loading review
     if (review == null) {
-        LoadingScreen(context.getString(R.string.loading_review))
+        if(!isOffline) {
+            LoadingScreen(context.getString(R.string.loading_review))
+        }
+        else {
+            viewModel.loadOfflineReview(reviewID)
+        }
         return
     }
     var reviewText by remember { mutableStateOf(TextFieldValue(review!!.text)) }
@@ -652,6 +700,17 @@ fun EditReviewScreen(
         //Add review
         Button(
             onClick = {
+                if(isOffline) {
+                    SqliteHandler(activity,null).updateReview(ReviewPutInfo(
+                        reviewText.text,
+                        (positives + negatives) as MutableList<ReviewAttributePostPutInfo>,
+                        (sliderPosition * 100).roundToInt()
+                    ),reviewID,deletePhotos,images)
+                    openScreen(context, AccountActivity())
+                    return@Button
+                }
+
+
                 MainScope().launch(Dispatchers.Main) {
                     try {
                         val auth = prefs.getString("token", "") ?: ""
@@ -726,6 +785,13 @@ fun EditReviewScreen(
         Button(
             onClick = {
                 //Delete review
+                if(isOffline) {
+                    SqliteHandler(activity,null).deleteReview(reviewID)
+                    openScreen(context, AccountActivity())
+                    return@Button
+                }
+
+
                 MainScope().launch(Dispatchers.Main) {
                     try {
                         val auth = prefs.getString("token", "") ?: ""
