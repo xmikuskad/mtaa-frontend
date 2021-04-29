@@ -74,11 +74,6 @@ class AccountActivity : ComponentActivity() {
             }
         }
 
-        /*if (authKey.isNotEmpty()) {
-            viewModel.finishedSyncing()
-            viewModel.loadUserReviews(authKey,queryParams)
-        }*/
-        //liteHandler.reloadTables()
         liteHandler.syncChanges( {
             initAccountScreen()},{
             offlineViewModel.changeResult(NO_INTERNET)
@@ -90,9 +85,6 @@ class AccountActivity : ComponentActivity() {
         if (authKey.isNotEmpty()) {
             viewModel.finishedSyncing()
             viewModel.loadUserReviewsThread(authKey,queryParams)
-        }
-        else {
-            println("TOO FAST!!!")
         }
     }
 }
@@ -112,9 +104,6 @@ class UserReviewsViewModel: ViewModel() {
     fun loadViewModel(viewModel:OfflineDialogViewModel, lite:SqliteHandler) {
         offlineViewModel = viewModel
         liteDB = lite
-
-        //Check for sync changes
-        //liteDB.syncChanges { finishedSyncing() }
     }
 
     fun loadUserReviewsThread(authKey: String,obj:OrderAttributes) {
@@ -133,10 +122,8 @@ class UserReviewsViewModel: ViewModel() {
                 liveUserReviews.postValue(liveUserReviews.value?.plus(userInfo.reviews) ?: userInfo.reviews)
                 trustScore.postValue(userInfo.trust_score)
 
-                println("PAGE IS $page")
                 if(page == 2) {
                     liteDB.reloadTables()
-                    println("RELOADING TABLE!")
                 }
                 //Add to Sqlite
                 for(review in userInfo.reviews)
@@ -178,7 +165,6 @@ class UserReviewsViewModel: ViewModel() {
                 }
 
                 //Add to Sqlite
-                println("Adding")
                 for(review in userInfo.reviews)
                     liteDB.addReview(review)
 
@@ -201,9 +187,7 @@ class UserReviewsViewModel: ViewModel() {
     }
 
     fun loadOfflineReviews() {
-        println("LOADING OFFLINE REVIEWS HERE")
         val reviews = liteDB.getAllReviews(false)
-        println("review size ${reviews.size}")
 
         liveUserReviews.value = liveUserReviews.value?.plus(reviews) ?: reviews
         trustScore.value = -1

@@ -72,8 +72,7 @@ class MainMenuActivity : ComponentActivity() {
                     MenuScreen(
                         liveCategories = viewModel.liveCategories,
                         liveRecentReviews = viewModel.liveRecentReviews,
-                        offlineViewModel = offlineViewModel,
-                        activity= this
+                        offlineViewModel = offlineViewModel
                     )
                     initMainMenu(intent.getStringExtra("activity")?:"")
                 }
@@ -491,8 +490,7 @@ fun TopBar(scaffoldState: ScaffoldState, scope: CoroutineScope) {
 fun MenuScreen(
     liveCategories: LiveData<List<CategoryInfo>>,
     liveRecentReviews: LiveData<List<ReviewInfoItem>>,
-    offlineViewModel: OfflineDialogViewModel,
-    activity: MainMenuActivity
+    offlineViewModel: OfflineDialogViewModel
 ) {
     val categories by liveCategories.observeAsState(initial = emptyList())
     val reviews by liveRecentReviews.observeAsState(initial = emptyList())
@@ -536,17 +534,6 @@ fun MenuScreen(
                 }
             }
         }
-
-        //If we have some connection problem
-        /*if(result != NO_ERROR) {
-            OfflineDialog(
-                callback = {
-                    offlineViewModel.changeResult(NO_ERROR)
-                    activity.initMainMenu("")
-                },
-                result = result
-            )
-        }*/
 
         IconButton(onClick = {
             openCategories(context)

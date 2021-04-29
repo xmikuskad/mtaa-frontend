@@ -70,14 +70,14 @@ class SplashActivity : ComponentActivity() {
                     SplashScreen(viewModel,isFirstRun,this)
 
                     //Download main menu data and load next activity
-                    initApplication(this, isFirstRun,viewModel)
+                    initApplication(this, isFirstRun)
                 }
             }
         }
     }
 
     //Load initial data
-    fun initApplication(context:Context, isFirstRun: Boolean,viewModel: OfflineDialogViewModel) {
+    fun initApplication(context:Context, isFirstRun: Boolean) {
         val scope = MainScope()
         scope.launch(Dispatchers.Main) {
             try {
@@ -86,19 +86,10 @@ class SplashActivity : ComponentActivity() {
                     reviews = getRecentReviews()
                     categories = getCategories()
                 }
-
-                //Load new screen
-                val intent = if (isFirstRun) {
-                    Intent(context, FirstLaunchActivity::class.java)
-                } else {
-                    Intent(context, MainMenuActivity::class.java)
-                }
-                intent.putExtra("activity","splash")
-                intent.flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
-                context.startActivity(intent)
             } catch (e: Exception) {
                 println(e.stackTraceToString())
+            }
+            finally {
                 //Load new screen
                 val intent = if (isFirstRun) {
                     Intent(context, FirstLaunchActivity::class.java)
@@ -154,7 +145,7 @@ fun SplashScreen(
             OfflineDialog(
                 callback = {
                     viewModel.changeResult(NO_ERROR)
-                    activity.initApplication(context, isFirstRun, viewModel)
+                    activity.initApplication(context, isFirstRun)
                 },
                 result = result
             )

@@ -1,7 +1,6 @@
 package com.mtaa.techtalk.activities
 
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
@@ -27,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.view.ContentInfoCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -171,7 +169,6 @@ class EditReviewViewModel: ViewModel() {
     }
 
     fun loadOfflineReview(id:Int) {
-        println("!!! LOADING OFFLINE REVIEW")
         val review = liteDB?.getReview(id)
         if(review!=null) {
             liveReview.value = ReviewInfo(

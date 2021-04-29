@@ -1,6 +1,4 @@
 package com.mtaa.techtalk
-
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
@@ -35,7 +33,6 @@ const val COLUMN_LIKES = "likes"
 const val COLUMN_DISLIKES = "dislikes"
 const val COLUMN_CREATED_AT = "created_at"
 const val COLUMN_UPDATE_STATUS = "update_status"   //Tracking updates
-const val COLUMN_VOTE_STATUS = "vote_status"   //Tracking likes, dislikes changes
 
 //Attributes columns
 const val COLUMN_IS_POSITIVE = "is_positive"
@@ -46,9 +43,6 @@ const val COLUMN_PHOTO_ID = "photo_id"
 
 //Commands
 const val NONE = 0
-const val ADDED_LIKE = 1
-const val ADDED_DISLIKE = 2
-
 const val DELETE_ITEM = 3
 const val UPDATE_ITEM = 2
 const val ADD_ITEM = 1
@@ -70,8 +64,7 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
                     COLUMN_LIKES + " INTEGER," +
                     COLUMN_DISLIKES + " INTEGER," +
                     CREATED_AT + " TEXT," +
-                    COLUMN_UPDATE_STATUS + " INTEGER," +
-                    COLUMN_VOTE_STATUS + " INTEGER" + ")")
+                    COLUMN_UPDATE_STATUS + " INTEGER" + ")")
 
         val CREATE_PHOTO_TABLE =
             ("CREATE TABLE " + PHOTO_TABLE + "(" +
@@ -105,7 +98,6 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
 
     //Adding reviews to remember them in Sqlite
     fun addReview(reviewInfo: ReviewInfoItem) {
-        println("ADD REVIEW")
         val db = writableDatabase //Get db
 
         val values = ContentValues()
@@ -118,7 +110,6 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
         values.put(COLUMN_DISLIKES, reviewInfo.dislikes)
         values.put(CREATED_AT, reviewInfo.created_at)
         values.put(COLUMN_UPDATE_STATUS, NONE)
-        values.put(COLUMN_VOTE_STATUS, NONE)
 
         db.insert(REVIEW_TABLE, null, values)
 
@@ -158,7 +149,6 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
         db.insert(PHOTO_TABLE, null, values)
     }
 
-    @SuppressLint("Recycle")
     fun getAllReviews(canBeDeleted: Boolean): MutableList<ReviewInfoItem> {
 
         val reviews = mutableListOf<ReviewInfoItem>()
@@ -216,14 +206,14 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
     fun parseServerPhotos(reviewID: Int): MutableList<ImageInfo> {
         val photos = mutableListOf<ImageInfo>()
         val db = writableDatabase
-        val photoCursor: Cursor?
+        var photoCursor: Cursor? = null
         try {
-            //println("QUERY select * from $PHOTO_TABLE where $COLUMN_REVIEW_ID=$reviewID and $COLUMN_PHOTO_ID > 0 and $COLUMN_UPDATE_STATUS=$NONE")
             photoCursor = db.rawQuery(
                 "select * from $PHOTO_TABLE where $COLUMN_REVIEW_ID=$reviewID and $COLUMN_PHOTO_ID > 0 and $COLUMN_UPDATE_STATUS=$NONE",
                 null
             )
         } catch (e: SQLiteException) {
+            photoCursor?.close()
             onCreate(db)
             return mutableListOf()
         }
@@ -237,19 +227,23 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
                 photoCursor.moveToNext()
             }
         }
+
+        photoCursor.close()
+
         return photos
     }
 
     fun parseLocalPhotos(reviewID: Int): MutableList<Uri> {
         val photos = mutableListOf<Uri>()
         val db = writableDatabase
-        val photoCursor: Cursor?
+        var photoCursor: Cursor? = null
         try {
             photoCursor = db.rawQuery(
                 "select * from $PHOTO_TABLE where $COLUMN_REVIEW_ID=$reviewID and $COLUMN_PHOTO_ID <0",
                 null
             )
         } catch (e: SQLiteException) {
+            photoCursor?.close()
             onCreate(db)
             return mutableListOf()
         }
@@ -263,19 +257,22 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
                 photoCursor.moveToNext()
             }
         }
+        photoCursor.close()
+
         return photos
     }
 
     fun parseAttributes(reviewID: Int): MutableList<ReviewAttributeInfo> {
         val attributes = mutableListOf<ReviewAttributeInfo>()
         val db = writableDatabase
-        val attributeCursor: Cursor?
+        var attributeCursor: Cursor? = null
         try {
             attributeCursor = db.rawQuery(
                 "select * from $ATTRIBUTES_TABLE where $COLUMN_REVIEW_ID=$reviewID",
                 null
             )
         } catch (e: SQLiteException) {
+            attributeCursor?.close()
             onCreate(db)
             return mutableListOf()
         }
@@ -296,6 +293,8 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
                 attributeCursor.moveToNext()
             }
         }
+        attributeCursor.close()
+
         return attributes
     }
 
@@ -340,14 +339,10 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
         }
 
         //Server photo update status to delete
-        /*for (photo in deletePhotosServer) {
-            val photoValues = ContentValues()
-            values.put(COLUMN_UPDATE_STATUS, DELETE_ITEM)
-            db.update(PHOTO_TABLE, photoValues, "$COLUMN_PHOTO_ID=$photo", null)
-        }*/ //TODO check why this doesnt work!
         for (photo in deletePhotosServer) {
-            db.execSQL("DELETE FROM $PHOTO_TABLE WHERE $COLUMN_PHOTO_ID = $photo")
-            addPhoto(reviewID, PHOTO_ON_SERVER,photo, DELETE_ITEM)
+            val photoValues = ContentValues()
+            photoValues.put(COLUMN_UPDATE_STATUS, DELETE_ITEM)
+            db.update(PHOTO_TABLE, photoValues, "$COLUMN_PHOTO_ID=$photo", null)
         }
 
 
@@ -374,9 +369,9 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
     fun reloadTables() {
         val db = writableDatabase
 
-        db.execSQL("DROP TABLE $ATTRIBUTES_TABLE")
-        db.execSQL("DROP TABLE $PHOTO_TABLE")
-        db.execSQL("DROP TABLE $REVIEW_TABLE")
+        db.execSQL("DROP TABLE IF EXISTS $ATTRIBUTES_TABLE")
+        db.execSQL("DROP TABLE IF EXISTS $PHOTO_TABLE")
+        db.execSQL("DROP TABLE IF EXISTS $REVIEW_TABLE")
         onCreate(db)
     }
 
@@ -405,7 +400,7 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
                         while (!reviewsCursor.isAfterLast) {
 
                             //Update review
-                            var review = parseReview(reviewsCursor)
+                            val review = parseReview(reviewsCursor)
                             reviewsCursor.moveToNext()
 
                             DataGetter.updateReview(
@@ -424,17 +419,19 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
                                     null
                                 )
                             } catch (e: SQLiteException) {
+                                photosCursor?.close()
                                 onCreate(db)
+                                continue
                             }
 
                             if (photosCursor!!.moveToFirst()) {
                                 while (!photosCursor.isAfterLast) {
-                                    var path = photosCursor.getString(
+                                    val path = photosCursor.getString(
                                         photosCursor.getColumnIndex(
                                             COLUMN_PATH
                                         )
                                     )
-                                    println("Uploading photo $path")
+
                                     DataGetter.uploadPhoto(
                                         review.review_id,
                                         Uri.parse(path),
@@ -444,6 +441,7 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
                                     photosCursor.moveToNext()
                                 }
                             }
+                            photosCursor.close()
 
                             //Delete old photos
                             try {
@@ -452,7 +450,9 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
                                     null
                                 )
                             } catch (e: SQLiteException) {
+                                photosCursor.close()
                                 onCreate(db)
+                                continue
                             }
 
                             if (photosCursor!!.moveToFirst()) {
@@ -461,11 +461,11 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
                                         photosCursor.getColumnIndex(COLUMN_PHOTO_ID)
                                     )
 
-                                    println("Deleting photo $id")
                                     DataGetter.deletePhoto(review.review_id, id, auth)
                                     photosCursor.moveToNext()
                                 }
                             }
+                            photosCursor.close()
                         }
                     }
                 }
@@ -473,9 +473,11 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
                 //After networking stuff is done
                 loadedCallback()
             } catch (e: Exception) {
-                println("ERROR HERE!")
                 println(e.stackTraceToString())
                 internetErrorCallback()
+            }
+            finally {
+                reviewsCursor?.close()
             }
         }
 

@@ -151,17 +151,3 @@ data class OrderAttributes(
     var order_by:String,
     var order_type:String
     )
-
-
-/**
- * Offline updates classes
- */
-
-data class LiteReviews(
-    val reviews: MutableList<ReviewInfoItem>,
-    val bonus_photos: LitePhotos
-)
-
-data class LitePhotos(
-    val path: String
-)
