@@ -276,7 +276,7 @@ fun ReviewsScreen(
                         .padding(top = 10.dp)
                 ) {
                     itemsIndexed(reviews!!) { index, item ->
-                        ReviewBox(reviewInfo = item, canEdit = false,false)
+                        ReviewBox(reviewInfo = item, canEdit = false)
                         if (index == reviews!!.lastIndex && result == NO_ERROR) {
                             viewModel.loadReviews(productId, obj)
                         }

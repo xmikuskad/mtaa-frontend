@@ -41,17 +41,18 @@ class AccountActivity : ComponentActivity() {
     private lateinit var offlineViewModel: OfflineDialogViewModel
 
     private lateinit var liteHandler : SqliteHandler
+    val queryParams = OrderAttributes("","")
+    var authKey = ""
 
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val prefs = getSharedPreferences("com.mtaa.techtalk", MODE_PRIVATE)
-        val authKey = prefs.getString("token", "") ?: ""
+        authKey = prefs.getString("token", "") ?: ""
         val name = prefs.getString("username", "") ?: ""
         viewModel = ViewModelProvider(this).get(UserReviewsViewModel::class.java)
         offlineViewModel = ViewModelProvider(this).get(OfflineDialogViewModel::class.java)
-        val queryParams = OrderAttributes("","")
 
         setLanguage(prefs.getString("language", "English"), this)
 
@@ -73,8 +74,25 @@ class AccountActivity : ComponentActivity() {
             }
         }
 
-        if (authKey.isNotEmpty()) {
+        /*if (authKey.isNotEmpty()) {
+            viewModel.finishedSyncing()
             viewModel.loadUserReviews(authKey,queryParams)
+        }*/
+        //liteHandler.reloadTables()
+        liteHandler.syncChanges( {
+            initAccountScreen()},{
+            offlineViewModel.changeResult(NO_INTERNET)
+        })
+
+    }
+
+    fun initAccountScreen() {
+        if (authKey.isNotEmpty()) {
+            viewModel.finishedSyncing()
+            viewModel.loadUserReviewsThread(authKey,queryParams)
+        }
+        else {
+            println("TOO FAST!!!")
         }
     }
 }
@@ -88,10 +106,58 @@ class UserReviewsViewModel: ViewModel() {
 
     lateinit var liteDB:SqliteHandler
 
+    val liveLoadingSync = MutableLiveData(false)
+
     //Set offline model
     fun loadViewModel(viewModel:OfflineDialogViewModel, lite:SqliteHandler) {
         offlineViewModel = viewModel
         liteDB = lite
+
+        //Check for sync changes
+        //liteDB.syncChanges { finishedSyncing() }
+    }
+
+    fun loadUserReviewsThread(authKey: String,obj:OrderAttributes) {
+        MainScope().launch(Dispatchers.Main) {
+            try {
+                liveUserReviews.postValue(null)
+                page = 1
+
+                val userInfo: UserInfo
+                withContext(Dispatchers.IO) {
+                    // do blocking networking on IO thread
+                    userInfo = DataGetter.getUserInfo(authKey, page,obj)
+                    page++
+                }
+                offlineViewModel.changeResult(NO_ERROR)
+                liveUserReviews.postValue(liveUserReviews.value?.plus(userInfo.reviews) ?: userInfo.reviews)
+                trustScore.postValue(userInfo.trust_score)
+
+                println("PAGE IS $page")
+                if(page == 2) {
+                    liteDB.reloadTables()
+                    println("RELOADING TABLE!")
+                }
+                //Add to Sqlite
+                for(review in userInfo.reviews)
+                    liteDB.addReview(review)
+
+            } catch (e: Exception) {
+                println(e.stackTraceToString())
+                when (e) {
+                    is ConnectTimeoutException -> {
+                        offlineViewModel.changeResult(SERVER_OFFLINE)
+                    }
+                    is ConnectException -> {
+                        offlineViewModel.changeResult(NO_INTERNET)
+                    }
+                    is ClientRequestException -> {
+                        //This is OK, the list it empty
+                    }
+                    else -> offlineViewModel.changeResult(OTHER_ERROR)
+                }
+            }
+        }
     }
 
     fun loadUserReviews(authKey: String,obj:OrderAttributes) {
@@ -111,8 +177,8 @@ class UserReviewsViewModel: ViewModel() {
                     liteDB.reloadTables()
                 }
 
-                //ADDED
-                println("ADDING")
+                //Add to Sqlite
+                println("Adding")
                 for(review in userInfo.reviews)
                     liteDB.addReview(review)
 
@@ -135,7 +201,9 @@ class UserReviewsViewModel: ViewModel() {
     }
 
     fun loadOfflineReviews() {
+        println("LOADING OFFLINE REVIEWS HERE")
         val reviews = liteDB.getAllReviews(false)
+        println("review size ${reviews.size}")
 
         liveUserReviews.value = liveUserReviews.value?.plus(reviews) ?: reviews
         trustScore.value = -1
@@ -146,6 +214,11 @@ class UserReviewsViewModel: ViewModel() {
         liveUserReviews.value = mutableListOf()
         page = 1
         loadUserReviews(authKey,obj)
+    }
+
+    //Called as callback after finishing syncing
+    fun finishedSyncing() {
+        liveLoadingSync.postValue(true)
     }
 }
 
@@ -162,28 +235,25 @@ fun AccountScreen(
     val result = offlineViewModel.loadingResult.observeAsState(initial = NO_ERROR)
     val isFirst = remember { mutableStateOf(true) }
     val isOffline = remember { mutableStateOf(false)}
+    val doneSyncing by viewModel.liveLoadingSync.observeAsState(initial = false)
 
     //Show warning that we are offline
     if (result.value != NO_ERROR && result.value != WAITING_FOR_CONFIRMATION) {
-        /*OfflineDialog(
-            callback = {
-                offlineViewModel.changeResult(WAITING_FOR_CONFIRMATION)
-                if (authKey != null) {
-                    viewModel.loadUserReviews(authKey, obj)
-                }
-            },
-            result = result.value
-        )*/
         if (!isOffline.value) {
             viewModel.loadOfflineReviews()
         }
         isOffline.value = true
     }
 
+    if(!doneSyncing && !isOffline.value) {
+        LoadingScreen(label = "Syncing changes")
+        return
+    }
+
     val orderState = remember { mutableStateOf(DrawerValue.Closed) }
 
-    //Open order window
-    if (orderState.value == DrawerValue.Open) {
+    //Open order window, only if we are online!
+    if (orderState.value == DrawerValue.Open && !isOffline.value) {
         Dialog(onDismissRequest = { orderState.value = DrawerValue.Closed }) {
 
             Card(
@@ -297,7 +367,7 @@ fun AccountScreen(
                         .padding(top = 10.dp)
                 ) {
                     itemsIndexed(userReviews!!) { index, item ->
-                        ReviewBox(reviewInfo = item, canEdit = true,isOffline.value)
+                        ReviewBox(reviewInfo = item, canEdit = true)
                         if (index == userReviews!!.lastIndex && result.value == NO_ERROR) {
                             if (authKey != null) {
                                 viewModel.loadUserReviews(authKey, obj)

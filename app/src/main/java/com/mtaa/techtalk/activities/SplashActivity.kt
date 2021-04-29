@@ -41,8 +41,8 @@ const val WAITING_FOR_CONFIRMATION = -4
 
 class SplashActivity : ComponentActivity() {
     companion object InitialData {
-        lateinit var categories : CategoriesInfo
-        lateinit var reviews : ReviewsInfo
+        var categories : CategoriesInfo? = null
+        var reviews : ReviewsInfo? = null
     }
 
     private lateinit var viewModel: OfflineDialogViewModel

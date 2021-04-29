@@ -96,7 +96,7 @@ class MainMenuActivity : ComponentActivity() {
 
         //If we came from splash screen load preloaded data
         if (prevScreen == "splash" || prevScreen == "first-launch") {
-            viewModel.loadRecentReviews(SplashActivity.reviews.reviews)
+            SplashActivity.reviews?.let { viewModel.loadRecentReviews(it.reviews) }
         } else { //Update data and download again
             loadReview()
         }
@@ -153,7 +153,7 @@ class MainMenuViewModel: ViewModel() {
     val liveRecentReviews = MutableLiveData<List<ReviewInfoItem>>()
 
     fun loadCategoriesMenu() {
-        liveCategories.value = SplashActivity.categories.categories
+        liveCategories.value = SplashActivity.categories?.categories ?: emptyList()
     }
 
     fun loadRecentReviews(reviews: List<ReviewInfoItem>) {
@@ -541,7 +541,7 @@ fun MenuScreen(
             modifier = Modifier.padding(top = 5.dp)
         ) {
             items(reviews) { item ->
-                ReviewBox(item,false,false)
+                ReviewBox(item,false)
             }
         }
     }
@@ -569,7 +569,7 @@ fun CategoryMainMenu(item:CategoryInfo,context: Context){
 
 //This is design for one review
 @Composable
-fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean, isOffline:Boolean) {
+fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean) {
     val context = LocalContext.current
 
     //Calculate before showing
@@ -588,7 +588,7 @@ fun ReviewBox(reviewInfo: ReviewInfoItem, canEdit:Boolean, isOffline:Boolean) {
             .fillMaxWidth()
             .clickable(onClick = {
                 if (canEdit) {
-                    openReviewEdit(context, reviewInfo.review_id, isOffline)
+                    openReviewEdit(context, reviewInfo.review_id)
                 } else {
                     openReviewInfo(context, reviewInfo.review_id)
                 }
@@ -690,10 +690,9 @@ fun openReviewInfo(context: Context,reviewID: Int) {
 }
 
 //Open review edit (called from account screen only!)
-fun openReviewEdit(context: Context,reviewID: Int, isOffline:Boolean) {
+fun openReviewEdit(context: Context,reviewID: Int) {
     val intent = Intent(context, EditReviewActivity::class.java)
     intent.putExtra("reviewID",reviewID)
-    intent.putExtra("isOffline",isOffline)
     context.startActivity(intent)
 }
 

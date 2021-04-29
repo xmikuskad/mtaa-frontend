@@ -120,35 +120,35 @@ class AddReviewActivity: ComponentActivity() {
 }
 
 class AddReviewViewModel: ViewModel() {
-    val livePositive= MutableLiveData<List<ReviewAttributePostPutInfo>>()
-    val liveNegative= MutableLiveData<List<ReviewAttributePostPutInfo>>()
+    val livePositive= MutableLiveData<List<ReviewAttributeInfo>>()
+    val liveNegative= MutableLiveData<List<ReviewAttributeInfo>>()
     val liveImage= MutableLiveData<List<Uri>>()
 
     //Add positive attribute to list
     fun addPositive(text:String){
         livePositive.value = livePositive.value?.plus(
-            ReviewAttributePostPutInfo(text,true)
-        ) ?: mutableListOf(ReviewAttributePostPutInfo(text,true))
+            ReviewAttributeInfo(text,true)
+        ) ?: mutableListOf(ReviewAttributeInfo(text,true))
     }
 
     //Delete positive attribute from list
     fun deletePositive(text: String){
         livePositive.value = livePositive.value?.minus(
-            ReviewAttributePostPutInfo(text,true)
+            ReviewAttributeInfo(text,true)
         )
     }
 
     //Add negative attribute to list
     fun addNegative(text:String){
         liveNegative.value = liveNegative.value?.plus(
-            ReviewAttributePostPutInfo(text,false)
-        ) ?: mutableListOf(ReviewAttributePostPutInfo(text,false))
+            ReviewAttributeInfo(text,false)
+        ) ?: mutableListOf(ReviewAttributeInfo(text,false))
     }
 
     //Delete negative attribute from list
     fun deleteNegative(text:String){
         liveNegative.value = liveNegative.value?.minus(
-            ReviewAttributePostPutInfo(text,false)
+            ReviewAttributeInfo(text,false)
         )
     }
 
@@ -166,8 +166,8 @@ class AddReviewViewModel: ViewModel() {
 @Composable
 fun AddReviewScreen(
     addReviewActivity: AddReviewActivity,
-    livePositives: LiveData<List<ReviewAttributePostPutInfo>>,
-    liveNegatives: LiveData<List<ReviewAttributePostPutInfo>>,
+    livePositives: LiveData<List<ReviewAttributeInfo>>,
+    liveNegatives: LiveData<List<ReviewAttributeInfo>>,
     viewModel: AddReviewViewModel,
     productID:Int,
     prefs:SharedPreferences,
@@ -507,7 +507,7 @@ fun AddReviewScreen(
                             val info = DataGetter.createReview(
                                 ReviewPostInfo(
                                     reviewText.text,
-                                    (positives + negatives) as MutableList<ReviewAttributePostPutInfo>,
+                                    (positives + negatives) as MutableList<ReviewAttributeInfo>,
                                     productID, (sliderPosition * 100).roundToInt()
                                 ), auth
                             )

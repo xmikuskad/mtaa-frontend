@@ -51,7 +51,7 @@ class CategoriesActivity : ComponentActivity() {
 @Composable
 fun CategoryScreen() {
     val context = LocalContext.current
-    val categories = SplashActivity.categories.categories
+    val categories = SplashActivity.categories?.categories ?: mutableListOf()
 
     Column(
         modifier = Modifier

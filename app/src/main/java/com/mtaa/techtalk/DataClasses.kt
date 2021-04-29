@@ -112,15 +112,11 @@ data class ImageInfo(
 
 data class ReviewPostInfo(
     val text: String,
-    val attributes: MutableList<ReviewAttributePostPutInfo>,
+    val attributes: MutableList<ReviewAttributeInfo>,
     val product_id: Int,
     val score: Int
     )
 
-data class ReviewAttributePostPutInfo(
-    val text: String,
-    val is_positive: Boolean
-    )
 
 /**
  * Reviews other
@@ -128,7 +124,7 @@ data class ReviewAttributePostPutInfo(
 
 data class ReviewPutInfo(
     val text: String,
-    val attributes: MutableList<ReviewAttributePostPutInfo>,
+    val attributes: MutableList<ReviewAttributeInfo>,
     val score: Int
     )
 data class ReviewVotesInfo(

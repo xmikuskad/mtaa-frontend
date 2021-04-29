@@ -1,6 +1,7 @@
 package com.mtaa.techtalk.activities
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
@@ -26,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ContentInfoCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -56,8 +58,6 @@ class EditReviewActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(EditReviewViewModel::class.java)
         viewModel.setLiteDb(liteDB)
         val reviewID = intent.getIntExtra("reviewID",-1)
-        val isOffline = intent.getBooleanExtra("isOffline",false)
-
 
         setLanguage(prefs.getString("language", "English"), this)
 
@@ -70,7 +70,7 @@ class EditReviewActivity : ComponentActivity() {
                     topBar = { TopBar(scaffoldState, scope) },
                     drawerContent = { Drawer(prefs) }
                 ) {
-                    EditReviewScreen(viewModel,this,prefs,reviewID,isOffline)
+                    EditReviewScreen(viewModel,this,prefs,reviewID)
                 }
             }
         }
@@ -89,8 +89,9 @@ class EditReviewActivity : ComponentActivity() {
                 //Need to be called here to prevent blocking UI
                 viewModel.loadReviewData(review)
             } catch (e: Exception) {
-                //Review wasn't found
+                viewModel.setIsOfflineThread(true)
                 println(e.stackTraceToString())
+
             }
         }
     }
@@ -100,7 +101,7 @@ class EditReviewActivity : ComponentActivity() {
         val intent = Intent()
         intent.type = "image/*"
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true)
-        intent.action = Intent.ACTION_GET_CONTENT
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
         startActivityForResult(Intent.createChooser(intent,"Select images"), PICK_IMAGES_CODE)
     }
 
@@ -115,12 +116,19 @@ class EditReviewActivity : ComponentActivity() {
                     val count = data.clipData?.itemCount ?: 0 //Number of images
                     for(i in 0 until count) {
                         val imageUri = data.clipData!!.getItemAt(i).uri
+                        if (imageUri != null) {
+                            contentResolver.takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
                         viewModel.addPhoto(imageUri)
                     }
                 }
                 else {
                     //One image
                     val imageUri = data.data
+
+                    if (imageUri != null) {
+                        contentResolver.takePersistableUriPermission(imageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
                     viewModel.addPhoto(imageUri)
                 }
             }
@@ -129,15 +137,16 @@ class EditReviewActivity : ComponentActivity() {
 }
 
 class EditReviewViewModel: ViewModel() {
-    val livePositive= MutableLiveData<List<ReviewAttributePostPutInfo>>()
-    val liveNegative= MutableLiveData<List<ReviewAttributePostPutInfo>>()
+    val livePositive= MutableLiveData<List<ReviewAttributeInfo>>()
+    val liveNegative= MutableLiveData<List<ReviewAttributeInfo>>()
     val liveImage= MutableLiveData<List<Uri>>()
 
-    var positives = mutableListOf<ReviewAttributePostPutInfo>()
-    var negatives = mutableListOf<ReviewAttributePostPutInfo>()
+    var positives = mutableListOf<ReviewAttributeInfo>()
+    var negatives = mutableListOf<ReviewAttributeInfo>()
 
     val liveReview= MutableLiveData<ReviewInfo>()
     var liteDB :SqliteHandler? = null
+    val isOffline= MutableLiveData(false)
 
     //Get review data from server
     fun loadReviewData(review:ReviewInfo) {
@@ -157,8 +166,12 @@ class EditReviewViewModel: ViewModel() {
         liteDB=lite
     }
 
+    fun setIsOfflineThread(value:Boolean) {
+        isOffline.postValue(value)
+    }
 
     fun loadOfflineReview(id:Int) {
+        println("!!! LOADING OFFLINE REVIEW")
         val review = liteDB?.getReview(id)
         if(review!=null) {
             liveReview.value = ReviewInfo(
@@ -191,37 +204,37 @@ class EditReviewViewModel: ViewModel() {
 
     //Add positive attribute
     fun addPositive(text:String){
-        positives.add(ReviewAttributePostPutInfo(text,true))
+        positives.add(ReviewAttributeInfo(text,true))
         livePositive.value = positives
     }
 
     //Edit positive attribute
     fun editPositive(text:String, position:Int) {
-        positives[position] = ReviewAttributePostPutInfo(text,true)
+        positives[position] = ReviewAttributeInfo(text,true)
         livePositive.value = positives
     }
 
     //Delete positive attribute
     fun deletePositive(text: String){
-        positives.remove(ReviewAttributePostPutInfo(text,true))
+        positives.remove(ReviewAttributeInfo(text,true))
         livePositive.value = positives
     }
 
     //Add negative attribute
     fun addNegative(text:String){
-        negatives.add(ReviewAttributePostPutInfo(text,false))
+        negatives.add(ReviewAttributeInfo(text,false))
         liveNegative.value = negatives
     }
 
     //Edit negative attribute
     fun editNegative(text:String, position:Int) {
-        negatives[position] = ReviewAttributePostPutInfo(text,false)
+        negatives[position] = ReviewAttributeInfo(text,false)
         liveNegative.value = negatives
     }
 
     //Delete negative attribute
     fun deleteNegative(text:String){
-        negatives.remove(ReviewAttributePostPutInfo(text,false))
+        negatives.remove(ReviewAttributeInfo(text,false))
         liveNegative.value = negatives
     }
 
@@ -242,13 +255,13 @@ fun EditReviewScreen(
     viewModel: EditReviewViewModel,
     activity: EditReviewActivity,
     prefs: SharedPreferences,
-    reviewID: Int,
-    isOffline: Boolean
+    reviewID: Int
 ) {
     val positives by viewModel.livePositive.observeAsState(initial = mutableListOf())
     val negatives by viewModel.liveNegative.observeAsState(initial = mutableListOf())
     val images by viewModel.liveImage.observeAsState(initial = mutableListOf())
     val review by viewModel.liveReview.observeAsState(initial = null)
+    val isOffline by viewModel.isOffline.observeAsState(initial = false)
 
     var positiveText by remember { mutableStateOf(TextFieldValue("")) }
     var negativeText by remember { mutableStateOf(TextFieldValue("")) }
@@ -657,7 +670,9 @@ fun EditReviewScreen(
                         }),
                     )
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-                        Button(onClick = { viewModel.deletePhoto(image) }) {
+                        Button(onClick = {
+                            viewModel.deletePhoto(image)
+                        }) {
                             Text(context.getString(R.string.delete))
                         }
                         //Spacer(modifier = Modifier.height(10.dp))
@@ -703,7 +718,7 @@ fun EditReviewScreen(
                 if(isOffline) {
                     SqliteHandler(activity,null).updateReview(ReviewPutInfo(
                         reviewText.text,
-                        (positives + negatives) as MutableList<ReviewAttributePostPutInfo>,
+                        (positives + negatives) as MutableList<ReviewAttributeInfo>,
                         (sliderPosition * 100).roundToInt()
                     ),reviewID,deletePhotos,images)
                     openScreen(context, AccountActivity())
@@ -719,7 +734,7 @@ fun EditReviewScreen(
                             DataGetter.updateReview(
                                 ReviewPutInfo(
                                     reviewText.text,
-                                    (positives + negatives) as MutableList<ReviewAttributePostPutInfo>,
+                                    (positives + negatives) as MutableList<ReviewAttributeInfo>,
                                     (sliderPosition * 100).roundToInt()
                                 ), reviewID, auth
                             )
