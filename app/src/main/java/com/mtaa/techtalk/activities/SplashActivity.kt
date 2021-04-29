@@ -99,15 +99,16 @@ class SplashActivity : ComponentActivity() {
                 context.startActivity(intent)
             } catch (e: Exception) {
                 println(e.stackTraceToString())
-                when (e) {
-                    is ConnectTimeoutException -> {
-                        viewModel.changeResult(SERVER_OFFLINE)
-                    }
-                    is ConnectException -> {
-                        viewModel.changeResult(NO_INTERNET)
-                    }
-                    else -> viewModel.changeResult(OTHER_ERROR)
+                //Load new screen
+                val intent = if (isFirstRun) {
+                    Intent(context, FirstLaunchActivity::class.java)
+                } else {
+                    Intent(context, MainMenuActivity::class.java)
                 }
+                intent.putExtra("activity","splash")
+                intent.flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                context.startActivity(intent)
             }
         }
     }

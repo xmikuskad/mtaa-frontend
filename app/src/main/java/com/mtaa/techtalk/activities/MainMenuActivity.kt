@@ -34,11 +34,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.mtaa.techtalk.CategoryInfo
-import com.mtaa.techtalk.DataGetter
+import com.mtaa.techtalk.*
 import com.mtaa.techtalk.R
-import com.mtaa.techtalk.ReviewInfoItem
-import com.mtaa.techtalk.ReviewsInfo
 import com.mtaa.techtalk.ui.theme.TechTalkGray
 import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.network.sockets.*
@@ -84,7 +81,7 @@ class MainMenuActivity : ComponentActivity() {
         }
     }
 
-    //This is called on activity creation
+    //This is also called on activity creation or on back pressed
     override fun onResume() {
         super.onResume()
         setUpWebsocket()
@@ -92,11 +89,15 @@ class MainMenuActivity : ComponentActivity() {
 
     //Get data from splash screen or load new data
     fun initMainMenu(prevScreen:String) {
-        viewModel.loadCategoriesMenu() //They are the same, no need to reload
+        if(SplashActivity.categories != null)
+            viewModel.loadCachedCategories() //They are the same, no need to reload
+        else {
+            loadCategories() //Network was down
+        }
 
         //If we came from splash screen load preloaded data
-        if (prevScreen == "splash" || prevScreen == "first-launch") {
-            SplashActivity.reviews?.let { viewModel.loadRecentReviews(it.reviews) }
+        if ((prevScreen == "splash" || prevScreen == "first-launch")&& SplashActivity.reviews != null) {
+            viewModel.loadRecentReviews(SplashActivity.reviews!!.reviews)
         } else { //Update data and download again
             loadReview()
         }
@@ -127,14 +128,38 @@ class MainMenuActivity : ComponentActivity() {
         }
     }
 
+    private fun loadCategories(){
+        MainScope().launch(Dispatchers.Main) {
+            try {
+                var categories : CategoriesInfo
+                withContext(Dispatchers.IO) {
+                    // do blocking networking on IO thread
+                    categories = DataGetter.getCategories()
+                }
+                //Need to be called here to prevent blocking UI
+                SplashActivity.categories = categories
+                viewModel.loadCategories(categories.categories)
+            } catch (e: Exception) {
+                println(e.stackTraceToString())
+                when (e) {
+                    is ConnectTimeoutException -> {
+                        offlineViewModel.changeResult(SERVER_OFFLINE)
+                    }
+                    is ConnectException -> {
+                        offlineViewModel.changeResult(NO_INTERNET)
+                    }
+                    else -> offlineViewModel.changeResult(OTHER_ERROR)
+                }
+            }
+        }
+    }
+
     private fun setUpWebsocket() {
         MainScope().launch(Dispatchers.Main) {
             try {
                 withContext(Dispatchers.IO) {
                     // do blocking networking on IO thread
-                    //DataGetter.votesUpdateListener(reviewID,callback = { loadReview()})
                     DataGetter.recentReviewsUpdateListener(callback = {
-                        println("HIIIIIRRR !!!!!!!!!!!!!!!")
                         loadReview()
                     })
                 }
@@ -152,8 +177,12 @@ class MainMenuViewModel: ViewModel() {
     val liveCategories = MutableLiveData<List<CategoryInfo>>()
     val liveRecentReviews = MutableLiveData<List<ReviewInfoItem>>()
 
-    fun loadCategoriesMenu() {
+    fun loadCachedCategories() {
         liveCategories.value = SplashActivity.categories?.categories ?: emptyList()
+    }
+
+    fun loadCategories(categories:MutableList<CategoryInfo>) {
+        liveCategories.value = categories
     }
 
     fun loadRecentReviews(reviews: List<ReviewInfoItem>) {
@@ -509,7 +538,7 @@ fun MenuScreen(
         }
 
         //If we have some connection problem
-        if(result != NO_ERROR) {
+        /*if(result != NO_ERROR) {
             OfflineDialog(
                 callback = {
                     offlineViewModel.changeResult(NO_ERROR)
@@ -517,7 +546,7 @@ fun MenuScreen(
                 },
                 result = result
             )
-        }
+        }*/
 
         IconButton(onClick = {
             openCategories(context)
@@ -543,6 +572,11 @@ fun MenuScreen(
             items(reviews) { item ->
                 ReviewBox(item,false)
             }
+        }
+
+        //If we have some connection problem
+        if(result != NO_ERROR) {
+            LoadingScreen(label = "CONNECTION PROBLEM")
         }
     }
 }
