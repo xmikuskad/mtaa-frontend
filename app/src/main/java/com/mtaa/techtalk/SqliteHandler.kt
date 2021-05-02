@@ -481,7 +481,12 @@ class SqliteHandler(context: Context,factory: SQLiteDatabase.CursorFactory?) : S
             }
         }
 
+    }
 
-
+    fun setReviewsToUpdated() {
+        val db = writableDatabase
+        val values = ContentValues()
+        values.put(COLUMN_UPDATE_STATUS, NONE)
+        db.update(REVIEW_TABLE, values, "$COLUMN_UPDATE_STATUS>$NONE", null)
     }
 }

@@ -30,6 +30,7 @@ import com.mtaa.techtalk.ui.theme.TechTalkTheme
 import io.ktor.network.sockets.*
 import kotlinx.coroutines.*
 import com.mtaa.techtalk.R
+import com.mtaa.techtalk.SqliteHandler
 import com.mtaa.techtalk.ui.theme.TechTalkGray
 import java.net.ConnectException
 
@@ -70,10 +71,20 @@ class SplashActivity : ComponentActivity() {
                     SplashScreen(viewModel,isFirstRun,this)
 
                     //Download main menu data and load next activity
-                    initApplication(this, isFirstRun)
+                    //initApplication(this, isFirstRun)
                 }
             }
         }
+
+        val liteHandler = SqliteHandler(this,null)
+        liteHandler.syncChanges(
+            loadedCallback = {
+                initApplication(this, isFirstRun)
+                liteHandler.setReviewsToUpdated()
+            },
+            internetErrorCallback = {
+                loadMainMenu(this, isFirstRun)
+            })
     }
 
     //Load initial data
@@ -91,17 +102,22 @@ class SplashActivity : ComponentActivity() {
             }
             finally {
                 //Load new screen
-                val intent = if (isFirstRun) {
-                    Intent(context, FirstLaunchActivity::class.java)
-                } else {
-                    Intent(context, MainMenuActivity::class.java)
-                }
-                intent.putExtra("activity","splash")
-                intent.flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
-                context.startActivity(intent)
+                loadMainMenu(context,isFirstRun)
             }
         }
+    }
+
+    private fun loadMainMenu(context:Context, isFirstRun: Boolean) {
+        //Load new screen
+        val intent = if (isFirstRun) {
+            Intent(context, FirstLaunchActivity::class.java)
+        } else {
+            Intent(context, MainMenuActivity::class.java)
+        }
+        intent.putExtra("activity","splash")
+        intent.flags =
+            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION
+        context.startActivity(intent)
     }
 }
 

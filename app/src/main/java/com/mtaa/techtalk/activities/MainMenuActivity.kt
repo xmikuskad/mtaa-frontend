@@ -563,7 +563,7 @@ fun MenuScreen(
 
         //If we have some connection problem
         if(result != NO_ERROR) {
-            LoadingScreen(label = "CONNECTION PROBLEM")
+            LoadingScreen(label = context.getString(R.string.err_internet_problem))
         }
     }
 }

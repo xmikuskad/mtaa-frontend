@@ -112,4 +112,6 @@
     <string name="uploading_photo">Nahrávanie fotky</string>
     <string name="one_positive_negative">Musíte pridať aspoň jedno pozitívum a negatívum!</string>
     <string name="review_text_empty">Musíte pridať text recenzie!</string>
+    <string name="syncing">Synchronizujem zmeny</string>
+    <string name="err_internet_problem">Naskytol sa problém s internetovým pripojením</string>
 </resources>

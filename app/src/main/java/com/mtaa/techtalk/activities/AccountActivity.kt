@@ -1,5 +1,6 @@
 package com.mtaa.techtalk.activities
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -57,7 +58,7 @@ class AccountActivity : ComponentActivity() {
         setLanguage(prefs.getString("language", "English"), this)
 
         liteHandler = SqliteHandler(this,null)
-        viewModel.loadViewModel(offlineViewModel,liteHandler)
+        viewModel.loadViewModel(offlineViewModel,liteHandler,prefs)
 
         setContent {
             TechTalkTheme(setColorScheme(prefs)) {
@@ -97,13 +98,15 @@ class UserReviewsViewModel: ViewModel() {
     private var page = 1
 
     lateinit var liteDB:SqliteHandler
+    lateinit var prefs:SharedPreferences
 
     val liveLoadingSync = MutableLiveData(false)
 
     //Set offline model
-    fun loadViewModel(viewModel:OfflineDialogViewModel, lite:SqliteHandler) {
+    fun loadViewModel(viewModel:OfflineDialogViewModel, lite:SqliteHandler,preferences: SharedPreferences) {
         offlineViewModel = viewModel
         liteDB = lite
+        prefs = preferences
     }
 
     fun loadUserReviewsThread(authKey: String,obj:OrderAttributes) {
@@ -118,6 +121,9 @@ class UserReviewsViewModel: ViewModel() {
                     userInfo = DataGetter.getUserInfo(authKey, page,obj)
                     page++
                 }
+
+                prefs.edit().putInt("rating", userInfo.trust_score).apply()
+
                 offlineViewModel.changeResult(NO_ERROR)
                 liveUserReviews.postValue(liveUserReviews.value?.plus(userInfo.reviews) ?: userInfo.reviews)
                 trustScore.postValue(userInfo.trust_score)
@@ -190,7 +196,7 @@ class UserReviewsViewModel: ViewModel() {
         val reviews = liteDB.getAllReviews(false)
 
         liveUserReviews.value = liveUserReviews.value?.plus(reviews) ?: reviews
-        trustScore.value = -1
+        trustScore.value = prefs.getInt("rating",-1)
     }
 
     //Delete all reviews and load them again
@@ -230,7 +236,7 @@ fun AccountScreen(
     }
 
     if(!doneSyncing && !isOffline.value) {
-        LoadingScreen(label = "Syncing changes")
+        LoadingScreen(label = context.getString(R.string.syncing),)
         return
     }
 
